@@ -72,7 +72,6 @@
 
 
 # path to your config file
-#CONFIG="${HOME}/.config/wine.encode.cfg"
 CONFIG="${HOME}/.config/wine.encode.cfg"
 
 while IFS='= ' read lhs rhs
