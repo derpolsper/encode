@@ -9,7 +9,7 @@ windows tools do work at least sufficiently in a wine environment.
 I have to admit I'm not that guy on the command line I wish I was. 
 My first attempt to write a script to ease my encoding, it was crap.
 Thanks to drstrangelove420, who pointed me to avs2yuv, I thought it over, re-
-wrote it completely and I hope, now it is usable and is more assistance 
+wrote it completely and I hope, it is usable now and is more assistance 
 than burden.
 
 I have written this script to produce test encodes in a kind of *cough* 
@@ -44,15 +44,14 @@ The bash script itself: wine.encode.sh and a config wine.encode.cfg.
 You can place the script whereever you want, maybe somewhere in your $PATH.
 The config file I suggest to place to 
 ~/.config/wine.encode.cfg
-but any other place may be suitable.
-Anyway, you have to edit the line 
-CONFIG="/home/<user>/.config/wine.encode.cfg"
+but any other place may be suitable. In the latter case, you have to edit the line 
+CONFIG="{HOME}/.config/wine.encode.cfg"
 which right now is around line 70 in the script.
 
 The config file stores all important parameters, the volatile ones, which
 change throughout the encoding process as well as the more constant ones you do
 not change without reason. The "more constant ones" are those between double
-lines of #.
+lines of #. If you want to change them, use your editor of choice.
 
 
 Requirements:
