@@ -252,6 +252,7 @@ case "$ANSWER10" in
 	echo "wine.encode.cfg and begin again."
 	echo ""
 	read -p "press enter to continue"
+
 	;;
 
 	1)	# 1 - copy your m2ts/ VOB files into a h264/ mpeg2 file
@@ -364,6 +365,7 @@ case "$ANSWER10" in
 	fi
 
 	if [ -e /usr/bin/beep ]; then beep $BEEP; fi
+
 	;;
 
 	2)	# 2 - create a avs file for first test and test encode with suitable integer crf
@@ -389,6 +391,7 @@ case "$ANSWER10" in
 		# keep cfg informed
 		sed -i '/TESTAVS/d' $CONFIG
 		echo "TESTAVS=$TESTAVS" >> $CONFIG
+
 		;;
 
 		n|N|No|NO) # write a .avs
@@ -539,7 +542,7 @@ case "$ANSWER10" in
 		echo "SAR=$SAR" >> $CONFIG
 
 		# find correct height, width and reframes for test encodes only
-		# movie encoding may have different values
+		# final movie encoding may have different values
 
 		DARHEIGHT0=$(mediainfo $SOURCE|grep Height|awk '{print $3$4}'|sed 's/[a-z]//g')
 		# keep cfg informed
@@ -566,6 +569,8 @@ case "$ANSWER10" in
 		echo ""
 		read -e -p "crf > " CRFHIGH
 
+		START=$(date +%s)
+
 		for ((CRF1=$CRFLOW; $CRF1<=$CRFHIGH; CRF1=$CRF1+1));do
 			echo ""
 			echo "encoding ${SOURCE%.*}.crf$CRF1.mkv"
@@ -587,6 +592,10 @@ case "$ANSWER10" in
 			-o ${SOURCE%.*}.crf$CRF1.mkv -;
 		done
 
+		STOP=$(date +%s);
+		TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
+		echo "test encodings for integer crf lasted $TIME"
+
 		if [ -e /usr/bin/beep ]; then beep $BEEP; fi
 		
 	echo ""
@@ -596,6 +605,7 @@ case "$ANSWER10" in
 	echo "this integer and run the script with"
 	echo "option 3"
 	echo ""
+
 	;;
 
 	3)	# 3 - a second round for fractionals of crf
@@ -618,6 +628,8 @@ case "$ANSWER10" in
 	echo ""
 	read -e -p "fractionals > " CRFFRACTIONAL
 
+	START=$(date +%s)
+
 	for ((CRF2=$CRFLOW2; $CRF2<=$CRFHIGH2; CRF2+=$CRFFRACTIONAL));do
 		echo ""
 		echo "encoding ${SOURCE%.*}.crf$CRF2.mkv"
@@ -638,6 +650,10 @@ case "$ANSWER10" in
 		--no-psy \
 		-o ${SOURCE%.*}.crf$CRF2.mkv -;
 	done
+
+	STOP=$(date +%s);
+	TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
+	echo "test encodings for fractional crf lasted $TIME"
 
 	if [ -e /usr/bin/beep ]; then beep $BEEP; fi
 
@@ -683,6 +699,8 @@ case "$ANSWER10" in
 	echo ""
 	read -e -p "fractionals > " QCOMPFRACTIONAL
 
+	START=$(date +%s)
+
 	for ((QCOMPNUMBER=$QCOMPLOW; $QCOMPNUMBER<=$QCOMPHIGH; QCOMPNUMBER+=$QCOMPFRACTIONAL));do
 		echo ""
 		echo "encoding ${SOURCE%.*}.crf$CRF.qc$QCOMPNUMBER.mkv"
@@ -705,6 +723,10 @@ case "$ANSWER10" in
 		-o ${SOURCE%.*}.crf$CRF.qc$QCOMPNUMBER.mkv -;
 	done
 
+	STOP=$(date +%s);
+	TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
+	echo "test encodings for qcomp lasted $TIME"
+
 	if [ -e /usr/bin/beep ]; then beep $BEEP; fi
 
 	echo ""
@@ -725,6 +747,7 @@ case "$ANSWER10" in
 	echo "from here, run the script with"
 	echo "option 5"
 	echo ""
+
 	;;
 
 	5)	# 5 - variations in aq strength and psy-rd
@@ -768,6 +791,8 @@ case "$ANSWER10" in
 	echo "this will last some time…"
 	echo ""
 
+	START=$(date +%s)
+
 	for ((AQNUMBER=$AQLOW; $AQNUMBER<=$AQHIGH; AQNUMBER+=$AQFRACTIONAL));do
 		for ((PSY1NUMBER=$PSY1LOW; $PSY1NUMBER<=$PSY1HIGH; PSY1NUMBER+=$PSY1FRACTIONAL));do
 			echo ""
@@ -793,6 +818,10 @@ case "$ANSWER10" in
 			-o ${SOURCE%.*}.crf$CRF.qc$QCOMP.aq$AQNUMBER.psy$PSY1NUMBER.mkv -;
 		done
 	done
+
+	STOP=$(date +%s);
+	TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
+	echo " test encodings for aq strength and psy-rd lasted $TIME"
 
 	if [ -e /usr/bin/beep ]; then beep $BEEP; fi
 
@@ -855,6 +884,8 @@ case "$ANSWER10" in
 			echo ""
 			read -e -p "fractionals > " PSY2FRACTIONAL
 
+			START=$(date +%s)
+
 			for ((PSY2NUMBER=$PSY2LOW; $PSY2NUMBER<=$PSY2HIGH; PSY2NUMBER+=$PSY2FRACTIONAL));do
 				echo ""
 				echo "encoding ${SOURCE%.*}.crf$CRF.qc$QCOMP.aq$AQS.psy$PSYRD.$PSY2NUMBER.mkv"
@@ -878,6 +909,11 @@ case "$ANSWER10" in
 				--psy-rd $PSYRD:$(echo "scale=1;$PSY2NUMBER/100"|bc) \
 				-o ${SOURCE%.*}.crf$CRF.qc$QCOMP.aq$AQS.psy$PSYRD.$PSY2NUMBER.mkv -;
 			done
+
+			STOP=$(date +%s);
+			TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
+			echo "test encodings for psy-trellis lasted $TIME"
+
 			if [ -e /usr/bin/beep ]; then beep $BEEP; fi
 
 			echo ""
@@ -918,6 +954,7 @@ case "$ANSWER10" in
 	echo "for optimal crf"
 	echo "option 7"
 	echo ""
+
 	;;
 
 	7)	# 7 - another round of crf
@@ -941,6 +978,8 @@ case "$ANSWER10" in
 	echo ""
 	read -e -p "fractionals > " CRFFRACTIONAL2
 
+	START=$(date +%s)
+
 	for ((CRFNUMBER2=$CRFLOW2; $CRFNUMBER2<=$CRFHIGH2; CRFNUMBER2+=$CRFFRACTIONAL2));do
 		echo ""
 		echo "encoding ${SOURCE%.*}.qc$QCOMP.aq$AQS.psy$PSYRD.$PSYTR.crf$CRFNUMBER2.mkv"
@@ -963,6 +1002,10 @@ case "$ANSWER10" in
 		-o ${SOURCE%.*}.qc$QCOMP.aq$AQS.psy$PSYRD.$PSYTR.crf$CRFNUMBER2.mkv -;
 	done
 
+	STOP=$(date +%s);
+	TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
+	echo "test encodings for a second round of crf lasted $TIME"
+
 	if [ -e /usr/bin/beep ]; then beep $BEEP; fi
 
 	echo ""
@@ -983,6 +1026,7 @@ case "$ANSWER10" in
 	echo "to encode the whole movie with"
 	echo "option 8"
 	echo ""
+
 	;;
 
 	8)	# 8 - encode the whole movie
@@ -1065,9 +1109,11 @@ case "$ANSWER10" in
 	echo "REF1=$REF1" >> $CONFIG
 
 	echo ""
-	echo "encoding ${SOURCE%.*}.final.1080.mkv"
-	echo "with $DARWIDTH1×$DARHEIGHT1"
+	echo "now encoding ${SOURCE%.*}.final.1080.mkv"
+	echo "with $DARWIDTH1×$DARHEIGHT1…"
 	echo ""
+
+	START=$(date +%s)
 
 	wine ~/$WINE/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $AVS - \
 	| x264 --stdin y4m \
@@ -1089,7 +1135,13 @@ case "$ANSWER10" in
 	--vf crop:$LEFT,$TOP,$RIGHT,$BOTTOM \
 	-o ${SOURCE%.*}.final.1080.mkv -;
 
+	STOP=$(date +%s);
+	TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
+	echo "encoding ${SOURCE%.*}.final.1080.mkv"
+	echo "with $DARWIDTH1×$DARHEIGHT1 lasted $TIME"
+
 	if [ -e /usr/bin/beep ]; then beep $BEEP; fi
+
 	;;
 
 	7|72|720|720p)
@@ -1105,8 +1157,8 @@ case "$ANSWER10" in
 	read -e -p "width > " WIDTH7
 
 	echo ""
-	echo "encoding ${SOURCE%.*}.final.720.mkv"
-	echo "with $WIDTH7×$HEIGHT7"
+	echo "now encoding ${SOURCE%.*}.final.720.mkv"
+	echo "with $WIDTH7×$HEIGHT7…"
 	echo ""
 
 	# Get Reframes for 720p
@@ -1114,7 +1166,9 @@ case "$ANSWER10" in
 	# keep cfg informed
 	sed -i '/REF7/d' $CONFIG
 	echo "REF7=$REF7" >> $CONFIG
-	
+
+	START=$(date +%s)
+
 	wine ~/$WINE/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $AVS - \
 	| x264 --stdin y4m \
 	--crf $CRF \
@@ -1134,7 +1188,13 @@ case "$ANSWER10" in
 	--vf crop:$LEFT,$TOP,$RIGHT,$BOTTOM/resize:$WIDTH7,$HEIGHT7 \
 	-o ${SOURCE%.*}.final.720.mkv -;
 
+	STOP=$(date +%s);
+	TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
+	echo "encoding ${SOURCE%.*}.final.720.mkv"
+	echo "with $WIDTH7×$HEIGHT7 lasted $TIME"
+
 	if [ -e /usr/bin/beep ]; then beep $BEEP; fi
+
 	;;
 
 	s|S|sd|SD)
@@ -1150,8 +1210,8 @@ case "$ANSWER10" in
 	read -e -p "width > " WIDTH5
 
 	echo ""
-	echo "encoding ${SOURCE%.*}.final.SD.mkv"
-	echo "with $WIDTH5×$HEIGHT5"
+	echo "now encoding ${SOURCE%.*}.final.SD.mkv"
+	echo "with $WIDTH5×$HEIGHT5…"
 	echo ""
 
 
@@ -1163,7 +1223,9 @@ case "$ANSWER10" in
 	# keep cfg informed
 	sed -i '/REF5/d' $CONFIG
 	echo "REF5=$REF5" >> $CONFIG
-	
+
+	START=$(date +%s)
+
 	wine ~/$WINE/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $AVS - \
 	| x264 --stdin y4m \
 	--crf $CRF \
@@ -1184,7 +1246,13 @@ case "$ANSWER10" in
 	--vf crop:$LEFT,$TOP,$RIGHT,$BOTTOM/resize:$WIDTH5,$HEIGHT5 \
 	-o ${SOURCE%.*}.final.SD.mkv -;
 
+	STOP=$(date +%s);
+	TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
+	echo "encoding ${SOURCE%.*}.final.SD.mkv"
+	echo "with $WIDTH5×$HEIGHT5 lasted $TIME"
+
 	if [ -e /usr/bin/beep ]; then beep $BEEP; fi
+
 	;;
 
 	a|A)
@@ -1215,8 +1283,8 @@ case "$ANSWER10" in
 	read -e -p "width > " WIDTH7
 
 	echo ""
-	echo "encoding ${SOURCE%.*}.final.SD.mkv"
-	echo "with $HEIGHT5×$WIDTH5"
+	echo "now encoding ${SOURCE%.*}.final.SD.mkv"
+	echo "with $HEIGHT5×$WIDTH5…"
 	echo ""
 
 	# Get Reframes for SD
@@ -1224,7 +1292,9 @@ case "$ANSWER10" in
 	# keep cfg informed
 	sed -i '/REF5/d' $CONFIG
 	echo "REF5=$REF5" >> $CONFIG
-	
+
+	START=$(date +%s)
+
 	wine ~/$WINE/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $AVS - \
 	| x264 --stdin y4m \
 	--crf $CRF \
@@ -1245,9 +1315,14 @@ case "$ANSWER10" in
 	--vf crop:$LEFT,$TOP,$RIGHT,$BOTTOM/resize:$WIDTH5,$HEIGHT5 \
 	-o ${SOURCE%.*}.final.SD.mkv -;
 
+	STOP=$(date +%s);
+	TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
+	echo "encoding ${SOURCE%.*}.final.SD.mkv"
+	echo "with $HEIGHT5×$WIDTH5 lasted $TIME"
+
 	echo ""
-	echo "encoding ${SOURCE%.*}.final.720.mkv"
-	echo "with $WIDTH7×$HEIGHT7"
+	echo "now encoding ${SOURCE%.*}.final.720.mkv"
+	echo "with $WIDTH7×$HEIGHT7…"
 	echo ""
 
 	# Get Reframes for 720p
@@ -1256,6 +1331,8 @@ case "$ANSWER10" in
 	sed -i '/REF7/d' $CONFIG
 	echo "REF7=$REF7" >> $CONFIG
 	
+	START=$(date +%s)
+
 	wine ~/$WINE/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $AVS - \
 	| x264 --stdin y4m \
 	--crf $CRF \
@@ -1276,9 +1353,11 @@ case "$ANSWER10" in
 	--vf crop:$LEFT,$TOP,$RIGHT,$BOTTOM/resize:$WIDTH7,$HEIGHT7 \
 	-o ${SOURCE%.*}.final.720.mkv -;
 
+	STOP=$(date +%s);
+	TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
 	echo ""
-	echo "encoding ${SOURCE%.*}.final.1080.mkv"
-	echo "with $DARWIDTH1×$DARHEIGHT1"
+	echo "encoding ${SOURCE%.*}.final.720.mkv"
+	echo "with $WIDTH7×$HEIGHT7 lasted $TIME"
 	echo ""
 
 	# Get Reframes for 1080
@@ -1288,6 +1367,13 @@ case "$ANSWER10" in
 	# keep cfg informed
 	sed -i '/REF1/d' $CONFIG
 	echo "REF1=$REF1" >> $CONFIG
+
+	echo ""
+	echo "now encoding ${SOURCE%.*}.final.1080.mkv"
+	echo "with $DARWIDTH1×$DARHEIGHT1…"
+	echo ""
+
+	START=$(date +%s)
 
 	wine ~/$WINE/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $AVS - \
 	| x264 --stdin y4m \
@@ -1308,6 +1394,14 @@ case "$ANSWER10" in
 	--deblock $DEBLOCK \
 	--vf crop:$LEFT,$TOP,$RIGHT,$BOTTOM \
 	-o ${SOURCE%.*}.final.1080.mkv -;
+
+	STOP=$(date +%s);
+	TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
+	echo ""
+	echo "encoding ${SOURCE%.*}.final.1080.mkv"
+	echo "with $DARWIDTH1×$DARHEIGHT1 lasted $TIME"
+	echo ""
+
 
 	if [ -e /usr/bin/beep ]; then beep $BEEP; fi
 	;;
