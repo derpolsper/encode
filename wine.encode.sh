@@ -569,12 +569,15 @@ case "$answer10" in
 		echo ""
 		read -e -p "crf > " crfhigh
 
-		start=$(date +%s)
+		start0=$(date +%s)
 
 		for ((crf1=$crflow; $crf1<=$crfhigh; crf1=$crf1+1));do
 			echo ""
 			echo "encoding ${source%.*}.crf$crf1.mkv"
 			echo ""
+
+			start1=$(date +%s)
+
 			wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
 			| x264 --stdin y4m \
 			--crf $crf1 \
@@ -592,15 +595,13 @@ case "$answer10" in
 			-o ${source%.*}.crf$crf1.mkv -;
 
 			stop=$(date +%s);
-			time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
-
+			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 			echo "encoding for ${source%.*}.crf$crf1.mkv lasted $time"
 
 		done
 
 		stop=$(date +%s);
-		time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
-
+		time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
 		echo "test encodings for integer crf lasted $time"
 
 		if [ -e /usr/bin/beep ]; then beep $beep; fi
@@ -635,12 +636,15 @@ case "$answer10" in
 	echo ""
 	read -e -p "fractionals > " crffractional
 
-	start=$(date +%s)
+	start0=$(date +%s)
 
 	for ((crf2=$crflow2; $crf2<=$crfhigh2; crf2+=$crffractional));do
 		echo ""
 		echo "encoding ${source%.*}.crf$crf2.mkv"
 		echo ""
+
+		start1=$(date +%s)
+
 		wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
 		| x264 --stdin y4m \
 		--crf $(printf '%s.%s' "$(($crf2/10))" "$(($crf2%10))") \
@@ -658,14 +662,13 @@ case "$answer10" in
 		-o ${source%.*}.crf$crf2.mkv -;
 
 		stop=$(date +%s);
-		time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
-
+		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 		echo "encoding for ${source%.*}.crf$crf2.mkv lasted $time"
+
 	done
 
 	stop=$(date +%s);
-	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
-
+	time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
 	echo "test encodings for fractional crf lasted $time"
 
 	if [ -e /usr/bin/beep ]; then beep $beep; fi
@@ -712,12 +715,15 @@ case "$answer10" in
 	echo ""
 	read -e -p "fractionals > " qcompfractional
 
-	start=$(date +%s)
+	start0=$(date +%s)
 
 	for ((qcompnumber=$qcomplow; $qcompnumber<=$qcomphigh; qcompnumber+=$qcompfractional));do
 		echo ""
 		echo "encoding ${source%.*}.crf$crf.qc$qcompnumber.mkv"
 		echo ""
+
+		start1=$(date +%s)
+
 		wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
 		| x264 --stdin y4m \
 		--crf $crf \
@@ -736,13 +742,13 @@ case "$answer10" in
 		-o ${source%.*}.crf$crf.qc$qcompnumber.mkv -;
 
 		stop=$(date +%s);
-		time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
+		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 		echo "encoding for ${source%.*}.crf$crf.qc$qcompnumber.mkv lasted $time"
 
 	done
 
 	stop=$(date +%s);
-	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
+	time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
 	echo "test encodings for qcomp lasted $time"
 
 	if [ -e /usr/bin/beep ]; then beep $beep; fi
@@ -809,13 +815,16 @@ case "$answer10" in
 	echo "this will last some time…"
 	echo ""
 
-	start=$(date +%s)
+	start0=$(date +%s)
 
 	for ((aqnumber=$aqlow; $aqnumber<=$aqhigh; aqnumber+=$aqfractional));do
 		for ((psy1number=$psy1low; $psy1number<=$psy1high; psy1number+=$psy1fractional));do
 			echo ""
 			echo "encoding ${source%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv"
 			echo ""
+
+			start1=$(date +%s)
+
 			wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
 			| x264 --stdin y4m \
 			--crf $crf \
@@ -836,7 +845,7 @@ case "$answer10" in
 			-o ${source%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv -;
 
 			stop=$(date +%s);
-			time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
+			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 			echo "encoding for ${source%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv lasted $time"
 
 	
@@ -844,7 +853,8 @@ case "$answer10" in
 	done
 
 	stop=$(date +%s);
-	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
+	time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
+
 	echo " test encodings for aq strength and psy-rd lasted $time"
 
 	if [ -e /usr/bin/beep ]; then beep $beep; fi
@@ -908,12 +918,15 @@ case "$answer10" in
 			echo ""
 			read -e -p "fractionals > " psy2fractional
 
-			start=$(date +%s)
+			start0=$(date +%s)
 
 			for ((psy2number=$psy2low; $psy2number<=$psy2high; psy2number+=$psy2fractional));do
 				echo ""
 				echo "encoding ${source%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv"
 				echo ""
+
+				start1=$(date +%s)
+
 				wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
 				| x264 --stdin y4m \
 				--crf $crf \
@@ -934,13 +947,13 @@ case "$answer10" in
 				-o ${source%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv -;
 
 				stop=$(date +%s);
-				time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
+				time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 				echo "encoding for ${source%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv lasted $time"
 
 			done
 
 			stop=$(date +%s);
-			time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
+			time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
 			echo "test encodings for psy-trellis lasted $time"
 
 			if [ -e /usr/bin/beep ]; then beep $beep; fi
@@ -1007,12 +1020,15 @@ case "$answer10" in
 	echo ""
 	read -e -p "fractionals > " crffractional2
 
-	start=$(date +%s)
+	start0=$(date +%s)
 
 	for ((crfnumber2=$crflow2; $crfnumber2<=$crfhigh2; crfnumber2+=$crffractional2));do
 		echo ""
 		echo "encoding ${source%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv"
 		echo ""
+
+		start1=$(date +%s)
+
 		wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
 		| x264 --stdin y4m \
 		--qcomp $qcomp \
@@ -1031,13 +1047,13 @@ case "$answer10" in
 		-o ${source%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv -;
 
 		stop=$(date +%s);
-		time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
+		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 		echo "encoding for ${source%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv lasted $time"
 
 	done
 
 	stop=$(date +%s);
-	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
+	time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
 	echo "test encodings for a second round of crf lasted $time"
 
 	if [ -e /usr/bin/beep ]; then beep $beep; fi
@@ -1349,7 +1365,8 @@ case "$answer10" in
 	--vf crop:$left,$top,$right,$bottom/resize:$width5,$height5 \
 	-o ${source%.*}.final.SD.mkv -;
 
-	stop=$(date +%s);
+	stop=$(date +%s)
+
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo "encoding ${source%.*}.final.SD.mkv"
 	echo "with $height5×$width5 lasted $time"
@@ -1389,7 +1406,6 @@ case "$answer10" in
 
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
-
 	echo ""
 	echo "encoding ${source%.*}.final.720.mkv"
 	echo "with $width7×$height7 lasted $time"
@@ -1432,12 +1448,10 @@ case "$answer10" in
 
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
-
 	echo ""
 	echo "encoding ${source%.*}.final.1080.mkv"
 	echo "with $darwidth1×$darheight1 lasted $time"
 	echo ""
-
 
 	if [ -e /usr/bin/beep ]; then beep $beep; fi
 	;;
