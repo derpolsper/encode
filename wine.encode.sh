@@ -590,6 +590,11 @@ case "$ANSWER10" in
 			--deblock $DEBLOCK \
 			--no-psy \
 			-o ${SOURCE%.*}.crf$CRF1.mkv -;
+
+			STOP=$(date +%s);
+			TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
+			echo "encoding for ${SOURCE%.*}.crf$CRF1.mkv lasted $TIME"
+
 		done
 
 		STOP=$(date +%s);
@@ -649,6 +654,10 @@ case "$ANSWER10" in
 		--deblock $DEBLOCK \
 		--no-psy \
 		-o ${SOURCE%.*}.crf$CRF2.mkv -;
+
+		STOP=$(date +%s);
+		TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
+		echo "encoding for ${SOURCE%.*}.crf$CRF2.mkv lasted $TIME"
 	done
 
 	STOP=$(date +%s);
@@ -721,6 +730,11 @@ case "$ANSWER10" in
 		--deblock $DEBLOCK \
 		--qcomp $(echo "scale=1;$QCOMPNUMBER/100"|bc) \
 		-o ${SOURCE%.*}.crf$CRF.qc$QCOMPNUMBER.mkv -;
+
+		STOP=$(date +%s);
+		TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
+		echo "encoding for ${SOURCE%.*}.crf$CRF.qc$QCOMPNUMBER.mkv lasted $TIME"
+
 	done
 
 	STOP=$(date +%s);
@@ -816,6 +830,12 @@ case "$ANSWER10" in
 			--aq-strength $(echo "scale=1;$AQNUMBER/100"|bc) \
 			--psy-rd $(echo "scale=1;$PSY1NUMBER/100"|bc):unset \
 			-o ${SOURCE%.*}.crf$CRF.qc$QCOMP.aq$AQNUMBER.psy$PSY1NUMBER.mkv -;
+
+			STOP=$(date +%s);
+			TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
+			echo "encoding for ${SOURCE%.*}.crf$CRF.qc$QCOMP.aq$AQNUMBER.psy$PSY1NUMBER.mkv lasted $TIME"
+
+	
 		done
 	done
 
@@ -908,6 +928,11 @@ case "$ANSWER10" in
 				--deblock $DEBLOCK \
 				--psy-rd $PSYRD:$(echo "scale=1;$PSY2NUMBER/100"|bc) \
 				-o ${SOURCE%.*}.crf$CRF.qc$QCOMP.aq$AQS.psy$PSYRD.$PSY2NUMBER.mkv -;
+
+				STOP=$(date +%s);
+				TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
+				echo "encoding for ${SOURCE%.*}.crf$CRF.qc$QCOMP.aq$AQS.psy$PSYRD.$PSY2NUMBER.mkv lasted $TIME"
+
 			done
 
 			STOP=$(date +%s);
@@ -1000,6 +1025,11 @@ case "$ANSWER10" in
 		--deblock $DEBLOCK \
 		--crf $(echo "scale=1;$CRFNUMBER2/10"|bc) \
 		-o ${SOURCE%.*}.qc$QCOMP.aq$AQS.psy$PSYRD.$PSYTR.crf$CRFNUMBER2.mkv -;
+
+		STOP=$(date +%s);
+		TIME=$(date -u -d "0 $STOP seconds - $START seconds" +"%H:%M:%S")
+		echo "encoding for ${SOURCE%.*}.qc$QCOMP.aq$AQS.psy$PSYRD.$PSYTR.crf$CRFNUMBER2.mkv lasted $TIME"
+
 	done
 
 	STOP=$(date +%s);
