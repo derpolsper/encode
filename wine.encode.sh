@@ -559,6 +559,12 @@ case "$answer10" in
 		sed -i '/ref0/d' $config
 		echo "ref0=$ref0" >> $config
 
+		# isolate the source file name without file extension
+		# bash parameter expansion does not allow nesting, so do it in two steps
+		sourc2=${source##*/}
+		sed -i '/sourc2/d' $config
+		echo "sourc2=$sourc2" >> $config
+
 		echo ""
 		echo "set lowest crf as integer, e.g. 15"
 		echo ""
@@ -573,7 +579,7 @@ case "$answer10" in
 
 		for ((crf1=$crflow; $crf1<=$crfhigh; crf1=$crf1+1));do
 			echo ""
-			echo "encoding ${source%.*}.crf$crf1.mkv"
+			echo "encoding ${sourc2%.*}.crf$crf1.mkv"
 			echo ""
 
 			start1=$(date +%s)
@@ -596,7 +602,7 @@ case "$answer10" in
 
 			stop=$(date +%s);
 			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-			echo "encoding for ${source%.*}.crf$crf1.mkv lasted $time"
+			echo "encoding for ${sourc2%.*}.crf$crf1.mkv lasted $time"
 
 		done
 
@@ -640,7 +646,7 @@ case "$answer10" in
 
 	for ((crf2=$crflow2; $crf2<=$crfhigh2; crf2+=$crffractional));do
 		echo ""
-		echo "encoding ${source%.*}.crf$crf2.mkv"
+		echo "encoding ${sourc2%.*}.crf$crf2.mkv"
 		echo ""
 
 		start1=$(date +%s)
@@ -663,7 +669,7 @@ case "$answer10" in
 
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-		echo "encoding for ${source%.*}.crf$crf2.mkv lasted $time"
+		echo "encoding for ${sourc2%.*}.crf$crf2.mkv lasted $time"
 
 	done
 
@@ -719,7 +725,7 @@ case "$answer10" in
 
 	for ((qcompnumber=$qcomplow; $qcompnumber<=$qcomphigh; qcompnumber+=$qcompfractional));do
 		echo ""
-		echo "encoding ${source%.*}.crf$crf.qc$qcompnumber.mkv"
+		echo "encoding ${sourc2%.*}.crf$crf.qc$qcompnumber.mkv"
 		echo ""
 
 		start1=$(date +%s)
@@ -743,7 +749,7 @@ case "$answer10" in
 
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-		echo "encoding for ${source%.*}.crf$crf.qc$qcompnumber.mkv lasted $time"
+		echo "encoding for ${sourc2%.*}.crf$crf.qc$qcompnumber.mkv lasted $time"
 
 	done
 
@@ -820,7 +826,7 @@ case "$answer10" in
 	for ((aqnumber=$aqlow; $aqnumber<=$aqhigh; aqnumber+=$aqfractional));do
 		for ((psy1number=$psy1low; $psy1number<=$psy1high; psy1number+=$psy1fractional));do
 			echo ""
-			echo "encoding ${source%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv"
+			echo "encoding ${sourc2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv"
 			echo ""
 
 			start1=$(date +%s)
@@ -846,7 +852,7 @@ case "$answer10" in
 
 			stop=$(date +%s);
 			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-			echo "encoding for ${source%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv lasted $time"
+			echo "encoding for ${sourc2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv lasted $time"
 
 	
 		done
@@ -922,7 +928,7 @@ case "$answer10" in
 
 			for ((psy2number=$psy2low; $psy2number<=$psy2high; psy2number+=$psy2fractional));do
 				echo ""
-				echo "encoding ${source%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv"
+				echo "encoding ${sourc2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv"
 				echo ""
 
 				start1=$(date +%s)
@@ -948,7 +954,7 @@ case "$answer10" in
 
 				stop=$(date +%s);
 				time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-				echo "encoding for ${source%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv lasted $time"
+				echo "encoding for ${sourc2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv lasted $time"
 
 			done
 
@@ -1024,7 +1030,7 @@ case "$answer10" in
 
 	for ((crfnumber2=$crflow2; $crfnumber2<=$crfhigh2; crfnumber2+=$crffractional2));do
 		echo ""
-		echo "encoding ${source%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv"
+		echo "encoding ${sourc2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv"
 		echo ""
 
 		start1=$(date +%s)
@@ -1048,7 +1054,7 @@ case "$answer10" in
 
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-		echo "encoding for ${source%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv lasted $time"
+		echo "encoding for ${sourc2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv lasted $time"
 
 	done
 
@@ -1159,7 +1165,7 @@ case "$answer10" in
 	echo "ref1=$ref1" >> $config
 
 	echo ""
-	echo "now encoding ${source%.*}.final.1080.mkv"
+	echo "now encoding ${sourc2%.*}.final.1080.mkv"
 	echo "with $darwidth1×$darheight1…"
 	echo ""
 
@@ -1187,7 +1193,7 @@ case "$answer10" in
 
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
-	echo "encoding ${source%.*}.final.1080.mkv"
+	echo "encoding ${sourc2%.*}.final.1080.mkv"
 	echo "with $darwidth1×$darheight1 lasted $time"
 
 	if [ -e /usr/bin/beep ]; then beep $beep; fi
@@ -1207,7 +1213,7 @@ case "$answer10" in
 	read -e -p "width > " width7
 
 	echo ""
-	echo "now encoding ${source%.*}.final.720.mkv"
+	echo "now encoding ${sourc2%.*}.final.720.mkv"
 	echo "with $width7×$height7…"
 	echo ""
 
@@ -1240,7 +1246,7 @@ case "$answer10" in
 
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
-	echo "encoding ${source%.*}.final.720.mkv"
+	echo "encoding ${sourc2%.*}.final.720.mkv"
 	echo "with $width7×$height7 lasted $time"
 
 	if [ -e /usr/bin/beep ]; then beep $beep; fi
@@ -1260,7 +1266,7 @@ case "$answer10" in
 	read -e -p "width > " width5
 
 	echo ""
-	echo "now encoding ${source%.*}.final.SD.mkv"
+	echo "now encoding ${sourc2%.*}.final.SD.mkv"
 	echo "with $width5×$height5…"
 	echo ""
 
@@ -1298,7 +1304,7 @@ case "$answer10" in
 
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
-	echo "encoding ${source%.*}.final.SD.mkv"
+	echo "encoding ${sourc2%.*}.final.SD.mkv"
 	echo "with $width5×$height5 lasted $time"
 
 	if [ -e /usr/bin/beep ]; then beep $beep; fi
@@ -1333,7 +1339,7 @@ case "$answer10" in
 	read -e -p "width > " width7
 
 	echo ""
-	echo "now encoding ${source%.*}.final.SD.mkv"
+	echo "now encoding ${sourc2%.*}.final.SD.mkv"
 	echo "with $height5×$width5…"
 	echo ""
 
@@ -1368,11 +1374,11 @@ case "$answer10" in
 	stop=$(date +%s)
 
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
-	echo "encoding ${source%.*}.final.SD.mkv"
+	echo "encoding ${sourc2%.*}.final.SD.mkv"
 	echo "with $height5×$width5 lasted $time"
 
 	echo ""
-	echo "now encoding ${source%.*}.final.720.mkv"
+	echo "now encoding ${sourc2%.*}.final.720.mkv"
 	echo "with $width7×$height7…"
 	echo ""
 
@@ -1407,7 +1413,7 @@ case "$answer10" in
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo ""
-	echo "encoding ${source%.*}.final.720.mkv"
+	echo "encoding ${sourc2%.*}.final.720.mkv"
 	echo "with $width7×$height7 lasted $time"
 	echo ""
 
@@ -1420,7 +1426,7 @@ case "$answer10" in
 	echo "ref1=$ref1" >> $config
 
 	echo ""
-	echo "now encoding ${source%.*}.final.1080.mkv"
+	echo "now encoding ${sourc2%.*}.final.1080.mkv"
 	echo "with $darwidth1×$darheight1…"
 	echo ""
 
@@ -1449,7 +1455,7 @@ case "$answer10" in
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo ""
-	echo "encoding ${source%.*}.final.1080.mkv"
+	echo "encoding ${sourc2%.*}.final.1080.mkv"
 	echo "with $darwidth1×$darheight1 lasted $time"
 	echo ""
 
