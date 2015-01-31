@@ -602,7 +602,7 @@ case "$answer10" in
 
 			stop=$(date +%s);
 			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-			echo "encoding for ${sourc2%.*}.crf$crf1.mkv lasted $time"
+			echo "encoding ${sourc2%.*}.crf$crf1.mkv lasted $time"
 
 		done
 
@@ -669,7 +669,7 @@ case "$answer10" in
 
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-		echo "encoding for ${sourc2%.*}.crf$crf2.mkv lasted $time"
+		echo "encoding ${sourc2%.*}.crf$crf2.mkv lasted $time"
 
 	done
 
@@ -749,7 +749,7 @@ case "$answer10" in
 
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-		echo "encoding for ${sourc2%.*}.crf$crf.qc$qcompnumber.mkv lasted $time"
+		echo "encoding ${sourc2%.*}.crf$crf.qc$qcompnumber.mkv lasted $time"
 
 	done
 
@@ -852,7 +852,7 @@ case "$answer10" in
 
 			stop=$(date +%s);
 			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-			echo "encoding for ${sourc2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv lasted $time"
+			echo "encoding ${sourc2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv lasted $time"
 
 	
 		done
@@ -954,7 +954,7 @@ case "$answer10" in
 
 				stop=$(date +%s);
 				time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-				echo "encoding for ${sourc2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv lasted $time"
+				echo "encoding ${sourc2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv lasted $time"
 
 			done
 
@@ -1054,7 +1054,7 @@ case "$answer10" in
 
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-		echo "encoding for ${sourc2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv lasted $time"
+		echo "encoding ${sourc2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv lasted $time"
 
 	done
 
