@@ -745,6 +745,7 @@ case "$answer10" in
 		--subme $subme \
 		--aq-mode $aqmode \
 		--deblock $deblock \
+		--no-psy \
 		--qcomp $(echo "scale=2;$qcompnumber/100"|bc) \
 		-o ${source%.*}.crf$crf.qc$qcompnumber.mkv -;
 
