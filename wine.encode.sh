@@ -375,8 +375,8 @@ case "$answer10" in
 	echo "$source1, right?"
 
 	echo ""
-	echo "do you have a suitable test avs file already? (y|n)"
-	read -e -p "> " answer20
+	echo "do you have a suitable test avs file already?"
+	read -e -p "(y|n) > " answer20
 	echo ""
 
 	case "$answer20" in
@@ -442,7 +442,7 @@ case "$answer10" in
 		echo "qualities of your video source:"
 		echo "(i)nterlaced? (t)elecined? (b)oth? (n)either nor?"
 		echo ""
-		read -e -p "> " answer40
+		read -e -p "(i|t|b|n) > " answer40
 
 		case "$answer40" in
 
@@ -567,14 +567,14 @@ case "$answer10" in
 		echo "source2=$source2" >> $config
 
 		echo ""
-		echo "set lowest crf as integer, e.g. 15"
+		echo "set minimum crf as integer, e.g. 15"
 		echo ""
-		read -e -p "crf > " crflow
+		read -e -p "crf, lowest value > " crflow
 
 		echo ""
-		echo "set highst crf as integer, e.g. 20"
+		echo "set maximum crf as integer, e.g. 20"
 		echo ""
-		read -e -p "crf > " crfhigh
+		read -e -p "crf, maximum value > " crfhigh
 
 		start0=$(date +%s)
 
@@ -708,13 +708,13 @@ case "$answer10" in
 	echo "first, set lowest qcomp value"
 	echo "e.g. 60 for 0.60"
 	echo ""
-	read -e -p "qcomp > " qcomplow
+	read -e -p "qcomp, lowest value > " qcomplow
 
 	echo ""
-	echo "set highst qcomp value"
+	echo "set maximum qcomp value"
 	echo "e.g. 80 for 0.80"
 	echo ""
-	read -e -p "qcomp > " qcomphigh
+	read -e -p "qcomp, maximum value > " qcomphigh
 
 	echo ""
 	echo "set fractional steps, e.g. 5 for 0.05"
@@ -788,14 +788,14 @@ case "$answer10" in
 	echo "aq strength: default is 1.0"
 	echo "film ~1.0, animation ~0.6, grain ~0.5"
 	echo ""
-	echo "set lower limit of aq strength, e.g. 50 for 0.5"
+	echo "set lowest value of aq strength, e.g. 50 for 0.5"
 	echo ""
-	read -e -p "aq strength, lower limit > " aqlow
+	read -e -p "aq strength, lowest value > " aqlow
 
 	echo ""
-	echo "set upper limit of aq strength, e.g. 100 for 1.0"
+	echo "set maximum value of aq strength, e.g. 100 for 1.0"
 	echo ""
-	read -e -p "aq strength, upper limit > " aqhigh
+	read -e -p "aq strength, maximum value > " aqhigh
 
 	echo ""
 	echo "set fractional steps, e.g. 5 for 0.05 or 10 for 0.10"
@@ -805,14 +805,14 @@ case "$answer10" in
 
 	echo ""
 	echo "psy-rd: default is 1.0, test with values around 0.9 to 1.2"
-	echo "set lower limit of psy-rd, e.g. 90 for 0.9"
+	echo "set lowest value of psy-rd, e.g. 90 for 0.9"
 	echo ""
-	read -e -p "psy-rd, lower limit > " psy1low
+	read -e -p "psy-rd, lowest value > " psy1low
 
 	echo ""
-	echo "upper limit of psy-rd, e.g. 120 for 1.2"
+	echo "maximum value of psy-rd, e.g. 120 for 1.2"
 	echo ""
-	read -e -p "psy-rd, upper limit> " psy1high
+	read -e -p "psy-rd, maximum value > " psy1high
 
 	echo ""
 	echo "fractional steps for psy-rd values"
@@ -903,11 +903,11 @@ case "$answer10" in
 	
 	6)	# 6 - variations in psy-trellis
 
-	case $(echo "$psytr" - 0.99999 | bc) in
+	case $(echo "$psyrd" - 0.99999 | bc) in
 
 		-*) # psy-rd <1 -> psytr unset
-		echo "as psy-rd is set to a value < 1"
-		echo "psy-trellis is unset automatically"
+		echo "as psy-rd is set to a value < 1 (or not at all)"
+		echo "psy-trellis is set to \"unset\" automatically"
 		echo ""
 
 		# keep cfg informed
@@ -916,7 +916,7 @@ case "$answer10" in
 
 		;;
 
-		*) # psytr >= 1
+		*) # psyrd >= 1
 		echo "your testing ended up with psy-rd ≥1"
 		echo "you may (t)est for psy-trellis"
 		echo "or (u)nset psy-trellis"
@@ -929,14 +929,14 @@ case "$answer10" in
 
 			echo "psy-trellis: default is 0.0"
 			echo "test for values ~0.0 to 0.15"
-			echo "set lower limit for psy-trellis, e.g. 0 for 0.0"
+			echo "set lowest value for psy-trellis, e.g. 0 for 0.0"
 			echo ""
-			read -e -p "psy-trellis, lower limit > " psy2low
+			read -e -p "psy-trellis, lowest value > " psy2low
 
 			echo ""
-			echo "set upper limit for psy-trellis, e.g. 10 for 0.1"
+			echo "set maximum value for psy-trellis, e.g. 10 for 0.1"
 			echo ""
-			read -e -p "psy-trellis, upper limit > " psy2high
+			read -e -p "psy-trellis, maximum value > " psy2high
 
 			echo ""
 			echo "set fractional steps, e.g. 5 for 0.05"
@@ -996,25 +996,27 @@ case "$answer10" in
 			sed -i '/psytr/d' $config
 			echo "psytr=$psytr" >> $config
 
-		;;
+			;;
 
-		u|U) # unset psy-trellis
+			u|U) # unset psy-trellis
 
 			# keep cfg informed
 			sed -i '/psytr/d' $config
 			echo "psytr=unset" >> $config
+			echo ""
 			echo "psy trellis is set to \"unset\"."
-		;;
+			echo ""
 
-		esac
+			;;
 
-		;;
+			*) # neither any of the above
 
-		*)
+			echo "stupid, that's neither \"t\" nor \"u\" :-) "
+			exit
 
-		echo "stupid, that's neither yes or no :-) "
-		exit
+			;;
 
+			esac
 		;;
 
 	esac
@@ -1033,13 +1035,13 @@ case "$answer10" in
 	echo "set lowest crf value as hundreds,"
 	echo "e.g. 168 for 16.8"
 	echo ""
-	read -e -p "crf > " crflow2
+	read -e -p "crf, lowest value > " crflow2
 
 	echo ""
 	echo "set highst crf value as hundreds,"
 	echo "e.g. 172 for 17.2"
 	echo ""
-	read -e -p "crf > " crfhigh2
+	read -e -p "crf, maximum value > " crfhigh2
 
 	echo ""
 	echo "set fractional steps, e.g. 1 for 0.1"
