@@ -535,6 +535,7 @@ case "$answer10" in
 		esac
 
 		echo "set sar as fraction with a slash: /"
+		echo "e.g. 16/15"
 		read -e -p "sar > " sar
 
 		# keep cfg informed
@@ -744,7 +745,7 @@ case "$answer10" in
 		--subme $subme \
 		--aq-mode $aqmode \
 		--deblock $deblock \
-		--qcomp $(echo "scale=1;$qcompnumber/100"|bc) \
+		--qcomp $(echo "scale=2;$qcompnumber/100"|bc) \
 		-o ${source%.*}.crf$crf.qc$qcompnumber.mkv -;
 
 		stop=$(date +%s);
@@ -846,8 +847,8 @@ case "$answer10" in
 			--subme $subme \
 			--aq-mode $aqmode \
 			--deblock $deblock \
-			--aq-strength $(echo "scale=1;$aqnumber/100"|bc) \
-			--psy-rd $(echo "scale=1;$psy1number/100"|bc):unset \
+			--aq-strength $(echo "scale=2;$aqnumber/100"|bc) \
+			--psy-rd $(echo "scale=2;$psy1number/100"|bc):unset \
 			-o ${source%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv -;
 
 			stop=$(date +%s);
@@ -949,7 +950,7 @@ case "$answer10" in
 				--subme $subme \
 				--aq-mode $aqmode \
 				--deblock $deblock \
-				--psy-rd $psyrd:$(echo "scale=1;$psy2number/100"|bc) \
+				--psy-rd $psyrd:$(echo "scale=2;$psy2number/100"|bc) \
 				-o ${source%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv -;
 
 				stop=$(date +%s);
