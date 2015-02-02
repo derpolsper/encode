@@ -1,31 +1,17 @@
-During the years, much great software for advanced video encoding has been 
-written, unfortunately most of it for windows only. So linux users, 
-who want to produce high quality encodings have to use a windows 
-installation either natively or in a virtual machine - or use that windows 
-runtime environment named wine, which is available for all major distributions.
-Thanks to all the great coders in the wine project, the most important 
-windows tools do work at least sufficiently in a wine environment.
+During the years, much great software for advanced video encoding has been written, unfortunately most of it for windows only. So linux users, who want to produce high quality encodings have to use a windows installation either natively or in a virtual machine. Both of which needs a windows license and often is disliked by those who never were at or went away from windows.
+Thanks to many great coders there is a windows runtime environment called wine, in which the most important windows tools do work at least sufficiently.
 
-I have to admit I'm not that guy on the command line I wish I was. 
-My first attempt to write a script to ease my encoding, it was crap.
-Thanks to drstrangelove420, who pointed me to avs2yuv, I thought it over, re-
-wrote it completely and I hope, it is usable now and is more assistance 
-than burden.
+I have to admit I'm not that guy on the command line I wish I was. My first attempt to write a script to ease my encoding, it was crap.
+Thanks to drstrangelove420, who pointed me to avs2yuv, I thought the script over, re-wrote it completely and I hope, it is usable now and is more assistance than burden.
 
-I have written this script to produce test encodes in a kind of *cough* 
-scientific, at least methodical manner. it is a boring and sometimes 
-maybe unstructered work. as a test encode may take twenty minutes, you may have to 
-operate your pc after every 20 minutes to prompt the next encode. 
-This script shall provide test encodes to compare parameters, and do some 
-little bit more complex encoding with crosswise parameters, and afterwards 
-doing all the work of encoding a whole movie.
+I have written this script to produce test encodes in a kind of methodical manner. It is boring and sometimes tempting to be done unstructered. As a test encode may take twenty minutes, you may have to operate your pc after every 20 minutes to prompt the next encode.
+This script shall provide test encodes to compare parameters, and do some little bit more complex encoding with crosswise parameters, and in the end encoding the whole movie.
 
-It offers nine options, one prerequesite to another, largely corresponding 
-to the way recommended in advanced encoding guides:
+It offers nine options, one prerequesite to another, largely corresponding to the way recommended in advanced encoding guides:
 
-0 - check, if all necessary programms are installed and show your default settings
+0 - check, if all necessary programs are installed and show your default settings
 1 - de-/ unencrypted VOB|m2ts -> mpeg2|h264 -> mkv
-2 - test for crf, followed by
+2 - test for crf integers, followed by
 3 - test for suitable fractionals of crf
 4 - test for qcomp
 5 - test for aq strength and and psy-rd
@@ -33,42 +19,30 @@ to the way recommended in advanced encoding guides:
 7 - another round of crf
 8 - encoding the whole movie
 
-It uses native linux cli tools as far as available (which is not much right
-now), all the rest is done using windows tools via wine.
+It uses native linux cli tools as far as available (which is not much right now), all the rest is done using windows tools via wine.
 
-It works for standard and high definition sources, getting along with VOB-
-containers as well as m2ts-Streams.
+It works for standard and high definition sources, getting along with VOB containers as well as m2ts streams.
 
 The script consists of two parts:
-The bash script itself: wine.encode.sh and a config wine.encode.cfg.
+The bash script itself: wine.encode.sh and a configuration file wine.encode.cfg.
 You can place the script whereever you want, maybe somewhere in your $PATH.
-The config file I suggest to place to 
+The config file I suggest to place to
 ~/.config/wine.encode.cfg
-but any other place may be suitable. In the latter case, you have to edit the line 
+but any other place may be suitable. In the latter case, you have to edit the line
 CONFIG="{HOME}/.config/wine.encode.cfg"
 which right now is around line 70 in the script.
 
-The config file stores all important parameters, the volatile ones, which
-change throughout the encoding process as well as the more constant ones you do
-not change without reason. The "more constant ones" are those between double
-lines of #. If you want to change them, use your editor of choice.
-
+The config file stores all important parameters, the volatile ones, which change throughout the encoding process as well as the more constant ones you do not change without reason. The "more constant ones" are those between double lines of #. If you want to change them, use your editor of choice.
 
 Requirements:
 
-Maybe you prefer not to mix your encoding environment with other
-installations of wine. If you do not have any wine-installation yet,
-you may leave the newly installed wine directory in place. If you do
-have a wine installation already, you may rename it or install your
-encoding environment to someplace else. There is an variable in the
-wine.encode.cfg configuration file which then has to be edited.
+Maybe you prefer not to mix your encoding environment with other installations of wine. If you do not have any wine-installation yet, you may leave the newly installed wine directory in place. If you do have a wine installation already, you may rename it or install your encoding environment to someplace else. There is an variable in the wine.encode.cfg configuration file  (wine=.wine) which then has to be edited.
 
-Install the linux programmes preferably from your distribution:
+Install the linux programs preferably from your distribution:
 
 # apt-get install wine x264 mkvmerge mediainfo beep
 
-Download eac3to, AvsPmod, avs2yuv, MatroskaSplitter, Avisynth and
-Avisynth Plugins.
+Download eac3to, AvsPmod, avs2yuv, MatroskaSplitter, Avisynth and Avisynth Plugins.
 
 Unzip your eac3to.zip to "Program Files":
 
@@ -93,24 +67,15 @@ $ wine path/to/Avisynth_258.exe
 Unrar Avisynth Plugins and copy the content of the plugins directory:
 
 $ unrar x -r /path/to/Avisynth\ Plugins.rar
-
 $ cp -v /path/to/unrar'ed/Avisynth\ Plugins/plugins/* /home/<user>/.wine/drive_c/Program\ Files/AviSynth\ 2.5/plugins/
 
-This scripts does not need more programmes to work. You can install
-all kind of filters, though there is no guarantee for them to work.
+This script does not need more programs to work. You can install all kind of avisynth filters, though there is no guarantee for them to work. Generally, many avisynth filters should work, but i did not do much testing here.
 
-The script generates a primitive .avs file if needed. Of course, that
-can be edited by $editor at any time as you like to.
+The script generates a primitive .avs file if needed. Of course, that can be edited by $editor at any time as you like to.
 
-As eac3to in wine  cannot mux streams into matroska containers, the scripts
-kind of walks around and demuxes the source into h264 or mpeg2 streams,
-which afterwards are muxed into a mkv file, just for traditional reason.
+As eac3to in wine  cannot mux streams into matroska containers, the scripts kind of walks around and demuxes the source into h264 or mpeg2 streams, which afterwards are muxed into a mkv file, just for traditional reason.
 
-I got to know that AvsPmod is not very stable while editing avs files. When
-using the resize calculator, better do NOT click »apply«, do NOT let the
-calculator work on your .avs, but set these parameters when the scripts
-asks you to do so.
-
+I got to know that AvsPmod is not very stable while editing opened avs files. When using the resize calculator, better do NOT click »apply«, do NOT let the calculator work on your .avs, but set these parameters when the scripts asks for them.
 
 Limitations:
 
@@ -119,24 +84,19 @@ The script does (yet) NOT do:
 decrypt sources
 de-telecine video tracks
 handle demuxed audio files
-handle with demuxed subtitles
+handle demuxed subtitles
 handle chapter files
 take comparison screenshots
 mux anything together
 
-Right now, you have one, just one cofig file to store your parameters, which means
-you can only encode one movie after the other, not simultaneously, as parameters
-change from one movie to the other.
+Right now, you have one, and just one config file to store your parameters, which means you can only encode one movie after the other, not simultaneously, as parameters change from one movie to another.
 
-Generally many AviSynth filters should work, but i did not do much testing here.
+Though some parameters can be set permanent, encoding needs a lot of trial and error to find the best possible result. There's lots of interaction. Sorry for that.
 
-Though some parameters can be set permanent, encoding needs a lot of trial and
-error to find the best possible result. There's lots of interaction. Sorry for that.
+The script as everything is work in progress, and I'd very much appreciate any help and criticism.
+Some flaky things I did not know how to avoid I commented in the script, these comments start with #TODONOTE. I'd be especially thankful for them to be solved in a clean way.
+The "code" right here is more or less for a quick look only, recent versions you will find on github:
 
-The script is still work in progress, and I'd very much appreciate any help and criticism.
-Some flaky things I commented in the script, these comments start with #TODONOTE.
-The "code" right here is more or less for a quick look only, recent versions 
-you will find on github.
+https://github.com/derpolsper/wine.encode
 
-I'm sorry for my poor english, as I am neither a native speaker nor used to speak 
-or write english.
+I'm sorry for my poor english, as I am neither a native speaker nor used to speak or write english.
