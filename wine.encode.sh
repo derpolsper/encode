@@ -297,24 +297,24 @@ case "$answer10" in
 		echo "where you want to place the demuxed file?"
 		echo "absolute path and name with file extension"
 		echo ""
-		read -e -p "> " source
+		read -e -p "> " source1
 
 		# keep cfg informed
-		sed -i '/source/d' $config
-		echo "source=$source" >> $config
+		sed -i '/source1/d' $config
+		echo "source1=$source1" >> $config
 
 #TODONOTE dirty. problems when >1 mpeg2 file
-		mkvmerge -v -o $source $(ls $source0|grep .mpeg2)
+		mkvmerge -v -o $source1 $(ls $source0|grep .mpeg2)
 
 		# eac3to's Log file names contain spaces
 		for i in *.txt; do mv -v "$i" $(echo $i | sed 's/ /_/g') &>/dev/null; done
 
 # TODONOTE move ALL eac3to associated files to directory for demuxed files. does it?
-		for file in *.mpeg* *.h264 *.dts* *.pcm *.flac *.ac3 *.aac *.wav *.w64 *.sup *.txt; do mv $file ${source%/*}/ &>/dev/null; done
+		for file in *.mpeg* *.h264 *.dts* *.pcm *.flac *.ac3 *.aac *.wav *.w64 *.sup *.txt; do mv $file ${source1%/*}/ &>/dev/null; done
 
 		echo ""
 		echo "you find the demuxed files in"
-		echo "${source%/*}"
+		echo "${source1%/*}"
 		echo ""
 
 	elif [ -f $source0 ];
@@ -337,25 +337,25 @@ case "$answer10" in
 		echo "where you want to place the demuxed file?"
 		echo "absolute path and name with file extension"
 		echo ""
-		read -e -p "> " source
+		read -e -p "> " source1
 
 		# keep cfg informed
-		sed -i '/source/d' $config
-		echo "source=$source" >> $config
+		sed -i '/source1/d' $config
+		echo "source1=$source1" >> $config
 
 		
 #TODONOTE: dirty. problems when >1 h264 file
-		mkvmerge -v -o $source $(ls ${source0%/*}|grep .h264)
+		mkvmerge -v -o $source1 $(ls ${source0%/*}|grep .h264)
 
 		# eac3to's Log file names contain spaces
 		for i in *.txt; do mv -v "$i" $(echo $i | sed 's/ /_/g') &>/dev/null; done
 
 # TODONOTE move ALL eac3to associated files to directory for demuxed files. does it?
-		for file in *.mpeg* *.h264 *.dts* *.pcm *.flac *.ac3 *.aac *.wav *.w64 *.sup *.txt; do mv $file ${source%/*}/ &>/dev/null; done
+		for file in *.mpeg* *.h264 *.dts* *.pcm *.flac *.ac3 *.aac *.wav *.w64 *.sup *.txt; do mv $file ${source1%/*}/ &>/dev/null; done
 
 		echo ""
 		echo "you find the demuxed files in"
-		echo "${source%/*}"
+		echo "${source1%/*}"
 		echo ""
 
 	else
@@ -372,7 +372,7 @@ case "$answer10" in
 
 	echo ""
 	echo "your movie source is"
-	echo "$source, right?"
+	echo "$source1, right?"
 
 	echo ""
 	echo "do you have a suitable test avs file already? (y|n)"
@@ -406,14 +406,14 @@ case "$answer10" in
 		sed -i '/testavs/d' $config
 		echo "testavs=$testavs" >> $config
 
-		echo "FFVideosource(\"$source\")" > $testavs
+		echo "FFVideosource(\"$source1\")" > $testavs
 
 		echo ""
 		echo "check, if your movie is interlaced"
 		echo ""
 		echo "mediainfo says:"
 
-		mediainfo $source|grep 'Scan type'|awk '{print $4}'
+		mediainfo $source1|grep 'Scan type'|awk '{print $4}'
 
 		echo ""
 		read -p "press enter to continue"
@@ -545,12 +545,12 @@ case "$answer10" in
 		# find correct height, width and reframes for test encodes only
 		# final movie encoding may have different values
 
-		darheight0=$(mediainfo $source|grep Height|awk '{print $3$4}'|sed 's/[a-z]//g')
+		darheight0=$(mediainfo $source1|grep Height|awk '{print $3$4}'|sed 's/[a-z]//g')
 		# keep cfg informed
 		sed -i '/darheight0/d' $config
 		echo "darheight0=$darheight0" >> $config
 
-		darwidth0=$(mediainfo $source|grep Width|awk '{print $3$4}'|sed 's/[a-z]//g')
+		darwidth0=$(mediainfo $source1|grep Width|awk '{print $3$4}'|sed 's/[a-z]//g')
 		# keep cfg informed
 		sed -i '/darwidth0/d' $config
 		echo "darwidth0=$darwidth0" >> $config
@@ -562,9 +562,9 @@ case "$answer10" in
 
 		# isolate the source file name without file extension
 		# bash parameter expansion does not allow nesting, so do it in two steps
-		sourc2=${source##*/}
-		sed -i '/sourc2/d' $config
-		echo "sourc2=$sourc2" >> $config
+		source2=${source1##*/}
+		sed -i '/source2/d' $config
+		echo "source2=$source2" >> $config
 
 		echo ""
 		echo "set lowest crf as integer, e.g. 15"
@@ -580,7 +580,7 @@ case "$answer10" in
 
 		for ((crf1=$crflow; $crf1<=$crfhigh; crf1=$crf1+1));do
 			echo ""
-			echo "encoding ${sourc2%.*}.crf$crf1.mkv"
+			echo "encoding ${source2%.*}.crf$crf1.mkv"
 			echo ""
 
 			start1=$(date +%s)
@@ -599,11 +599,11 @@ case "$answer10" in
 			--subme $subme \
 			--deblock $deblock \
 			--no-psy \
-			-o ${source%.*}.crf$crf1.mkv -;
+			-o ${source1%.*}.crf$crf1.mkv -;
 
 			stop=$(date +%s);
 			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-			echo "encoding ${sourc2%.*}.crf$crf1.mkv lasted $time"
+			echo "encoding ${source2%.*}.crf$crf1.mkv lasted $time"
 
 		done
 
@@ -647,7 +647,7 @@ case "$answer10" in
 
 	for ((crf2=$crflow2; $crf2<=$crfhigh2; crf2+=$crffractional));do
 		echo ""
-		echo "encoding ${sourc2%.*}.crf$crf2.mkv"
+		echo "encoding ${source2%.*}.crf$crf2.mkv"
 		echo ""
 
 		start1=$(date +%s)
@@ -666,11 +666,11 @@ case "$answer10" in
 		--subme $subme \
 		--deblock $deblock \
 		--no-psy \
-		-o ${source%.*}.crf$crf2.mkv -;
+		-o ${source1%.*}.crf$crf2.mkv -;
 
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-		echo "encoding ${sourc2%.*}.crf$crf2.mkv lasted $time"
+		echo "encoding ${source2%.*}.crf$crf2.mkv lasted $time"
 
 	done
 
@@ -726,7 +726,7 @@ case "$answer10" in
 
 	for ((qcompnumber=$qcomplow; $qcompnumber<=$qcomphigh; qcompnumber+=$qcompfractional));do
 		echo ""
-		echo "encoding ${sourc2%.*}.crf$crf.qc$qcompnumber.mkv"
+		echo "encoding ${source2%.*}.crf$crf.qc$qcompnumber.mkv"
 		echo ""
 
 		start1=$(date +%s)
@@ -747,11 +747,11 @@ case "$answer10" in
 		--deblock $deblock \
 		--no-psy \
 		--qcomp $(echo "scale=2;$qcompnumber/100"|bc) \
-		-o ${source%.*}.crf$crf.qc$qcompnumber.mkv -;
+		-o ${source1%.*}.crf$crf.qc$qcompnumber.mkv -;
 
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-		echo "encoding ${sourc2%.*}.crf$crf.qc$qcompnumber.mkv lasted $time"
+		echo "encoding ${source2%.*}.crf$crf.qc$qcompnumber.mkv lasted $time"
 
 	done
 
@@ -830,7 +830,7 @@ case "$answer10" in
 	for ((aqnumber=$aqlow; $aqnumber<=$aqhigh; aqnumber+=$aqfractional));do
 		for ((psy1number=$psy1low; $psy1number<=$psy1high; psy1number+=$psy1fractional));do
 			echo ""
-			echo "encoding ${sourc2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv"
+			echo "encoding ${source2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv"
 			echo ""
 
 			start1=$(date +%s)
@@ -852,11 +852,11 @@ case "$answer10" in
 			--deblock $deblock \
 			--aq-strength $(echo "scale=2;$aqnumber/100"|bc) \
 			--psy-rd $(echo "scale=2;$psy1number/100"|bc):unset \
-			-o ${source%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv -;
+			-o ${source1%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv -;
 
 			stop=$(date +%s);
 			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-			echo "encoding ${sourc2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv lasted $time"
+			echo "encoding ${source2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv lasted $time"
 
 	
 		done
@@ -933,7 +933,7 @@ case "$answer10" in
 
 			for ((psy2number=$psy2low; $psy2number<=$psy2high; psy2number+=$psy2fractional));do
 				echo ""
-				echo "encoding ${sourc2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv"
+				echo "encoding ${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv"
 				echo ""
 
 				start1=$(date +%s)
@@ -955,11 +955,11 @@ case "$answer10" in
 				--aq-mode $aqmode \
 				--deblock $deblock \
 				--psy-rd $psyrd:$(echo "scale=2;$psy2number/100"|bc) \
-				-o ${source%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv -;
+				-o ${source1%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv -;
 
 				stop=$(date +%s);
 				time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-				echo "encoding ${sourc2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv lasted $time"
+				echo "encoding ${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv lasted $time"
 
 			done
 
@@ -1035,7 +1035,7 @@ case "$answer10" in
 
 	for ((crfnumber2=$crflow2; $crfnumber2<=$crfhigh2; crfnumber2+=$crffractional2));do
 		echo ""
-		echo "encoding ${sourc2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv"
+		echo "encoding ${source2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv"
 		echo ""
 
 		start1=$(date +%s)
@@ -1055,11 +1055,11 @@ case "$answer10" in
 		--subme $subme \
 		--deblock $deblock \
 		--crf $(echo "scale=1;$crfnumber2/10"|bc) \
-		-o ${source%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv -;
+		-o ${source1%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv -;
 
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-		echo "encoding ${sourc2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv lasted $time"
+		echo "encoding ${source2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv lasted $time"
 
 	done
 
@@ -1170,7 +1170,7 @@ case "$answer10" in
 	echo "ref1=$ref1" >> $config
 
 	echo ""
-	echo "now encoding ${sourc2%.*}.final.1080.mkv"
+	echo "now encoding ${source2%.*}.final.1080.mkv"
 	echo "with $darwidth1×$darheight1…"
 	echo ""
 
@@ -1194,11 +1194,11 @@ case "$answer10" in
 	--aq-mode $aqmode \
 	--deblock $deblock \
 	--vf crop:$left,$top,$right,$bottom \
-	-o ${source%.*}.final.1080.mkv -;
+	-o ${source1%.*}.final.1080.mkv -;
 
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
-	echo "encoding ${sourc2%.*}.final.1080.mkv"
+	echo "encoding ${source2%.*}.final.1080.mkv"
 	echo "with $darwidth1×$darheight1 lasted $time"
 
 	if [ -e /usr/bin/beep ]; then beep $beep; fi
@@ -1218,7 +1218,7 @@ case "$answer10" in
 	read -e -p "width > " width7
 
 	echo ""
-	echo "now encoding ${sourc2%.*}.final.720.mkv"
+	echo "now encoding ${source2%.*}.final.720.mkv"
 	echo "with $width7×$height7…"
 	echo ""
 
@@ -1247,11 +1247,11 @@ case "$answer10" in
 	--aq-mode $aqmode \
 	--deblock $deblock \
 	--vf crop:$left,$top,$right,$bottom/resize:$width7,$height7 \
-	-o ${source%.*}.final.720.mkv -;
+	-o ${source1%.*}.final.720.mkv -;
 
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
-	echo "encoding ${sourc2%.*}.final.720.mkv"
+	echo "encoding ${source2%.*}.final.720.mkv"
 	echo "with $width7×$height7 lasted $time"
 
 	if [ -e /usr/bin/beep ]; then beep $beep; fi
@@ -1271,7 +1271,7 @@ case "$answer10" in
 	read -e -p "width > " width5
 
 	echo ""
-	echo "now encoding ${sourc2%.*}.final.SD.mkv"
+	echo "now encoding ${source2%.*}.final.SD.mkv"
 	echo "with $width5×$height5…"
 	echo ""
 
@@ -1305,11 +1305,11 @@ case "$answer10" in
 	--aq-mode $aqmode \
 	--deblock $deblock \
 	--vf crop:$left,$top,$right,$bottom/resize:$width5,$height5 \
-	-o ${source%.*}.final.SD.mkv -;
+	-o ${source1%.*}.final.SD.mkv -;
 
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
-	echo "encoding ${sourc2%.*}.final.SD.mkv"
+	echo "encoding ${source2%.*}.final.SD.mkv"
 	echo "with $width5×$height5 lasted $time"
 
 	if [ -e /usr/bin/beep ]; then beep $beep; fi
@@ -1344,7 +1344,7 @@ case "$answer10" in
 	read -e -p "width > " width7
 
 	echo ""
-	echo "now encoding ${sourc2%.*}.final.SD.mkv"
+	echo "now encoding ${source2%.*}.final.SD.mkv"
 	echo "with $height5×$width5…"
 	echo ""
 
@@ -1374,16 +1374,16 @@ case "$answer10" in
 	--aq-mode $aqmode \
 	--deblock $deblock \
 	--vf crop:$left,$top,$right,$bottom/resize:$width5,$height5 \
-	-o ${source%.*}.final.SD.mkv -;
+	-o ${source1%.*}.final.SD.mkv -;
 
 	stop=$(date +%s)
 
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
-	echo "encoding ${sourc2%.*}.final.SD.mkv"
+	echo "encoding ${source2%.*}.final.SD.mkv"
 	echo "with $height5×$width5 lasted $time"
 
 	echo ""
-	echo "now encoding ${sourc2%.*}.final.720.mkv"
+	echo "now encoding ${source2%.*}.final.720.mkv"
 	echo "with $width7×$height7…"
 	echo ""
 
@@ -1413,12 +1413,12 @@ case "$answer10" in
 	--aq-mode $aqmode \
 	--deblock $deblock \
 	--vf crop:$left,$top,$right,$bottom/resize:$width7,$height7 \
-	-o ${source%.*}.final.720.mkv -;
+	-o ${source1%.*}.final.720.mkv -;
 
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo ""
-	echo "encoding ${sourc2%.*}.final.720.mkv"
+	echo "encoding ${source2%.*}.final.720.mkv"
 	echo "with $width7×$height7 lasted $time"
 	echo ""
 
@@ -1431,7 +1431,7 @@ case "$answer10" in
 	echo "ref1=$ref1" >> $config
 
 	echo ""
-	echo "now encoding ${sourc2%.*}.final.1080.mkv"
+	echo "now encoding ${source2%.*}.final.1080.mkv"
 	echo "with $darwidth1×$darheight1…"
 	echo ""
 
@@ -1455,12 +1455,12 @@ case "$answer10" in
 	--aq-mode $aqmode \
 	--deblock $deblock \
 	--vf crop:$left,$top,$right,$bottom \
-	-o ${source%.*}.final.1080.mkv -;
+	-o ${source1%.*}.final.1080.mkv -;
 
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo ""
-	echo "encoding ${sourc2%.*}.final.1080.mkv"
+	echo "encoding ${source2%.*}.final.1080.mkv"
 	echo "with $darwidth1×$darheight1 lasted $time"
 	echo ""
 
