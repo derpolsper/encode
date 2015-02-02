@@ -704,7 +704,7 @@ case "$answer10" in
 	4)	#4 - test variations in qcomp
 
 	echo ""
-	echo "qcomp: mostly values range from 0.6 to 0.8"
+	echo "qcomp: default is 0.60, test with values around 0.60 to 0.80"
 	echo "first, set lowest qcomp value"
 	echo "e.g. 60 for 0.60"
 	echo ""
@@ -785,8 +785,10 @@ case "$answer10" in
 	5)	# 5 - variations in aq strength and psy-rd
 
 	echo ""
-	echo "aq strength: values range 0.6 to 1.0, mostly"
-	echo "set lower limit of aq strength, e.g. 60 for 0.6"
+	echo "aq strength: default is 1.0"
+	echo "film ~1.0, animation ~0.6, grain ~0.5"
+	echo ""
+	echo "set lower limit of aq strength, e.g. 50 for 0.5"
 	echo ""
 	read -e -p "aq strength, lower limit > " aqlow
 
@@ -802,7 +804,7 @@ case "$answer10" in
 	read -e -p "fractionals > " aqfractional
 
 	echo ""
-	echo "psy-rd: mostly values range 0.9 to 1.2"
+	echo "psy-rd: default is 1.0, test with values around 0.9 to 1.2"
 	echo "set lower limit of psy-rd, e.g. 90 for 0.9"
 	echo ""
 	read -e -p "psy-rd, lower limit > " psy1low
@@ -911,7 +913,8 @@ case "$answer10" in
 
 		t|T) # test for psy-trellis
 
-			echo "psy-trellis: values range 0.0 to 0.1, in most cases"
+			echo "psy-trellis: default is 0.0"
+			echo "test for values ~0.0 to 0.15"
 			echo "set lower limit for psy-trellis, e.g. 0 for 0.0"
 			echo ""
 			read -e -p "psy-trellis, lower limit > " psy2low
