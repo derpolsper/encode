@@ -896,22 +896,36 @@ case "$answer10" in
 
 	echo ""
 	echo "run the script with option 6"
-	echo "to set or unset psy-trellis"
+	echo "to test for psy-trellis"
 	echo ""
 
 	;;
 	
 	6)	# 6 - variations in psy-trellis
 
-	echo "if you ended up with psy-rd ≥1"
-	echo "you may (t)est for psy-trellis"
-	echo "if you ended up with psy-rd <1"
-	echo "you may (u)nset psy-trellis"
-	read -e -p "psy-trellis > " answer60
+	case $(echo "$psytr" - 0.99999 | bc) in
 
-	case $answer60 in
+		-*) # psy-rd <1 -> psytr unset
+		echo "as psy-rd is set to a value < 1"
+		echo "psy-trellis is unset automatically"
+		echo ""
 
-		t|T) # test for psy-trellis
+		# keep cfg informed
+		sed -i '/psytr/d' $config
+		echo "psytr=unset" >> $config
+
+		;;
+
+		*) # psytr >= 1
+		echo "your testing ended up with psy-rd ≥1"
+		echo "you may (t)est for psy-trellis"
+		echo "or (u)nset psy-trellis"
+		echo ""
+		read -e -p "psy-trellis > " answer60
+
+			case $answer60 in
+
+			t|T) # test for psy-trellis
 
 			echo "psy-trellis: default is 0.0"
 			echo "test for values ~0.0 to 0.15"
@@ -989,6 +1003,10 @@ case "$answer10" in
 			# keep cfg informed
 			sed -i '/psytr/d' $config
 			echo "psytr=unset" >> $config
+			echo "psy trellis is set to \"unset\"."
+		;;
+
+		esac
 
 		;;
 
@@ -1000,8 +1018,6 @@ case "$answer10" in
 		;;
 
 	esac
-
-	if [ -e /usr/bin/beep ]; then beep $beep; fi
 
 	echo "try another (maybe last) round"
 	echo "for optimal crf"
