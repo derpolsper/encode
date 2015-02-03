@@ -244,6 +244,12 @@ case "$answer10" in
 	echo -e "DEBLOCK:\t "$deblock
 	echo -e "lookahead:\t "$lookahead
 	echo ""
+	echo "*** SelectRangeEvery ***"
+	echo ""
+	echo -e "INTERVAL:\t" $interval
+	echo -e "LENGTH:\t\t" $length
+	echo -e "OFFSET:\t\t" $offset
+	echo ""
 	echo "please note, parameters for reframes are"
 	echo "calculated from source file"
 	echo ""
@@ -469,14 +475,14 @@ case "$answer10" in
 			i|I) # interlaced
 
 			echo "QTGMC().SelectEven()" >> $testavs
-			echo "SelectRangeEvery(20000, 500, 10000)" >> $testavs
+			echo "SelectRangeEvery($interval, $length, $offset)" >> $testavs
 
 			;;
 
 			t|T) # telecined
 # TODONOTE: how to integrate de-telecine?
 			echo "# placeholder de-telecine >> $testavs"
-			echo "SelectRangeEvery(20000, 500, 10000)" >> $testavs
+			echo "SelectRangeEvery($interval, $length, $offset)" >> $testavs
 
 			;;
 
@@ -484,13 +490,13 @@ case "$answer10" in
 # TODONOTE: how to integrate de-telecine?
 			echo "QTGMC().SelectEven()" >> $testavs
 			echo "# placeholder de-telecine >> $testavs"
-			echo "SelectRangeEvery(20000, 500, 10000)" >> $testavs
+			echo "SelectRangeEvery($interval, $length, $offset)" >> $testavs
 
 			;;
 
 			n|N) # neither interlaced nor telecined
 
-			echo "SelectRangeEvery(20000, 500, 10000)" >> $testavs
+			echo "SelectRangeEvery($interval, $length, $offset)" >> $testavs
 
 			;;
 
