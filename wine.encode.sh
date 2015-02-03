@@ -247,11 +247,31 @@ case "$answer10" in
 	echo "please note, parameters for reframes are"
 	echo "calculated from source file"
 	echo ""
-	echo "if you want to adjust them to your needs,"
-	echo "stop the script (hit return), edit the"
-	echo "wine.encode.cfg and begin again."
+	echo "do you want to adjust them to your needs?"
+	echo "(e)dit now or"
+	echo "(n)o thanks, everything is fine"
 	echo ""
-	read -p "press enter to continue"
+	read -e -p "(e|n) > " answer00
+
+	case "$answer00" in
+
+		e|E|edit) # edit the wine.encode.cfg
+
+		"${EDITOR:-vi}" $config
+
+		;;
+
+		n|N|no|NO|No) # do nothing
+
+		;;
+
+		*) # wrong! layer 8 problem
+
+		echo "stupid, that's neither \"e\" nor \"n\" :-) "
+		exit
+
+		;;
+	esac
 
 	;;
 
