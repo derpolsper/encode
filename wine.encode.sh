@@ -1316,7 +1316,7 @@ case "$answer10" in
 
 	echo ""
 	echo "now encoding ${source2%.*}.final.SD.mkv"
-	echo "with $width5×$height5…"
+	echo "with a resolution of $width5×$height5…"
 	echo ""
 
 
@@ -1389,7 +1389,7 @@ case "$answer10" in
 
 	echo ""
 	echo "now encoding ${source2%.*}.final.SD.mkv"
-	echo "with $height5×$width5…"
+	echo "with a resolution of $height5×$width5…"
 	echo ""
 
 	# Get reframes for SD
@@ -1428,7 +1428,7 @@ case "$answer10" in
 
 	echo ""
 	echo "now encoding ${source2%.*}.final.720.mkv"
-	echo "with $width7×$height7…"
+	echo "with a resolution of $width7×$height7…"
 	echo ""
 
 	# Get reframes for 720p
@@ -1476,7 +1476,7 @@ case "$answer10" in
 
 	echo ""
 	echo "now encoding ${source2%.*}.final.1080.mkv"
-	echo "with $darwidth1×$darheight1…"
+	echo "with a resolution of $darwidth1×$darheight1…"
 	echo ""
 
 	start=$(date +%s)
