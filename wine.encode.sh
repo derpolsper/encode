@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# During the years, much great software for advanced video encoding has been
+# Over the years, much great software for advanced video encoding has been
 # written, unfortunately most of them for windows only. So linux users,
 # who want to produce high quality encodings have to use a windows
 # installation either natively or in a virtual machine - or use that windows
@@ -24,8 +24,8 @@
 # containers as well as m2ts-Streams.
 
 # As eac3to in wine does not support direct import into mkv, we have to walk
-# around by taking either the mpeg2 or h264 stream. Though technically not
-# necessary, we mux them into a matroska container.
+# around by taking either the mpeg2 or h264 stream. Afterwards, we mux them
+# into a matroska container for further working with x264.
 
 # Generally many AviSynth filters should work, but i did not do much testing
 # here.
@@ -40,7 +40,6 @@
 # do anything with demuxed audio files
 # do anything with demuxed subtitles
 # handle chapter files
-# take comparison screenshots
 # mux anything together
 # 
 
@@ -48,11 +47,11 @@
 # 0 - check, if all necessary programs are installed and show your default
 #     settings
 # 1 - VOB|m2ts -> mpeg2|h264 -> mkv
-# 2 - suitable crf
-# 3 - suitable fractionals of crf
-# 4 - qcomp
-# 5 - aq strength and and psy-rd
-# 6 - psy-trellis
+# 2 - suitable crf, first integers, then fractionals
+# 3 - suitable qcomp, first intergers, then fractionals
+# 4 - aq strength and and psy-rd
+# 5 - psy-trellis
+# 6 - different things
 # 7 - another round of crf
 # 8 - encoding the whole movie
 
@@ -94,25 +93,25 @@ echo "    show your default settings"
 echo ""
 echo "1 - rip your m2ts/ VOB files into a matroska container"
 echo ""
-echo "2 - create your .avs and do first test encodes with crf integers"
+echo "2 - create your .avs; crf integers and fractionals"
 echo ""
-echo "3 - a second round for fractionals of crf"
+echo "3 - variations in qcomp"
 echo ""
-echo "4 - variations in qcomp"
+echo "4 - variations in aq strength and psy-rd"
 echo ""
-echo "5 - variations in aq strength and psy-rd"
+echo "5 - variations in psy-trellis"
 echo ""
-echo "6 - variations in psy-trellis"
+echo "6 - different things: chroma_qp_offset etc"
 echo ""
 echo "7 - another round of crf"
 echo ""
 echo "8 - encode the whole movie"
 echo ""
-read -p "> " answer10
+read -p "> " answer00
 
-case "$answer10" in
+case "$answer00" in
 
-	0)	# installed programs - default settings
+	0)	# 0 - installed programs - default settings
 	
 	# x264, avconv/ffmpeg, mkvmerge, mediainfo, wine, eac3to, AviSynth,
 	# AvsPmod, avs2yuv, Haali MatroskaSplitter, beep
@@ -257,9 +256,9 @@ case "$answer10" in
 	echo "(e)dit now or"
 	echo "(n)o thanks, everything is fine"
 	echo ""
-	read -e -p "(e|n) > " answer00
+	read -e -p "(e|n) > " answer10
 
-	case "$answer00" in
+	case "$answer10" in
 
 		e|E|edit) # edit the wine.encode.cfg
 
@@ -394,7 +393,7 @@ case "$answer10" in
 
 	;;
 
-	2)	# 2 - create a avs file for first test and test encode with suitable integer crf
+	2)	# 2 - create a avs file; test encodes for crf
 
 	echo ""
 	echo "your movie source is"
@@ -447,7 +446,7 @@ case "$answer10" in
 		echo ""
 		echo "do you want to check with AvsPmod frame by frame,"
 		echo "if your movie is interlaced and/or telecined?"
-		echo "after this, close AvsPmod window"
+		echo "if yes, close AvsPmod window afterwards"
 		echo ""
 		read -e -p "check now? (y|n) > " answer30
 
@@ -465,7 +464,7 @@ case "$answer10" in
 		esac
 
 		echo ""
-		echo "qualities of your video source:"
+		echo "characteristics of your video source:"
 		echo "(i)nterlaced? (t)elecined? (b)oth? (n)either nor?"
 		echo ""
 		read -e -p "(i|t|b|n) > " answer40
@@ -500,6 +499,12 @@ case "$answer10" in
 
 			;;
 
+			*)
+			echo "stupid, that's not what i asked for :-) "
+			exit
+
+			;;
+
 		esac
 
 		;;
@@ -522,8 +527,6 @@ case "$answer10" in
 		sleep 1
 		sed -i '/SelectRangeEvery/d' ${testavs%/*}/final.avs
 
-	
-
 		echo ""
 		echo "________________SAR_______|_PAR_|____DAR____"
 		echo "widescreen ntsc 720x480 -> 40/33 ->  704x480"
@@ -539,118 +542,133 @@ case "$answer10" in
 		echo ""
 		read -e -p "check now? (y|n) > " answer50
 
-		case $answer50 in 
+	case $answer50 in 
 
-			y|Y|yes|YES) # check sar with AvsPmod
+		y|Y|yes|YES) # check sar with AvsPmod
 
 			wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe $testavs
 
 			;;
 
-			n|N|no|NO|"") # do nothing
+		n|N|no|NO|"") # do nothing
 			
 			;;
 
-			*)
+		*)
 
 			echo "stupid, that's neither yes or no :-) "
 			exit
 
 			;;
 
-		esac
+	esac
 
-		echo "set sar as fraction with a slash: /"
-		echo "e.g. 16/15"
-		read -e -p "sar > " sar
+	echo "set sar as fraction with a slash: /"
+	echo "e.g. 16/15"
+	read -e -p "sar > " sar
 
-		# keep cfg informed
-		sed -i '/sar/d' $config
-		echo "sar=$sar" >> $config
+	# keep cfg informed
+	sed -i '/sar/d' $config
+	echo "sar=$sar" >> $config
 
-		# find correct height, width and reframes for test encodes only
-		# final movie encoding may have different values
+	# find correct height, width and reframes for test encodes only
+	# final movie encoding may have different values due to cropping
+	# and resizing
 
-		darheight0=$(mediainfo $source1|grep Height|awk '{print $3$4}'|sed 's/[a-z]//g')
-		# keep cfg informed
-		sed -i '/darheight0/d' $config
-		echo "darheight0=$darheight0" >> $config
+	darheight0=$(mediainfo $source1|grep Height|awk '{print $3$4}'|sed 's/[a-z]//g')
+	# keep cfg informed
+	sed -i '/darheight0/d' $config
+	echo "darheight0=$darheight0" >> $config
 
-		darwidth0=$(mediainfo $source1|grep Width|awk '{print $3$4}'|sed 's/[a-z]//g')
-		# keep cfg informed
-		sed -i '/darwidth0/d' $config
-		echo "darwidth0=$darwidth0" >> $config
+	darwidth0=$(mediainfo $source1|grep Width|awk '{print $3$4}'|sed 's/[a-z]//g')
+	# keep cfg informed
+	sed -i '/darwidth0/d' $config
+	echo "darwidth0=$darwidth0" >> $config
 
-		ref0=$(echo "scale=0;32768/((($darwidth0 * ($sar) /16)+0.5)/1 * (($darheight0/16)+0.5)/1)"|bc)
-		# keep cfg informed
-		sed -i '/ref0/d' $config
-		echo "ref0=$ref0" >> $config
+	ref0=$(echo "scale=0;32768/((($darwidth0 * ($sar) /16)+0.5)/1 * (($darheight0/16)+0.5)/1)"|bc)
+	# keep cfg informed
+	sed -i '/ref0/d' $config
+	echo "ref0=$ref0" >> $config
 
-		# isolate the source file name without file extension
-		# bash parameter expansion does not allow nesting, so do it in two steps
-		source2=${source1##*/}
-		sed -i '/source2/d' $config
-		echo "source2=$source2" >> $config
+	# isolate the source file name without file extension
+	# bash parameter expansion does not allow nesting, so do it in two steps
+	source2=${source1##*/}
+	sed -i '/source2/d' $config
+	echo "source2=$source2" >> $config
 
+	echo ""
+	echo "set minimum crf as integer, e.g. 15"
+	echo ""
+	read -e -p "crf, lowest value > " crflow
+
+	echo ""
+	echo "set maximum crf as integer, e.g. 20"
+	echo ""
+	read -e -p "crf, maximum value > " crfhigh
+
+	start0=$(date +%s)
+
+	# create comparison screen avs
+	rm ${source1%.*}.crf.avs &>/dev/null
+	echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > ${source1%.*}.crf.avs
+
+	for ((crf1=$crflow; $crf1<=$crfhigh; crf1=$crf1+1));do
 		echo ""
-		echo "set minimum crf as integer, e.g. 15"
+		echo "encoding ${source2%.*}.crf$crf1.mkv"
 		echo ""
-		read -e -p "crf, lowest value > " crflow
 
-		echo ""
-		echo "set maximum crf as integer, e.g. 20"
-		echo ""
-		read -e -p "crf, maximum value > " crfhigh
+		start1=$(date +%s)
 
-		start0=$(date +%s)
+		#comparison screen
+		echo "=ffvideosource(\"${source2%.*}.crf$crf1.mkv\").subtitle(\"${source2%.*}.crf$crf1.mkv\", align=8)" >> ${source1%.*}.crf.avs
 
-		for ((crf1=$crflow; $crf1<=$crfhigh; crf1=$crf1+1));do
-			echo ""
-			echo "encoding ${source2%.*}.crf$crf1.mkv"
-			echo ""
-
-			start1=$(date +%s)
-
-			wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
-			| x264 --stdin y4m \
-			--crf $crf1 \
-			--preset $preset \
-			--tune $tune \
-			--profile $profile \
-			--ref $ref0 \
-			--sar $sar \
-			--rc-lookahead $lookahead \
-			--me $me \
-			--merange $merange \
-			--subme $subme \
-			--deblock $deblock \
-			--no-psy \
-			-o ${source1%.*}.crf$crf1.mkv -;
-
-			stop=$(date +%s);
-			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-			echo "encoding ${source2%.*}.crf$crf1.mkv lasted $time"
-
-		done
+		wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
+		| x264 --stdin y4m \
+		--crf $crf1 \
+		--preset $preset \
+		--tune $tune \
+		--profile $profile \
+		--ref $ref0 \
+		--sar $sar \
+		--rc-lookahead $lookahead \
+		--me $me \
+		--merange $merange \
+		--subme $subme \
+		--deblock $deblock \
+		--no-psy \
+		-o ${source1%.*}.crf$crf1.mkv -;
 
 		stop=$(date +%s);
-		time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-		echo "test encodings for integer crf lasted $time"
+		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
+		echo "encoding ${source2%.*}.crf$crf1.mkv lasted $time"
 
-		if [ -e /usr/bin/beep ]; then beep $beep; fi
+	done
+
+	stop=$(date +%s);
+	time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
+	echo "test encodings for crf integers lasted $time"
+
+	#comparison screen
+	prefixes=({a..z} {a..z}{a..z})
+	i=0
+	while IFS= read -r line; do
+	printf "%s %s\n" "${prefixes[i++]}""$line" >> ${source1%.*}2.crf.avs
+	done < ${source1%.*}.crf.avs
+	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < ${source1%.*}.crf.avs) *2 -1|bc)-102 >> ${source1%.*}2.crf.avs
+	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> ${source1%.*}2.crf.avs
+	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> ${source1%.*}2.crf.avs
+	mv ${source1%.*}2.crf.avs ${source1%.*}.crf.avs
+
+	if [ -e /usr/bin/beep ]; then beep $beep; fi
 		
 	echo ""
-	echo "look at these first encodings. if you find any"
-	echo "detail loss in still images, you have found"
-	echo "your crf integer. go on to find fractionals around"
-	echo "this integer and run the script with"
-	echo "option 3"
-	echo ""
-
-	;;
-
-	3)	# 3 - a second round for fractionals of crf
-
+	echo "look at these first encodings. if you find any detail loss"
+	echo "in still images, you have found your crf integer. go on"
+	echo "find fractionals around this integer."
+	echo "then close AvsPmod."
+	sleep 2
+	wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ${source1%.*}.crf.avs
+	
 	echo ""	
 	echo "set lowest crf value as hundreds,"
 	echo "e.g. 168 for 16.8"
@@ -671,12 +689,19 @@ case "$answer10" in
 
 	start0=$(date +%s)
 
+	# create comparison screen avs
+	rm ${source1%.*}.crf2.avs &>/dev/null
+	echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > ${source1%.*}.crf2.avs
+
 	for ((crf2=$crflow2; $crf2<=$crfhigh2; crf2+=$crffractional));do
 		echo ""
 		echo "encoding ${source2%.*}.crf$crf2.mkv"
 		echo ""
 
 		start1=$(date +%s)
+
+		#comparison screen
+		echo "=ffvideosource(\"${source2%.*}.crf$crf2.mkv\").subtitle(\"${source2%.*}.crf$crf2.mkv\", align=8)" >> ${source1%.*}.crf2.avs
 
 		wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
 		| x264 --stdin y4m \
@@ -702,7 +727,18 @@ case "$answer10" in
 
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-	echo "test encodings for fractional crf lasted $time"
+	echo "test encodings for crf fractionals lasted $time"
+
+	#comparison screen
+	prefixes=({a..z} {a..z}{a..z})
+	i=0
+	while IFS= read -r line; do
+	printf "%s %s\n" "${prefixes[i++]}""$line" >> ${source1%.*}2.crf2.avs
+	done < ${source1%.*}.crf2.avs
+	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < ${source1%.*}.crf2.avs) *2 -1|bc)-102 >> ${source1%.*}2.crf2.avs
+	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> ${source1%.*}2.crf2.avs
+	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> ${source1%.*}2.crf2.avs
+	mv ${source1%.*}2.crf2.avs ${source1%.*}.crf2.avs
 
 	if [ -e /usr/bin/beep ]; then beep $beep; fi
 
@@ -710,6 +746,9 @@ case "$answer10" in
 	echo "thoroughly look through all your test"
 	echo "encodings and decide, which crf gave"
 	echo "best results at acceptable file size."
+	echo "then close AvsPmod."
+	sleep 2
+	wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ${source1%.*}.crf2.avs
 
 	echo ""
 	echo "set crf parameter"
@@ -722,12 +761,12 @@ case "$answer10" in
 
 	echo ""
 	echo "from here, run the script with"
-	echo "option 4"
+	echo "option 3"
 	echo ""
 
 	;;
 
-	4)	#4 - test variations in qcomp
+	3)	# 3 - test variations in qcomp
 
 	echo ""
 	echo "qcomp: default is 0.60, test with values around 0.60 to 0.80"
@@ -743,12 +782,16 @@ case "$answer10" in
 	read -e -p "qcomp, maximum value > " qcomphigh
 
 	echo ""
-	echo "set fractional steps, e.g. 5 for 0.05"
+	echo "set fractional steps, e.g. 10 for 0.10"
 	echo "≠0"
 	echo ""
 	read -e -p "fractionals > " qcompfractional
 
 	start0=$(date +%s)
+
+	# create comparison screen avs
+	rm ${source1%.*}.qcomp.avs &>/dev/null
+	echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > ${source1%.*}.qcomp.avs
 
 	for ((qcompnumber=$qcomplow; $qcompnumber<=$qcomphigh; qcompnumber+=$qcompfractional));do
 		echo ""
@@ -756,6 +799,9 @@ case "$answer10" in
 		echo ""
 
 		start1=$(date +%s)
+
+		#comparison screen
+		echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\", align=8)" >> ${source1%.*}.qcomp.avs
 
 		wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
 		| x264 --stdin y4m \
@@ -785,15 +831,135 @@ case "$answer10" in
 	time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
 	echo "test encodings for qcomp lasted $time"
 
+	#comparison screen
+	prefixes=({a..z} {a..z}{a..z})
+	i=0
+	while IFS= read -r line; do
+	printf "%s %s\n" "${prefixes[i++]}""$line" >> ${source1%.*}.qcomp2.avs
+	done < ${source1%.*}.qcomp.avs
+	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < ${source1%.*}.qcomp.avs) *2 -1|bc)-102 >> ${source1%.*}.qcomp2.avs
+	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> ${source1%.*}.qcomp2.avs
+	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> ${source1%.*}.qcomp2.avs
+	mv ${source1%.*}.qcomp2.avs ${source1%.*}.qcomp.avs
+
 	if [ -e /usr/bin/beep ]; then beep $beep; fi
 
 	echo ""
-	echo "thoroughly look through the encodings"
-	echo "and decide, which qcomp parameters"
-	echo "gave best results."
+	echo "thoroughly look through all your test"
+	echo "encodings and decide, which qcomp gave"
+	echo "best results."
+	echo "then close AvsPmod."
+	sleep 2
+	wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ${source1%.*}.qcomp.avs
+
 	echo ""
-	echo "set qcomp parameter"
-	echo "e.g. 0.75"
+	echo "do you want to look for more subtle values in qcomp?"
+	echo ""
+	read -e -p "(y)es or (n)o > " answer55
+
+	case $answer55 in
+		y|Y|Yes|YES|yes)
+
+		echo ""
+		echo "first, set lowest qcomp value"
+		echo "e.g. 65 for 0.65"
+		echo ""
+		read -e -p "qcomp, lowest value > " qcomplow
+
+		echo ""
+		echo "set maximum qcomp value"
+		echo "e.g. 75 for 0.75"
+		echo ""
+		read -e -p "qcomp, maximum value > " qcomphigh
+
+		echo ""
+		echo "set fractional steps, e.g. 2 for 0.02"
+		echo "≠0"
+		echo ""
+		read -e -p "fractionals > " qcompfractional
+
+		start0=$(date +%s)
+
+		# create comparison screen avs
+		rm ${source1%.*}.qcomp2.avs &>/dev/null
+		echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > ${source1%.*}.qcomp2.avs
+
+		for ((qcompnumber=$qcomplow; $qcompnumber<=$qcomphigh; qcompnumber+=$qcompfractional));do
+			echo ""
+			echo "encoding ${source2%.*}.crf$crf.qc$qcompnumber.mkv"
+			echo ""
+
+			start1=$(date +%s)
+
+			#comparison screen
+			echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\", align=8)" >> ${source1%.*}.qcomp2.avs
+
+			wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
+			| x264 --stdin y4m \
+			--crf $crf \
+			--preset $preset \
+			--tune $tune \
+			--profile $profile \
+			--ref $ref0 \
+			--sar $sar \
+			--rc-lookahead $lookahead \
+			--me $me \
+			--merange $merange \
+			--subme $subme \
+			--aq-mode $aqmode \
+			--deblock $deblock \
+			--no-psy \
+			--qcomp $(echo "scale=2;$qcompnumber/100"|bc) \
+			-o ${source1%.*}.crf$crf.qc$qcompnumber.mkv -;
+
+			stop=$(date +%s);
+			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
+			echo "encoding ${source2%.*}.crf$crf.qc$qcompnumber.mkv lasted $time"
+
+		done
+
+		stop=$(date +%s);
+		time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
+		echo "test encodings for qcomp lasted $time"
+
+		#comparison screen
+		prefixes=({a..z} {a..z}{a..z})
+		i=0
+		while IFS= read -r line; do
+		printf "%s %s\n" "${prefixes[i++]}""$line" >> ${source1%.*}.qcomp3.avs
+		done < ${source1%.*}.qcomp2.avs
+		echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < ${source1%.*}.qcomp2.avs) *2 -1|bc)-102 >> ${source1%.*}.qcomp3.avs
+		echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> ${source1%.*}.qcomp3.avs
+		echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> ${source1%.*}.qcomp3.avs
+		mv ${source1%.*}.qcomp3.avs ${source1%.*}.qcomp2.avs
+
+		if [ -e /usr/bin/beep ]; then beep $beep; fi
+
+		echo ""
+		echo "thoroughly look through all your test"
+		echo "encodings and decide, which qcomp gave"
+		echo "best results."
+		echo "then close AvsPmod."
+		sleep 2
+		wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ${source1%.*}.qcomp2.avs
+	
+		;;
+
+		n|N|No|NO|no) # just nothing
+
+		;;
+
+		*) # layer 8 problem
+
+ 		echo "stupid, i take this for a no :-) "
+
+		;;
+
+	esac
+
+	echo ""
+	echo "set your qcomp parameter"
+	echo "e.g. 0.71"
 	echo ""
 	read -e -p "qcomp > " qcomp
 
@@ -803,12 +969,12 @@ case "$answer10" in
 
 	echo ""
 	echo "from here, run the script with"
-	echo "option 5"
+	echo "option 4"
 	echo ""
 
 	;;
 
-	5)	# 5 - variations in aq strength and psy-rd
+	4)	# 4 - variations in aq strength and psy-rd
 
 	echo ""
 	echo "aq strength: default is 1.0"
@@ -853,6 +1019,10 @@ case "$answer10" in
 
 	start0=$(date +%s)
 
+	# create comparison screen avs
+	rm ${source1%.*}.aqpsy.avs &>/dev/null
+	echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > ${source1%.*}.aqpsy.avs
+
 	for ((aqnumber=$aqlow; $aqnumber<=$aqhigh; aqnumber+=$aqfractional));do
 		for ((psy1number=$psy1low; $psy1number<=$psy1high; psy1number+=$psy1fractional));do
 			echo ""
@@ -860,6 +1030,9 @@ case "$answer10" in
 			echo ""
 
 			start1=$(date +%s)
+
+			#comparison screen
+			echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv\", align=8)" >> ${source1%.*}.aqpsy.avs
 
 			wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
 			| x264 --stdin y4m \
@@ -884,7 +1057,6 @@ case "$answer10" in
 			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 			echo "encoding ${source2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv lasted $time"
 
-	
 		done
 	done
 
@@ -893,13 +1065,27 @@ case "$answer10" in
 
 	echo " test encodings for aq strength and psy-rd lasted $time"
 
+	#comparison screen
+	prefixes=({a..z} {a..z}{a..z})
+	i=0
+	while IFS= read -r line; do
+	printf "%s %s\n" "${prefixes[i++]}""$line" >> ${source1%.*}.aqpsy2.avs
+	done < ${source1%.*}.aqpsy.avs
+	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < ${source1%.*}.aqpsy.avs) *2 -1|bc)-102 >> ${source1%.*}.aqpsy2.avs
+	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> ${source1%.*}aqpsy2.avs
+	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> ${source1%.*}.aqpsy2.avs
+	mv ${source1%.*}.aqpsy2.avs ${source1%.*}.aqpsy.avs
+
 	if [ -e /usr/bin/beep ]; then beep $beep; fi
 
 	echo ""
 	echo "thoroughly look through all your test encodings"
 	echo "and decide, which aq strength and which psy-rd"
 	echo "parameters gave you best results."
-
+	echo "then close AvsPmod."
+	sleep 2
+	wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ${source1%.*}.aqpsy.avs
+	
 	echo ""
 	echo "set aq strength"
 	echo "e.g. 0.85"
@@ -921,13 +1107,13 @@ case "$answer10" in
 	echo "psyrd=$psyrd" >> $config
 
 	echo ""
-	echo "run the script with option 6"
+	echo "run the script with option 5"
 	echo "to test for psy-trellis"
 	echo ""
 
 	;;
 	
-	6)	# 6 - variations in psy-trellis
+	5)	# 5 - variations in psy-trellis
 
 	case $(echo "$psyrd" - 0.99999 | bc) in
 
@@ -971,12 +1157,19 @@ case "$answer10" in
 
 			start0=$(date +%s)
 
+			# create comparison screen avs
+			rm ${source1%.*}.psytr.avs &>/dev/null
+			echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > ${source1%.*}.psytr.avs
+
 			for ((psy2number=$psy2low; $psy2number<=$psy2high; psy2number+=$psy2fractional));do
 				echo ""
 				echo "encoding ${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv"
 				echo ""
 
 				start1=$(date +%s)
+
+				#comparison screen
+				echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv\", align=8)" >> ${source1%.*}.psytr.avs
 
 				wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
 				| x264 --stdin y4m \
@@ -1007,11 +1200,26 @@ case "$answer10" in
 			time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
 			echo "test encodings for psy-trellis lasted $time"
 
+			#comparison screen
+			prefixes=({a..z} {a..z}{a..z})
+			i=0
+			while IFS= read -r line; do
+			printf "%s %s\n" "${prefixes[i++]}""$line" >> ${source1%.*}2.psytr.avs
+			done < ${source1%.*}.psytr.avs
+			echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < ${source1%.*}.psytr.avs) *2 -1|bc)-102 >> ${source1%.*}2.psytr.avs
+			echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> ${source1%.*}2.psytr.avs
+			echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> ${source1%.*}2.psy.avs
+			mv ${source1%.*}2.psy.avs ${source1%.*}.psytr.avs
+
 			if [ -e /usr/bin/beep ]; then beep $beep; fi
 
 			echo ""
 			echo "thoroughly look through this last test encodings and"
 			echo "decide, which one is your best encode."
+			echo "then close AvsPmod."
+			sleep 2
+			wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ${source1%.*}.psytr.avs
+
 			echo ""
 			echo "set psy-trellis"
 			echo "e.g. 0.05"
@@ -1026,11 +1234,12 @@ case "$answer10" in
 
 			u|U) # unset psy-trellis
 
+			echo "psy trellis now is set to \"unset\"."
+			echo ""
+
 			# keep cfg informed
 			sed -i '/psytr/d' $config
 			echo "psytr=unset" >> $config
-			echo ""
-			echo "psy trellis is set to \"unset\"."
 			echo ""
 
 			;;
@@ -1038,7 +1247,13 @@ case "$answer10" in
 			*) # neither any of the above
 
 			echo "stupid, that's neither \"t\" nor \"u\" :-) "
-			exit
+			echo "anyway, psy trellis now is set to \"unset\"."
+			echo ""
+
+			# keep cfg informed
+			sed -i '/psytr/d' $config
+			echo "psytr=unset" >> $config
+			echo ""
 
 			;;
 
@@ -1047,10 +1262,16 @@ case "$answer10" in
 
 	esac
 
-	echo "try another (maybe last) round"
-	echo "for optimal crf"
+	echo "do some weird things (option 6) or"
+	echo "try another (maybe last) round for optimal crf"
 	echo "option 7"
 	echo ""
+
+	;;
+
+	6)	# 6 - some more testing with different parameters
+
+	echo "here will be some more testing for e.g. chroma_qp_offset or other things"
 
 	;;
 
@@ -1077,12 +1298,19 @@ case "$answer10" in
 
 	start0=$(date +%s)
 
+	# create comparison screen avs
+	rm ${source1%.*}.finalcrf.avs &>/dev/null
+	echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > ${source1%.*}.finalcrf.avs
+
 	for ((crfnumber2=$crflow2; $crfnumber2<=$crfhigh2; crfnumber2+=$crffractional2));do
 		echo ""
 		echo "encoding ${source2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv"
 		echo ""
 
 		start1=$(date +%s)
+
+		#comparison screen
+		echo "=ffvideosource(\"${source2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv\").subtitle(\"${source2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv\", align=8)" >> ${source1%.*}.finalcrf.avs
 
 		wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
 		| x264 --stdin y4m \
@@ -1111,12 +1339,27 @@ case "$answer10" in
 	time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
 	echo "test encodings for a second round of crf lasted $time"
 
+	#comparison screen
+	prefixes=({a..z} {a..z}{a..z})
+	i=0
+	while IFS= read -r line; do
+	printf "%s %s\n" "${prefixes[i++]}""$line" >> ${source1%.*}.finalcrf2.avs
+	done < ${source1%.*}.finalcrf.avs
+	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < ${source1%.*}.finalcrf.avs) *2 -1|bc)-102 >> ${source1%.*}.finalcrf2.avs
+	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> ${source1%.*}.finalcrf2.avs
+	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> ${source1%.*}.finalcrf2.avs
+	mv ${source1%.*}.finalcrf2.avs ${source1%.*}.finalcrf.avs
+
 	if [ -e /usr/bin/beep ]; then beep $beep; fi
 
 	echo ""
 	echo "thoroughly look through all your test"
 	echo "encodings and decide, with which crf you"
 	echo "get best results at considerable bitrate."
+	echo "then close AvsPmod."
+	sleep 2
+	wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ${source1%.*}.finalcrf.avs
+
 	echo ""
 	echo "set crf parameter"
 	echo "e.g. 17.3"
