@@ -71,8 +71,8 @@
 
 
 # path to your config file
-config="${HOME}/.config/wine.encode.cfg"
-
+#config="${HOME}/.config/wine.encode.cfg"
+config="${HOME}/ptp/wine.encode/wine.encode.cfg"
 while IFS='= ' read lhs rhs
 do
     if [[ ! $lhs =~ ^\ *# && -n $lhs ]]; then
@@ -272,8 +272,8 @@ case "$answer00" in
 
 		*) # wrong! layer 8 problem
 
-		echo "stupid, that's neither \"e\" nor \"n\" :-) "
-		exit
+		echo "stupid, that's neither \"e\" nor \"n\""
+		echo "i take this for a no :-) "
 
 		;;
 	esac
@@ -500,8 +500,8 @@ case "$answer00" in
 			;;
 
 			*)
-			echo "stupid, that's not what i asked for :-) "
-			exit
+			echo "stupid, that's not what i asked for"
+			echo "you may try again"
 
 			;;
 
@@ -511,7 +511,7 @@ case "$answer00" in
 
 		*)
 		echo "stupid, that's neither yes or no :-) "
-		exit
+		echo "you may try again"
 
 		;;
 
@@ -557,7 +557,7 @@ case "$answer00" in
 		*)
 
 			echo "stupid, that's neither yes or no :-) "
-			exit
+			echo "i take this for a no :-) "
 
 			;;
 
@@ -620,7 +620,7 @@ case "$answer00" in
 		start1=$(date +%s)
 
 		#comparison screen
-		echo "=ffvideosource(\"${source2%.*}.crf$crf1.mkv\").subtitle(\"${source2%.*}.crf$crf1.mkv\", align=8)" >> ${source1%.*}.crf.avs
+		echo "=ffvideosource(\"${source1%.*}.crf$crf1.mkv\").subtitle(\"${source2%.*}.crf$crf1.mkv\", align=8)" >> ${source1%.*}.crf.avs
 
 		wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
 		| x264 --stdin y4m \
@@ -1430,7 +1430,7 @@ case "$answer00" in
 		*)
 
 		echo "stupid, that's neither yes or no :-) "
-		exit
+		echo "i take this for a no"
 
 		;;
 
