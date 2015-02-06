@@ -71,8 +71,8 @@
 
 
 # path to your config file
-#config="${HOME}/.config/wine.encode.cfg"
-config="${HOME}/ptp/wine.encode/wine.encode.cfg"
+config="${HOME}/.config/wine.encode.cfg"
+
 while IFS='= ' read lhs rhs
 do
     if [[ ! $lhs =~ ^\ *# && -n $lhs ]]; then
