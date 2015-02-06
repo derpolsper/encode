@@ -11,11 +11,11 @@ It offers nine options, one prerequesite to another, largely corresponding to th
 
 0 - check, if all necessary programs are installed and show your default settings
 1 - de-/ unencrypted VOB|m2ts -> mpeg2|h264 -> mkv
-2 - test for crf integers, followed by
-3 - test for suitable fractionals of crf
-4 - test for qcomp
-5 - test for aq strength and and psy-rd
-6 - test for psy-trellis
+2 - test for crf integers and fractionals of crf
+3 - test for qcomp 
+4 - test for aq strength and and psy-rd
+5 - test for psy-trellis
+6 - do some more things
 7 - another round of crf
 8 - encoding the whole movie
 
@@ -86,7 +86,6 @@ de-telecine video tracks
 handle demuxed audio files
 handle demuxed subtitles
 handle chapter files
-take comparison screenshots
 mux anything together
 
 Right now, you have one, and just one config file to store your parameters, which means you can only encode one movie after the other, not simultaneously, as parameters change from one movie to another.
