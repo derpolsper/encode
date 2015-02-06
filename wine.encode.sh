@@ -1208,8 +1208,8 @@ case "$answer00" in
 			done < ${source1%.*}.psytr.avs
 			echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < ${source1%.*}.psytr.avs) *2 -1|bc)-102 >> ${source1%.*}2.psytr.avs
 			echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> ${source1%.*}2.psytr.avs
-			echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> ${source1%.*}2.psy.avs
-			mv ${source1%.*}2.psy.avs ${source1%.*}.psytr.avs
+			echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> ${source1%.*}2.psytr.avs
+			mv ${source1%.*}2.psytr.avs ${source1%.*}.psytr.avs
 
 			if [ -e /usr/bin/beep ]; then beep $beep; fi
 
