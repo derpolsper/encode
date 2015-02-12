@@ -332,17 +332,17 @@ case "$answer00" in
 		mkvmerge -v -o "$source1" $(ls "$source0"|grep .mpeg2)
 
 		# eac3to's Log file names contain spaces
-		for i in *.txt; do mv -v "$i" $(echo "$i" | sed 's/ /_/g') &>/dev/null; done
+		for i in ./*.txt; do mv -v "$i" $(echo "$i" | sed 's/ /_/g') &>/dev/null; done
 
 # TODONOTE move ALL eac3to associated files to directory for demuxed files. does it?
-		for file in *.mpeg* *.h264 *.dts* *.pcm *.flac *.ac3 *.aac *.wav *.w64 *.sup *.txt; do mv $file "${source1%/*}"/ &>/dev/null; done
+		for file in ./*.mpeg* ./*.h264 ./*.dts* ./*.pcm ./*.flac ./*.ac3 ./*.aac ./*.wav ./*.w64 ./*.sup ./*.txt; do mv $file "${source1%/*}"/ &>/dev/null; done
 
 		echo ""
 		echo "you find the demuxed files in"
 		echo "${source1%/*}"
 		echo ""
 
-	elif [[ -f "$source0" && "$source0" = *.m2ts ]];
+	elif [[ -f "$source0" && "$source0" = ./*.m2ts ]];
 	then
 
 		cd "${source0%/*}"
@@ -373,10 +373,10 @@ case "$answer00" in
 		mkvmerge -v -o "$source1" $(ls "${source0%/*}"|grep .h264)
 
 		# eac3to's Log file names contain spaces
-		for i in *.txt; do mv -v "$i" $(echo $i | sed 's/ /_/g') &>/dev/null; done
+		for i in ./*.txt; do mv -v "$i" $(echo $i | sed 's/ /_/g') &>/dev/null; done
 
 # TODONOTE move ALL eac3to associated files to directory for demuxed files. does it?
-		for file in *.mpeg* *.h264 *.dts* *.pcm *.flac *.ac3 *.aac *.wav *.w64 *.sup *.txt; do mv $file "${source1%/*}"/ &>/dev/null; done
+		for file in ./*.mpeg* ./*.h264 ./*.dts* ./*.pcm ./*.flac ./*.ac3 ./*.aac ./*.wav ./*.w64 ./*.sup ./*.txt; do mv $file "${source1%/*}"/ &>/dev/null; done
 
 		echo ""
 		echo "you find the demuxed files in"
