@@ -82,7 +82,7 @@ do
         rhs="${rhs#\"*}"		# delete closing string quotes
         declare $lhs="$rhs"
     fi
-done < $config
+done < "$config"
 
 
 echo ""
@@ -159,8 +159,8 @@ case "$answer00" in
 		echo "" ;
 	fi
 
-	if [ -e ~/$wine/drive_c/Program\ Files/eac3to/eac3to.exe ]
-		then wine ~/$wine/drive_c/Program\ Files/eac3to/eac3to.exe|grep 'eac3to v'; echo ""
+	if [ -e ~/"$wine"/drive_c/Program\ Files/eac3to/eac3to.exe ]
+		then wine ~/"$wine"/drive_c/Program\ Files/eac3to/eac3to.exe|grep 'eac3to v'; echo ""
 		else echo ""
 		echo "***"
 		echo "*** eac3to seems NOT to be installed"
@@ -168,7 +168,7 @@ case "$answer00" in
 		echo "" ;
 	fi
 
-	if [ -e ~/$wine/drive_c/windows/system32/avisynth.dll ]
+	if [ -e ~/"$wine"/drive_c/windows/system32/avisynth.dll ]
 		then echo "avisynth seems to be installed"
 		echo ""
 		else
@@ -179,7 +179,7 @@ case "$answer00" in
 		echo "" ;
 	fi
 
-	if [ -e ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ]
+	if [ -e ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ]
 		then echo "AvsPmod seems to be installed"
 		echo ""
 		else echo ""
@@ -189,7 +189,7 @@ case "$answer00" in
 		echo "" ;
 	fi
 
-	if [ -e ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe ]
+	if [ -e ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe ]
 		then echo "avs2yuv seems to be installed"
 		echo ""
 		else
@@ -200,7 +200,7 @@ case "$answer00" in
 		echo "" ;
 	fi
 
-	if [ -e ~/$wine/drive_c/Program\ Files/Haali/MatroskaSplitter/uninstall.exe ]
+	if [ -e ~/"$wine"/drive_c/Program\ Files/Haali/MatroskaSplitter/uninstall.exe ]
 # TODONOTE: where and what to  search for?
 		then echo "MatroskaSplitter seems to be installed"
 		echo ""
@@ -230,24 +230,24 @@ case "$answer00" in
 	echo ""
 	echo "*** these are default encode settings ***"
 	echo ""
-	echo -e "TUNE:\t\t "$tune
-	echo -e "PROFILE:\t "$profile
-	echo -e "PRESET:\t\t "$preset
+	echo -e "TUNE:\t\t ""$tune"
+	echo -e "PROFILE:\t ""$profile"
+	echo -e "PRESET:\t\t ""$preset"
 	echo ""
 	echo -e "*** more specific settings ***"
 	echo ""
-	echo -e "ME:\t\t "$me
-	echo -e "MERANGE:\t "$merange
-	echo -e "SUBME:\t\t "$subme
-	echo -e "AQMODE:\t\t "$aqmode
-	echo -e "DEBLOCK:\t "$deblock
-	echo -e "lookahead:\t "$lookahead
+	echo -e "ME:\t\t ""$me"
+	echo -e "MERANGE:\t ""$merange"
+	echo -e "SUBME:\t\t ""$subme"
+	echo -e "AQMODE:\t\t ""$aqmode"
+	echo -e "DEBLOCK:\t ""$deblock"
+	echo -e "lookahead:\t ""$lookahead"
 	echo ""
 	echo "*** SelectRangeEvery ***"
 	echo ""
-	echo -e "INTERVAL:\t" $interval
-	echo -e "LENGTH:\t\t" $length
-	echo -e "OFFSET:\t\t" $offset
+	echo -e "INTERVAL:\t" "$interval"
+	echo -e "LENGTH:\t\t" "$length"
+	echo -e "OFFSET:\t\t" "$offset"
 	echo ""
 	echo "please note, parameters for reframes are"
 	echo "calculated from source file"
@@ -262,7 +262,7 @@ case "$answer00" in
 
 		e|E|edit) # edit the wine.encode.cfg
 
-		"${EDITOR:-vi}" $config
+		"${EDITOR:-vi}" "$config"
 
 		;;
 
@@ -293,13 +293,13 @@ case "$answer00" in
 	read -e -p "> " source0
 
 # TODONOTE dirty: if dir then dvd, if file then bluray
-	if [ -d $source0 ];
+	if [ -d "$source0" ];
 	then
 
-		cd $source0
+		cd "$source0"
 		echo "choose out of these VOB containers:"
 		echo ""
-		ls -l $source0|grep VOB$ |grep -v _0.VOB|grep -v VIDEO|awk '{print $9, $5}'
+		ls -l "$source0"|grep VOB$ |grep -v _0.VOB|grep -v VIDEO|awk '{print $9, $5}'
 		echo ""
 		echo "which group(s) of VOB containers do you"
 		echo "want to encode? add them like this:"
@@ -307,7 +307,7 @@ case "$answer00" in
 		echo ""
 		read -e -p "> " param0
 
-		wine ~/$wine/drive_c/Program\ Files/eac3to/eac3to.exe $param0
+		wine ~/"$wine"/drive_c/Program\ Files/eac3to/eac3to.exe "$param0"
 
 		echo ""
 		echo "extract all wanted tracks following this name pattern:"
@@ -316,7 +316,7 @@ case "$answer00" in
 		echo ""
 		read -e -p "> " param1
 
-		wine ~/$wine/drive_c/Program\ Files/eac3to/eac3to.exe $param0 $param1
+		wine ~/"$wine"/drive_c/Program\ Files/eac3to/eac3to.exe "$param0" "$param1"
 
 		echo ""
 		echo "where you want to place the demuxed file?"
@@ -325,29 +325,29 @@ case "$answer00" in
 		read -e -p "> " source1
 
 		# keep cfg informed
-		sed -i '/source1/d' $config
-		echo "source1=$source1" >> $config
+		sed -i '/source1/d' "$config"
+		echo "source1=$source1" >> "$config"
 
 #TODONOTE dirty. problems when >1 mpeg2 file
-		mkvmerge -v -o $source1 $(ls $source0|grep .mpeg2)
+		mkvmerge -v -o "$source1" $(ls "$source0"|grep .mpeg2)
 
 		# eac3to's Log file names contain spaces
-		for i in *.txt; do mv -v "$i" $(echo $i | sed 's/ /_/g') &>/dev/null; done
+		for i in *.txt; do mv -v "$i" $(echo "$i" | sed 's/ /_/g') &>/dev/null; done
 
 # TODONOTE move ALL eac3to associated files to directory for demuxed files. does it?
-		for file in *.mpeg* *.h264 *.dts* *.pcm *.flac *.ac3 *.aac *.wav *.w64 *.sup *.txt; do mv $file ${source1%/*}/ &>/dev/null; done
+		for file in *.mpeg* *.h264 *.dts* *.pcm *.flac *.ac3 *.aac *.wav *.w64 *.sup *.txt; do mv $file "${source1%/*}"/ &>/dev/null; done
 
 		echo ""
 		echo "you find the demuxed files in"
 		echo "${source1%/*}"
 		echo ""
 
-	elif [ -f $source0 ];
+	elif [[ -f "$source0" && "$source0" = *.m2ts ]];
 	then
 
-		cd ${source0%/*}
+		cd "${source0%/*}"
 
-		wine ~/$wine/drive_c/Program\ Files/eac3to/eac3to.exe ${source0##*/}
+		wine ~/"$wine"/drive_c/Program\ Files/eac3to/eac3to.exe "${source0##*/}"
 
 		echo ""
 		echo "extract all wanted tracks following this name pattern:"
@@ -356,7 +356,7 @@ case "$answer00" in
 		echo ""
 		read -e -p "> " param1
 
-		wine ~/$wine/drive_c/Program\ Files/eac3to/eac3to.exe ${source0##*/} $param1
+		wine ~/"$wine"/drive_c/Program\ Files/eac3to/eac3to.exe "${source0##*/}" "$param1"
 
 		echo ""
 		echo "where you want to place the demuxed file?"
@@ -365,18 +365,18 @@ case "$answer00" in
 		read -e -p "> " source1
 
 		# keep cfg informed
-		sed -i '/source1/d' $config
-		echo "source1=$source1" >> $config
+		sed -i '/source1/d' "$config"
+		echo "source1=$source1" >> "$config"
 
 		
 #TODONOTE: dirty. problems when >1 h264 file
-		mkvmerge -v -o $source1 $(ls ${source0%/*}|grep .h264)
+		mkvmerge -v -o "$source1" $(ls "${source0%/*}"|grep .h264)
 
 		# eac3to's Log file names contain spaces
 		for i in *.txt; do mv -v "$i" $(echo $i | sed 's/ /_/g') &>/dev/null; done
 
 # TODONOTE move ALL eac3to associated files to directory for demuxed files. does it?
-		for file in *.mpeg* *.h264 *.dts* *.pcm *.flac *.ac3 *.aac *.wav *.w64 *.sup *.txt; do mv $file ${source1%/*}/ &>/dev/null; done
+		for file in *.mpeg* *.h264 *.dts* *.pcm *.flac *.ac3 *.aac *.wav *.w64 *.sup *.txt; do mv $file "${source1%/*}"/ &>/dev/null; done
 
 		echo ""
 		echo "you find the demuxed files in"
@@ -389,7 +389,7 @@ case "$answer00" in
 
 	fi
 
-	if [ -e /usr/bin/beep ]; then beep $beep; fi
+	if [ -e /usr/bin/beep ]; then beep "$beep"; fi
 
 	;;
 
@@ -414,8 +414,8 @@ case "$answer00" in
 		read -e -p "> " testavs
 
 		# keep cfg informed
-		sed -i '/testavs/d' $config
-		echo "testavs=$testavs" >> $config
+		sed -i '/testavs/d' "$config"
+		echo "testavs=$testavs" >> "$config"
 
 		;;
 
@@ -428,17 +428,17 @@ case "$answer00" in
 		read -e -p "> " testavs
 
 		# keep cfg informed
-		sed -i '/testavs/d' $config
-		echo "testavs=$testavs" >> $config
+		sed -i '/testavs/d' "$config"
+		echo "testavs=$testavs" >> "$config"
 
-		echo "FFVideosource(\"$source1\")" > $testavs
+		echo "FFVideosource(\"$source1\")" > "$testavs"
 
 		echo ""
 		echo "check, if your movie is interlaced"
 		echo ""
 		echo "mediainfo says:"
 
-		mediainfo $source1|grep 'Scan type'|awk '{print $4}'
+		mediainfo "$source1"|grep 'Scan type'|awk '{print $4}'
 
 		echo ""
 		read -p "press enter to continue"
@@ -454,7 +454,7 @@ case "$answer00" in
 
 			y|Y|yes|YES)
 
-			wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe $testavs
+			wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "$testavs"
 
 			;;
 
@@ -473,29 +473,29 @@ case "$answer00" in
 
 			i|I) # interlaced
 
-			echo "QTGMC().SelectEven()" >> $testavs
-			echo "SelectRangeEvery($interval, $length, $offset)" >> $testavs
+			echo "QTGMC().SelectEven()" >> "$testavs"
+			echo "SelectRangeEvery($interval, $length, $offset)" >> "$testavs"
 
 			;;
 
 			t|T) # telecined
 # TODONOTE: how to integrate de-telecine?
-			echo "# placeholder de-telecine >> $testavs"
-			echo "SelectRangeEvery($interval, $length, $offset)" >> $testavs
+			echo "# placeholder de-telecine >> \"$testavs\""
+			echo "SelectRangeEvery($interval, $length, $offset)" >> "$testavs"
 
 			;;
 
 			b|B) # interlaced and telecined
 # TODONOTE: how to integrate de-telecine?
-			echo "QTGMC().SelectEven()" >> $testavs
-			echo "# placeholder de-telecine >> $testavs"
-			echo "SelectRangeEvery($interval, $length, $offset)" >> $testavs
+			echo "QTGMC().SelectEven()" >> "$testavs"
+			echo "# placeholder de-telecine >> \"$testavs\""
+			echo "SelectRangeEvery($interval, $length, $offset)" >> "$testavs"
 
 			;;
 
 			n|N) # neither interlaced nor telecined
 
-			echo "SelectRangeEvery($interval, $length, $offset)" >> $testavs
+			echo "SelectRangeEvery($interval, $length, $offset)" >> "$testavs"
 
 			;;
 
@@ -520,12 +520,12 @@ case "$answer00" in
 		# write path to final.avs to CFG and delete line Select…
 		# from final.avs
 #TODONOTE: thats quite circumstantial, can be done by ${testavs%/*}/final.avs only
-		cat  $testavs > ${testavs%/*}/final.avs
+		cat  "$testavs" > "${testavs%/*}"/final.avs
 		# keep cfg informed
-		sed -i '/^avs/d' $config
-		echo "avs=${testavs%/*}/final.avs" >> $config
+		sed -i '/^avs/d' "$config"
+		echo "avs=${testavs%/*}/final.avs" >> "$config"
 		sleep 1
-		sed -i '/SelectRangeEvery/d' ${testavs%/*}/final.avs
+		sed -i '/SelectRangeEvery/d' "${testavs%/*}"/final.avs
 
 		echo ""
 		echo "________________SAR_______|_PAR_|____DAR____"
@@ -546,7 +546,7 @@ case "$answer00" in
 
 		y|Y|yes|YES) # check sar with AvsPmod
 
-			wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe $testavs
+			wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "$testavs"
 
 			;;
 
@@ -568,33 +568,33 @@ case "$answer00" in
 	read -e -p "sar > " sar
 
 	# keep cfg informed
-	sed -i '/sar/d' $config
-	echo "sar=$sar" >> $config
+	sed -i '/sar/d' "$config"
+	echo "sar=$sar" >> "$config"
 
 	# find correct height, width and reframes for test encodes only
 	# final movie encoding may have different values due to cropping
 	# and resizing
 
-	darheight0=$(mediainfo $source1|grep Height|awk '{print $3$4}'|sed 's/[a-z]//g')
+	darheight0=$(mediainfo "$source1"|grep Height|awk '{print $3$4}'|sed 's/[a-z]//g')
 	# keep cfg informed
-	sed -i '/darheight0/d' $config
-	echo "darheight0=$darheight0" >> $config
+	sed -i '/darheight0/d' "$config"
+	echo "darheight0=$darheight0" >> "$config"
 
-	darwidth0=$(mediainfo $source1|grep Width|awk '{print $3$4}'|sed 's/[a-z]//g')
+	darwidth0=$(mediainfo "$source1"|grep Width|awk '{print $3$4}'|sed 's/[a-z]//g')
 	# keep cfg informed
-	sed -i '/darwidth0/d' $config
-	echo "darwidth0=$darwidth0" >> $config
+	sed -i '/darwidth0/d' "$config"
+	echo "darwidth0=$darwidth0" >> "$config"
 
-	ref0=$(echo "scale=0;32768/((($darwidth0 * ($sar) /16)+0.5)/1 * (($darheight0/16)+0.5)/1)"|bc)
+	ref0=$(echo "scale=0;32768/(((\"$darwidth0\" * (\"$sar\") /16)+0.5)/1 * ((\"$darheight0\"/16)+0.5)/1)"|bc)
 	# keep cfg informed
-	sed -i '/ref0/d' $config
-	echo "ref0=$ref0" >> $config
+	sed -i '/ref0/d' "$config"
+	echo "ref0=$ref0" >> "$config"
 
 	# isolate the source file name without file extension
 	# bash parameter expansion does not allow nesting, so do it in two steps
 	source2=${source1##*/}
-	sed -i '/source2/d' $config
-	echo "source2=$source2" >> $config
+	sed -i '/source2/d' "$config"
+	echo "source2=$source2" >> "$config"
 
 	echo ""
 	echo "set minimum crf as integer, e.g. 15"
@@ -609,8 +609,8 @@ case "$answer00" in
 	start0=$(date +%s)
 
 	# create comparison screen avs
-	rm ${source1%.*}.crf.avs &>/dev/null
-	echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > ${source1%.*}.crf.avs
+	rm "${source1%.*}".crf.avs &>/dev/null
+	echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > "${source1%.*}".crf.avs
 
 	for ((crf1=$crflow; $crf1<=$crfhigh; crf1=$crf1+1));do
 		echo ""
@@ -620,23 +620,23 @@ case "$answer00" in
 		start1=$(date +%s)
 
 		#comparison screen
-		echo "=ffvideosource(\"${source1%.*}.crf$crf1.mkv\").subtitle(\"${source2%.*}.crf$crf1.mkv\", align=8)" >> ${source1%.*}.crf.avs
+		echo "=ffvideosource(\"${source1%.*}.crf$crf1.mkv\").subtitle(\"${source2%.*}.crf$crf1.mkv\", align=8)" >> "${source1%.*}".crf.avs
 
-		wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
+		wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$testavs" - \
 		| x264 --stdin y4m \
-		--crf $crf1 \
-		--preset $preset \
-		--tune $tune \
-		--profile $profile \
-		--ref $ref0 \
-		--sar $sar \
-		--rc-lookahead $lookahead \
-		--me $me \
-		--merange $merange \
-		--subme $subme \
-		--deblock $deblock \
+		--crf "$crf1" \
+		--preset "$preset" \
+		--tune "$tune" \
+		--profile "$profile" \
+		--ref "$ref0" \
+		--sar "$sar" \
+		--rc-lookahead "$lookahead" \
+		--me "$me" \
+		--merange "$merange" \
+		--subme "$subme" \
+		--deblock "$deblock" \
 		--no-psy \
-		-o ${source1%.*}.crf$crf1.mkv -;
+		-o "${source1%.*}".crf$crf1.mkv -;
 
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
@@ -652,14 +652,14 @@ case "$answer00" in
 	prefixes=({a..z} {a..z}{a..z})
 	i=0
 	while IFS= read -r line; do
-	printf "%s %s\n" "${prefixes[i++]}""$line" >> ${source1%.*}2.crf.avs
-	done < ${source1%.*}.crf.avs
-	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < ${source1%.*}.crf.avs) *2 -1|bc)-102 >> ${source1%.*}2.crf.avs
-	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> ${source1%.*}2.crf.avs
-	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> ${source1%.*}2.crf.avs
-	mv ${source1%.*}2.crf.avs ${source1%.*}.crf.avs
+	printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}"2.crf.avs
+	done < "${source1%.*}".crf.avs
+	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".crf.avs) *2 -1|bc)-102 >> "${source1%.*}"2.crf.avs
+	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}"2.crf.avs
+	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}"2.crf.avs
+	mv "${source1%.*}"2.crf.avs "${source1%.*}".crf.avs
 
-	if [ -e /usr/bin/beep ]; then beep $beep; fi
+	if [ -e /usr/bin/beep ]; then beep "$beep"; fi
 		
 	echo ""
 	echo "look at these first encodings. if you find any detail loss"
@@ -667,7 +667,7 @@ case "$answer00" in
 	echo "find fractionals around this integer."
 	echo "then close AvsPmod."
 	sleep 2
-	wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ${source1%.*}.crf.avs
+	wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".crf.avs
 	
 	echo ""	
 	echo "set lowest crf value as hundreds,"
@@ -690,8 +690,8 @@ case "$answer00" in
 	start0=$(date +%s)
 
 	# create comparison screen avs
-	rm ${source1%.*}.crf2.avs &>/dev/null
-	echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > ${source1%.*}.crf2.avs
+	rm "${source1%.*}".crf2.avs &>/dev/null
+	echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > "${source1%.*}".crf2.avs
 
 	for ((crf2=$crflow2; $crf2<=$crfhigh2; crf2+=$crffractional));do
 		echo ""
@@ -701,23 +701,23 @@ case "$answer00" in
 		start1=$(date +%s)
 
 		#comparison screen
-		echo "=ffvideosource(\"${source2%.*}.crf$crf2.mkv\").subtitle(\"${source2%.*}.crf$crf2.mkv\", align=8)" >> ${source1%.*}.crf2.avs
+		echo "=ffvideosource(\"${source2%.*}.crf$crf2.mkv\").subtitle(\"${source2%.*}.crf$crf2.mkv\", align=8)" >> "${source1%.*}".crf2.avs
 
-		wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
+		wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$testavs" - \
 		| x264 --stdin y4m \
 		--crf $(printf '%s.%s' "$(($crf2/10))" "$(($crf2%10))") \
-		--preset $preset \
-		--tune $tune \
-		--profile $profile \
-		--ref $ref0 \
-		--sar $sar \
-		--rc-lookahead $lookahead \
-		--me $me \
-		--merange $merange \
-		--subme $subme \
-		--deblock $deblock \
+		--preset "$preset" \
+		--tune "$tune" \
+		--profile "$profile" \
+		--ref "$ref0" \
+		--sar "$sar" \
+		--rc-lookahead "$lookahead" \
+		--me "$me" \
+		--merange "$merange" \
+		--subme "$subme" \
+		--deblock "$deblock" \
 		--no-psy \
-		-o ${source1%.*}.crf$crf2.mkv -;
+		-o "${source1%.*}".crf$crf2.mkv -;
 
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
@@ -733,14 +733,14 @@ case "$answer00" in
 	prefixes=({a..z} {a..z}{a..z})
 	i=0
 	while IFS= read -r line; do
-	printf "%s %s\n" "${prefixes[i++]}""$line" >> ${source1%.*}2.crf2.avs
-	done < ${source1%.*}.crf2.avs
-	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < ${source1%.*}.crf2.avs) *2 -1|bc)-102 >> ${source1%.*}2.crf2.avs
-	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> ${source1%.*}2.crf2.avs
-	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> ${source1%.*}2.crf2.avs
-	mv ${source1%.*}2.crf2.avs ${source1%.*}.crf2.avs
+	printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}"2.crf2.avs
+	done < "${source1%.*}".crf2.avs
+	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".crf2.avs) *2 -1|bc)-102 >> "${source1%.*}"2.crf2.avs
+	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}"2.crf2.avs
+	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}"2.crf2.avs
+	mv "${source1%.*}"2.crf2.avs "${source1%.*}".crf2.avs
 
-	if [ -e /usr/bin/beep ]; then beep $beep; fi
+	if [ -e /usr/bin/beep ]; then beep "$beep"; fi
 
 	echo ""
 	echo "thoroughly look through all your test"
@@ -748,7 +748,7 @@ case "$answer00" in
 	echo "best results at acceptable file size."
 	echo "then close AvsPmod."
 	sleep 2
-	wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ${source1%.*}.crf2.avs
+	wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".crf2.avs
 
 	echo ""
 	echo "set crf parameter"
@@ -756,8 +756,8 @@ case "$answer00" in
 	echo ""
 	read -e -p "crf > " crf
 	# keep cfg informed
-	sed -i '/crf/d' $config
-	echo "crf=$crf" >> $config
+	sed -i '/crf/d' "$config"
+	echo "crf=$crf" >> "$config"
 
 	echo ""
 	echo "from here, run the script with"
@@ -790,8 +790,8 @@ case "$answer00" in
 	start0=$(date +%s)
 
 	# create comparison screen avs
-	rm ${source1%.*}.qcomp.avs &>/dev/null
-	echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > ${source1%.*}.qcomp.avs
+	rm "${source1%.*}".qcomp.avs &>/dev/null
+	echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > "${source1%.*}".qcomp.avs
 
 	for ((qcompnumber=$qcomplow; $qcompnumber<=$qcomphigh; qcompnumber+=$qcompfractional));do
 		echo ""
@@ -801,25 +801,25 @@ case "$answer00" in
 		start1=$(date +%s)
 
 		#comparison screen
-		echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\", align=8)" >> ${source1%.*}.qcomp.avs
+		echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\", align=8)" >> "${source1%.*}".qcomp.avs
 
-		wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
+		wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$testavs" - \
 		| x264 --stdin y4m \
-		--crf $crf \
-		--preset $preset \
-		--tune $tune \
-		--profile $profile \
-		--ref $ref0 \
-		--sar $sar \
-		--rc-lookahead $lookahead \
-		--me $me \
-		--merange $merange \
-		--subme $subme \
-		--aq-mode $aqmode \
-		--deblock $deblock \
+		--crf "$crf" \
+		--preset "$preset" \
+		--tune "$tune" \
+		--profile "$profile" \
+		--ref "$ref0" \
+		--sar "$sar" \
+		--rc-lookahead "$lookahead" \
+		--me "$me" \
+		--merange "$merange" \
+		--subme "$subme" \
+		--aq-mode "$aqmode" \
+		--deblock "$deblock" \
 		--no-psy \
 		--qcomp $(echo "scale=2;$qcompnumber/100"|bc) \
-		-o ${source1%.*}.crf$crf.qc$qcompnumber.mkv -;
+		-o "${source1%.*}".crf$crf.qc$qcompnumber.mkv -;
 
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
@@ -835,14 +835,14 @@ case "$answer00" in
 	prefixes=({a..z} {a..z}{a..z})
 	i=0
 	while IFS= read -r line; do
-	printf "%s %s\n" "${prefixes[i++]}""$line" >> ${source1%.*}.qcomp2.avs
-	done < ${source1%.*}.qcomp.avs
-	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < ${source1%.*}.qcomp.avs) *2 -1|bc)-102 >> ${source1%.*}.qcomp2.avs
-	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> ${source1%.*}.qcomp2.avs
-	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> ${source1%.*}.qcomp2.avs
-	mv ${source1%.*}.qcomp2.avs ${source1%.*}.qcomp.avs
+	printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}".qcomp2.avs
+	done < "${source1%.*}".qcomp.avs
+	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".qcomp.avs) *2 -1|bc)-102 >> "${source1%.*}".qcomp2.avs
+	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".qcomp2.avs
+	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".qcomp2.avs
+	mv "${source1%.*}".qcomp2.avs "${source1%.*}".qcomp.avs
 
-	if [ -e /usr/bin/beep ]; then beep $beep; fi
+	if [ -e /usr/bin/beep ]; then beep "$beep"; fi
 
 	echo ""
 	echo "thoroughly look through all your test"
@@ -850,7 +850,7 @@ case "$answer00" in
 	echo "best results."
 	echo "then close AvsPmod."
 	sleep 2
-	wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ${source1%.*}.qcomp.avs
+	wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".qcomp.avs
 
 	echo ""
 	echo "do you want to look for more subtle values in qcomp?"
@@ -881,8 +881,8 @@ case "$answer00" in
 		start0=$(date +%s)
 
 		# create comparison screen avs
-		rm ${source1%.*}.qcomp2.avs &>/dev/null
-		echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > ${source1%.*}.qcomp2.avs
+		rm "${source1%.*}".qcomp2.avs &>/dev/null
+		echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > "${source1%.*}".qcomp2.avs
 
 		for ((qcompnumber=$qcomplow; $qcompnumber<=$qcomphigh; qcompnumber+=$qcompfractional));do
 			echo ""
@@ -892,25 +892,25 @@ case "$answer00" in
 			start1=$(date +%s)
 
 			#comparison screen
-			echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\", align=8)" >> ${source1%.*}.qcomp2.avs
+			echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\", align=8)" >> "${source1%.*}".qcomp2.avs
 
-			wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
+			wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$testavs" - \
 			| x264 --stdin y4m \
-			--crf $crf \
-			--preset $preset \
-			--tune $tune \
-			--profile $profile \
-			--ref $ref0 \
-			--sar $sar \
-			--rc-lookahead $lookahead \
-			--me $me \
-			--merange $merange \
-			--subme $subme \
-			--aq-mode $aqmode \
-			--deblock $deblock \
+			--crf "$crf" \
+			--preset "$preset" \
+			--tune "$tune" \
+			--profile "$profile" \
+			--ref "$ref0" \
+			--sar "$sar" \
+			--rc-lookahead "$lookahead" \
+			--me "$me" \
+			--merange "$merange" \
+			--subme "$subme" \
+			--aq-mode "$aqmode" \
+			--deblock "$deblock" \
 			--no-psy \
 			--qcomp $(echo "scale=2;$qcompnumber/100"|bc) \
-			-o ${source1%.*}.crf$crf.qc$qcompnumber.mkv -;
+			-o "${source1%.*}".crf$crf.qc$qcompnumber.mkv -;
 
 			stop=$(date +%s);
 			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
@@ -926,14 +926,14 @@ case "$answer00" in
 		prefixes=({a..z} {a..z}{a..z})
 		i=0
 		while IFS= read -r line; do
-		printf "%s %s\n" "${prefixes[i++]}""$line" >> ${source1%.*}.qcomp3.avs
-		done < ${source1%.*}.qcomp2.avs
-		echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < ${source1%.*}.qcomp2.avs) *2 -1|bc)-102 >> ${source1%.*}.qcomp3.avs
-		echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> ${source1%.*}.qcomp3.avs
-		echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> ${source1%.*}.qcomp3.avs
-		mv ${source1%.*}.qcomp3.avs ${source1%.*}.qcomp2.avs
+		printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}".qcomp3.avs
+		done < "${source1%.*}".qcomp2.avs
+		echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".qcomp2.avs) *2 -1|bc)-102 >> "${source1%.*}".qcomp3.avs
+		echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".qcomp3.avs
+		echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".qcomp3.avs
+		mv "${source1%.*}".qcomp3.avs "${source1%.*}".qcomp2.avs
 
-		if [ -e /usr/bin/beep ]; then beep $beep; fi
+		if [ -e /usr/bin/beep ]; then beep "$beep"; fi
 
 		echo ""
 		echo "thoroughly look through all your test"
@@ -941,7 +941,7 @@ case "$answer00" in
 		echo "best results."
 		echo "then close AvsPmod."
 		sleep 2
-		wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ${source1%.*}.qcomp2.avs
+		wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".qcomp2.avs
 	
 		;;
 
@@ -964,8 +964,8 @@ case "$answer00" in
 	read -e -p "qcomp > " qcomp
 
 	# keep cfg informed
-	sed -i '/qcomp/d' $config
-	echo "qcomp=$qcomp" >> $config
+	sed -i '/qcomp/d' "$config"
+	echo "qcomp=$qcomp" >> "$config"
 
 	echo ""
 	echo "from here, run the script with"
@@ -1020,8 +1020,8 @@ case "$answer00" in
 	start0=$(date +%s)
 
 	# create comparison screen avs
-	rm ${source1%.*}.aqpsy.avs &>/dev/null
-	echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > ${source1%.*}.aqpsy.avs
+	rm "${source1%.*}".aqpsy.avs &>/dev/null
+	echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > "${source1%.*}".aqpsy.avs
 
 	for ((aqnumber=$aqlow; $aqnumber<=$aqhigh; aqnumber+=$aqfractional));do
 		for ((psy1number=$psy1low; $psy1number<=$psy1high; psy1number+=$psy1fractional));do
@@ -1032,26 +1032,26 @@ case "$answer00" in
 			start1=$(date +%s)
 
 			#comparison screen
-			echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv\", align=8)" >> ${source1%.*}.aqpsy.avs
+			echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv\", align=8)" >> "${source1%.*}".aqpsy.avs
 
-			wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
+			wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$testavs" - \
 			| x264 --stdin y4m \
-			--crf $crf \
-			--qcomp $qcomp \
-			--preset $preset \
-			--tune $tune \
-			--profile $profile \
-			--ref $ref0 \
-			--sar $sar \
-			--rc-lookahead $lookahead \
-			--me $me \
-			--merange $merange \
-			--subme $subme \
-			--aq-mode $aqmode \
-			--deblock $deblock \
+			--crf "$crf" \
+			--qcomp "$qcomp" \
+			--preset "$preset" \
+			--tune "$tune" \
+			--profile "$profile" \
+			--ref "$ref0" \
+			--sar "$sar" \
+			--rc-lookahead "$lookahead" \
+			--me "$me" \
+			--merange "$merange" \
+			--subme "$subme" \
+			--aq-mode "$aqmode" \
+			--deblock "$deblock" \
 			--aq-strength $(echo "scale=2;$aqnumber/100"|bc) \
 			--psy-rd $(echo "scale=2;$psy1number/100"|bc):unset \
-			-o ${source1%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv -;
+			-o "${source1%.*}".crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv -;
 
 			stop=$(date +%s);
 			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
@@ -1069,14 +1069,14 @@ case "$answer00" in
 	prefixes=({a..z} {a..z}{a..z})
 	i=0
 	while IFS= read -r line; do
-	printf "%s %s\n" "${prefixes[i++]}""$line" >> ${source1%.*}.aqpsy2.avs
-	done < ${source1%.*}.aqpsy.avs
-	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < ${source1%.*}.aqpsy.avs) *2 -1|bc)-102 >> ${source1%.*}.aqpsy2.avs
-	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> ${source1%.*}aqpsy2.avs
-	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> ${source1%.*}.aqpsy2.avs
-	mv ${source1%.*}.aqpsy2.avs ${source1%.*}.aqpsy.avs
+	printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}".aqpsy2.avs
+	done < "${source1%.*}".aqpsy.avs
+	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".aqpsy.avs) *2 -1|bc)-102 >> "${source1%.*}".aqpsy2.avs
+	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}"aqpsy2.avs
+	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".aqpsy2.avs
+	mv "${source1%.*}".aqpsy2.avs "${source1%.*}".aqpsy.avs
 
-	if [ -e /usr/bin/beep ]; then beep $beep; fi
+	if [ -e /usr/bin/beep ]; then beep "$beep"; fi
 
 	echo ""
 	echo "thoroughly look through all your test encodings"
@@ -1084,7 +1084,7 @@ case "$answer00" in
 	echo "parameters gave you best results."
 	echo "then close AvsPmod."
 	sleep 2
-	wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ${source1%.*}.aqpsy.avs
+	wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".aqpsy.avs
 	
 	echo ""
 	echo "set aq strength"
@@ -1093,8 +1093,8 @@ case "$answer00" in
 	read -e -p "aq strength > " aqs
 
 	# keep cfg informed
-	sed -i '/aqs/d' $config
-	echo "aqs=$aqs" >> $config
+	sed -i '/aqs/d' "$config"
+	echo "aqs=$aqs" >> "$config"
 
 	echo ""
 	echo "set psy-rd"
@@ -1103,8 +1103,8 @@ case "$answer00" in
 	read -e -p "psy-rd > " psyrd
 
 	# keep cfg informed
-	sed -i '/psyrd/d' $config
-	echo "psyrd=$psyrd" >> $config
+	sed -i '/psyrd/d' "$config"
+	echo "psyrd=$psyrd" >> "$config"
 
 	echo ""
 	echo "run the script with option 5"
@@ -1123,8 +1123,8 @@ case "$answer00" in
 		echo ""
 
 		# keep cfg informed
-		sed -i '/psytr/d' $config
-		echo "psytr=unset" >> $config
+		sed -i '/psytr/d' "$config"
+		echo "psytr=unset" >> "$config"
 
 		;;
 
@@ -1158,8 +1158,8 @@ case "$answer00" in
 			start0=$(date +%s)
 
 			# create comparison screen avs
-			rm ${source1%.*}.psytr.avs &>/dev/null
-			echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > ${source1%.*}.psytr.avs
+			rm "${source1%.*}".psytr.avs &>/dev/null
+			echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > "${source1%.*}".psytr.avs
 
 			for ((psy2number=$psy2low; $psy2number<=$psy2high; psy2number+=$psy2fractional));do
 				echo ""
@@ -1169,26 +1169,26 @@ case "$answer00" in
 				start1=$(date +%s)
 
 				#comparison screen
-				echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv\", align=8)" >> ${source1%.*}.psytr.avs
+				echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv\", align=8)" >> "${source1%.*}".psytr.avs
 
-				wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
+				wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$testavs" - \
 				| x264 --stdin y4m \
-				--crf $crf \
-				--qcomp $qcomp \
-				--aq-strength $aqs \
-				--preset $preset \
-				--tune $tune \
-				--profile $profile \
-				--ref $ref0 \
-				--sar $sar \
-				--rc-lookahead $lookahead \
-				--me $me \
-				--merange $merange \
-				--subme $subme \
-				--aq-mode $aqmode \
-				--deblock $deblock \
-				--psy-rd $psyrd:$(echo "scale=2;$psy2number/100"|bc) \
-				-o ${source1%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv -;
+				--crf "$crf" \
+				--qcomp "$qcomp" \
+				--aq-strength "$aqs" \
+				--preset "$preset" \
+				--tune "$tune" \
+				--profile "$profile" \
+				--ref "$ref0" \
+				--sar "$sar" \
+				--rc-lookahead "$lookahead" \
+				--me "$me" \
+				--merange "$merange" \
+				--subme "$subme" \
+				--aq-mode "$aqmode" \
+				--deblock "$deblock" \
+				--psy-rd "$psyrd":$(echo "scale=2;$psy2number/100"|bc) \
+				-o "${source1%.*}".crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv -;
 
 				stop=$(date +%s);
 				time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
@@ -1204,21 +1204,21 @@ case "$answer00" in
 			prefixes=({a..z} {a..z}{a..z})
 			i=0
 			while IFS= read -r line; do
-			printf "%s %s\n" "${prefixes[i++]}""$line" >> ${source1%.*}2.psytr.avs
-			done < ${source1%.*}.psytr.avs
-			echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < ${source1%.*}.psytr.avs) *2 -1|bc)-102 >> ${source1%.*}2.psytr.avs
-			echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> ${source1%.*}2.psytr.avs
-			echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> ${source1%.*}2.psytr.avs
-			mv ${source1%.*}2.psytr.avs ${source1%.*}.psytr.avs
+			printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}"2.psytr.avs
+			done < "${source1%.*}".psytr.avs
+			echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".psytr.avs) *2 -1|bc)-102 >> "${source1%.*}"2.psytr.avs
+			echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}"2.psytr.avs
+			echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}"2.psytr.avs
+			mv "${source1%.*}"2.psytr.avs "${source1%.*}".psytr.avs
 
-			if [ -e /usr/bin/beep ]; then beep $beep; fi
+			if [ -e /usr/bin/beep ]; then beep "$beep"; fi
 
 			echo ""
 			echo "thoroughly look through this last test encodings and"
 			echo "decide, which one is your best encode."
 			echo "then close AvsPmod."
 			sleep 2
-			wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ${source1%.*}.psytr.avs
+			wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".psytr.avs
 
 			echo ""
 			echo "set psy-trellis"
@@ -1227,8 +1227,8 @@ case "$answer00" in
 			read -e -p "psy-trellis > " psytr
 
 			# keep cfg informed
-			sed -i '/psytr/d' $config
-			echo "psytr=$psytr" >> $config
+			sed -i '/psytr/d' "$config"
+			echo "psytr=$psytr" >> "$config"
 
 			;;
 
@@ -1238,8 +1238,8 @@ case "$answer00" in
 			echo ""
 
 			# keep cfg informed
-			sed -i '/psytr/d' $config
-			echo "psytr=unset" >> $config
+			sed -i '/psytr/d' "$config"
+			echo "psytr=unset" >> "$config"
 			echo ""
 
 			;;
@@ -1251,8 +1251,8 @@ case "$answer00" in
 			echo ""
 
 			# keep cfg informed
-			sed -i '/psytr/d' $config
-			echo "psytr=unset" >> $config
+			sed -i '/psytr/d' "$config"
+			echo "psytr=unset" >> "$config"
 			echo ""
 
 			;;
@@ -1299,8 +1299,8 @@ case "$answer00" in
 	start0=$(date +%s)
 
 	# create comparison screen avs
-	rm ${source1%.*}.finalcrf.avs &>/dev/null
-	echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > ${source1%.*}.finalcrf.avs
+	rm "${source1%.*}".finalcrf.avs &>/dev/null
+	echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > "${source1%.*}".finalcrf.avs
 
 	for ((crfnumber2=$crflow2; $crfnumber2<=$crfhigh2; crfnumber2+=$crffractional2));do
 		echo ""
@@ -1310,24 +1310,24 @@ case "$answer00" in
 		start1=$(date +%s)
 
 		#comparison screen
-		echo "=ffvideosource(\"${source2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv\").subtitle(\"${source2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv\", align=8)" >> ${source1%.*}.finalcrf.avs
+		echo "=ffvideosource(\"${source2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv\").subtitle(\"${source2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv\", align=8)" >> "${source1%.*}".finalcrf.avs
 
-		wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $testavs - \
+		wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$testavs" - \
 		| x264 --stdin y4m \
-		--qcomp $qcomp \
-		--aq-strength $aqs \
-		--psy-rd $psyrd:$psytr \
-		--preset $preset \
-		--tune $tune \
-		--profile $profile \
-		--ref $ref0 \
-		--rc-lookahead $lookahead \
-		--me $me \
-		--merange $merange \
-		--subme $subme \
-		--deblock $deblock \
+		--qcomp "$qcomp" \
+		--aq-strength "$aqs" \
+		--psy-rd "$psyrd":"$psytr": \
+		--preset "$preset" \
+		--tune "$tune" \
+		--profile "$profile" \
+		--ref "$ref0" \
+		--rc-lookahead "$lookahead" \
+		--me "$me" \
+		--merange "$merange" \
+		--subme "$subme" \
+		--deblock "$deblock" \
 		--crf $(echo "scale=1;$crfnumber2/10"|bc) \
-		-o ${source1%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv -;
+		-o "${source1%.*}".qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv -;
 
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
@@ -1343,14 +1343,14 @@ case "$answer00" in
 	prefixes=({a..z} {a..z}{a..z})
 	i=0
 	while IFS= read -r line; do
-	printf "%s %s\n" "${prefixes[i++]}""$line" >> ${source1%.*}.finalcrf2.avs
-	done < ${source1%.*}.finalcrf.avs
-	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < ${source1%.*}.finalcrf.avs) *2 -1|bc)-102 >> ${source1%.*}.finalcrf2.avs
-	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> ${source1%.*}.finalcrf2.avs
-	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> ${source1%.*}.finalcrf2.avs
-	mv ${source1%.*}.finalcrf2.avs ${source1%.*}.finalcrf.avs
+	printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}".finalcrf2.avs
+	done < "${source1%.*}".finalcrf.avs
+	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".finalcrf.avs) *2 -1|bc)-102 >> "${source1%.*}".finalcrf2.avs
+	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".finalcrf2.avs
+	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".finalcrf2.avs
+	mv "${source1%.*}".finalcrf2.avs "${source1%.*}".finalcrf.avs
 
-	if [ -e /usr/bin/beep ]; then beep $beep; fi
+	if [ -e /usr/bin/beep ]; then beep "$beep"; fi
 
 	echo ""
 	echo "thoroughly look through all your test"
@@ -1358,7 +1358,7 @@ case "$answer00" in
 	echo "get best results at considerable bitrate."
 	echo "then close AvsPmod."
 	sleep 2
-	wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ${source1%.*}.finalcrf.avs
+	wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".finalcrf.avs
 
 	echo ""
 	echo "set crf parameter"
@@ -1367,8 +1367,8 @@ case "$answer00" in
 	read -e -p "crf > " crf
 
 	# keep cfg informed
-	sed -i '/crf/d' $config
-	echo "crf=$crf" >> $config
+	sed -i '/crf/d' "$config"
+	echo "crf=$crf" >> "$config"
 
 	echo "now you may run the script"
 	echo "to encode the whole movie with"
@@ -1419,7 +1419,7 @@ case "$answer00" in
 
 		y|Y|yes|YES)
 
-		wine ~/$wine/drive_c/Program\ Files/AvsPmod/AvsPmod.exe $avs
+		wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "$avs"
 
 		;;
 
@@ -1450,11 +1450,11 @@ case "$answer00" in
 	# Get reframes for 1080
 	darwidth1=$(echo "$darwidth0-$left-$right"|bc)
 	darheight1=$(echo "$darheight0-$top-$bottom"|bc)
-	ref1=$(echo "scale=0;32768/((($darwidth1 * ($sar) /16)+0.5)/1 * (($darheight1/16)+0.5)/1)"|bc)
+	ref1=$(echo "scale=0;32768/(((\"$darwidth1\" * (\"$sar\") /16)+0.5)/1 * ((\"$darheight1\"/16)+0.5)/1)"|bc)
 
 	# keep cfg informed
-	sed -i '/ref1/d' $config
-	echo "ref1=$ref1" >> $config
+	sed -i '/ref1/d' "$config"
+	echo "ref1=$ref1" >> "$config"
 
 	echo ""
 	echo "now encoding ${source2%.*}.final.1080.mkv"
@@ -1463,32 +1463,32 @@ case "$answer00" in
 
 	start=$(date +%s)
 
-	wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $avs - \
+	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
 	| x264 --stdin y4m \
-	--crf $crf \
-	--sar $sar \
-	--qcomp $qcomp \
-	--aq-strength $aqs \
-	--psy-rd $psyrd:$psytr \
-	--preset $preset \
-	--tune $tune \
-	--profile $profile \
-	--ref $ref1 \
-	--rc-lookahead $lookahead \
-	--me $me \
-	--merange $merange \
-	--subme $subme \
-	--aq-mode $aqmode \
-	--deblock $deblock \
-	--vf crop:$left,$top,$right,$bottom \
-	-o ${source1%.*}.final.1080.mkv -;
+	--crf "$crf" \
+	--sar "$sar" \
+	--qcomp "$qcomp" \
+	--aq-strength "$aqs" \
+	--psy-rd "$psyrd":"$psytr": \
+	--preset "$preset" \
+	--tune "$tune" \
+	--profile "$profile" \
+	--ref "$ref1" \
+	--rc-lookahead "$lookahead" \
+	--me "$me" \
+	--merange "$merange" \
+	--subme "$subme" \
+	--aq-mode "$aqmode" \
+	--deblock "$deblock" \
+	--vf crop:"$left","$top","$right","$bottom" \
+	-o "${source1%.*}".final.1080.mkv -;
 
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo "encoding ${source2%.*}.final.1080.mkv"
 	echo "with $darwidth1×$darheight1 lasted $time"
 
-	if [ -e /usr/bin/beep ]; then beep $beep; fi
+	if [ -e /usr/bin/beep ]; then beep "$beep"; fi
 
 	;;
 
@@ -1510,38 +1510,38 @@ case "$answer00" in
 	echo ""
 
 	# Get reframes for 720p
-	ref7=$(echo "scale=0;32768/((($width7 * ($sar) /16)+0.5)/1 * (($height7/16)+0.5)/1)"|bc)
+	ref7=$(echo "scale=0;32768/(((\"$width7\" * (\"$sar\") /16)+0.5)/1 * ((\"$height7\"/16)+0.5)/1)"|bc)
 	# keep cfg informed
-	sed -i '/ref7/d' $config
-	echo "ref7=$ref7" >> $config
+	sed -i '/ref7/d' "$config"
+	echo "ref7=$ref7" >> "$config"
 
 	start=$(date +%s)
 
-	wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $avs - \
+	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
 	| x264 --stdin y4m \
-	--crf $crf \
-	--qcomp $qcomp \
-	--aq-strength $aqs \
-	--psy-rd $psyrd:$psytr \
-	--preset $preset \
-	--tune $tune \
-	--profile $profile \
-	--ref $ref7 \
-	--rc-lookahead $lookahead \
-	--me $me \
-	--merange $merange \
-	--subme $subme \
-	--aq-mode $aqmode \
-	--deblock $deblock \
-	--vf crop:$left,$top,$right,$bottom/resize:$width7,$height7 \
-	-o ${source1%.*}.final.720.mkv -;
+	--crf "$crf" \
+	--qcomp "$qcomp" \
+	--aq-strength "$aqs" \
+	--psy-rd "$psyrd":"$psytr": \
+	--preset "$preset" \
+	--tune "$tune" \
+	--profile "$profile" \
+	--ref "$ref7" \
+	--rc-lookahead "$lookahead" \
+	--me "$me" \
+	--merange "$merange" \
+	--subme "$subme" \
+	--aq-mode "$aqmode" \
+	--deblock "$deblock" \
+	--vf crop:"$left","$top","$right","$bottom"/resize:"$width7","$height7" \
+	-o "${source1%.*}".final.720.mkv -;
 
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo "encoding ${source2%.*}.final.720.mkv"
 	echo "with $width7×$height7 lasted $time"
 
-	if [ -e /usr/bin/beep ]; then beep $beep; fi
+	if [ -e /usr/bin/beep ]; then beep "$beep"; fi
 
 	;;
 
@@ -1567,39 +1567,39 @@ case "$answer00" in
 	# though --preset Placebo sets reframes to 16, but 
 	# 1- that may set level ≥ 4.1
 	# 2- cropping may change reframes value
-	ref5=$(echo "scale=0;32768/((($width5 * ($sar) /16)+0.5)/1 * (($height5/16)+0.5)/1)"|bc)
+	ref5=$(echo "scale=0;32768/(((\"$width5\" * (\"$sar\") /16)+0.5)/1 * ((\"$height5\"/16)+0.5)/1)"|bc)
 	# keep cfg informed
-	sed -i '/ref5/d' $config
-	echo "ref5=$ref5" >> $config
+	sed -i '/ref5/d' "$config"
+	echo "ref5=$ref5" >> "$config"
 
 	start=$(date +%s)
 
-	wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $avs - \
+	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
 	| x264 --stdin y4m \
-	--crf $crf \
-	--sar $sar \
-	--ref $ref5 \
-	--qcomp $qcomp \
-	--aq-strength $aqs \
-	--psy-rd $psyrd:$psytr \
-	--preset $preset \
-	--tune $tune \
-	--profile $profile \
-	--rc-lookahead $lookahead \
-	--me $me \
-	--merange $merange \
-	--subme $subme \
-	--aq-mode $aqmode \
-	--deblock $deblock \
-	--vf crop:$left,$top,$right,$bottom/resize:$width5,$height5 \
-	-o ${source1%.*}.final.SD.mkv -;
+	--crf "$crf" \
+	--sar "$sar" \
+	--ref "$ref5" \
+	--qcomp "$qcomp" \
+	--aq-strength "$aqs" \
+	--psy-rd "$psyrd":"$psytr": \
+	--preset "$preset" \
+	--tune "$tune" \
+	--profile "$profile" \
+	--rc-lookahead "$lookahead" \
+	--me "$me" \
+	--merange "$merange" \
+	--subme "$subme" \
+	--aq-mode "$aqmode" \
+	--deblock "$deblock" \
+	--vf crop:"$left","$top","$right","$bottom"/resize:"$width5","$height5" \
+	-o "${source1%.*}".final.SD.mkv -;
 
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo "encoding ${source2%.*}.final.SD.mkv"
 	echo "with $width5×$height5 lasted $time"
 
-	if [ -e /usr/bin/beep ]; then beep $beep; fi
+	if [ -e /usr/bin/beep ]; then beep "$beep"; fi
 
 	;;
 
@@ -1636,32 +1636,32 @@ case "$answer00" in
 	echo ""
 
 	# Get reframes for SD
-	ref5=$(echo "scale=0;32768/((($width5/16)+0.5)/1 * (($height5/16)+0.5)/1)"|bc)
+	ref5=$(echo "scale=0;32768/(((\"$width5\"/16)+0.5)/1 * ((\"$height5\"/16)+0.5)/1)"|bc)
 	# keep cfg informed
-	sed -i '/ref5/d' $config
-	echo "ref5=$ref5" >> $config
+	sed -i '/ref5/d' "$config"
+	echo "ref5=$ref5" >> "$config"
 
 	start=$(date +%s)
 
-	wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $avs - \
+	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
 	| x264 --stdin y4m \
-	--crf $crf \
-	--sar $sar \
-	--ref $ref5 \
-	--qcomp $qcomp \
-	--aq-strength $aqs \
-	--psy-rd $psyrd:$psytr \
-	--preset $preset \
-	--tune $tune \
-	--profile $profile \
-	--rc-lookahead $lookahead \
-	--me $me \
-	--merange $merange \
-	--subme $subme \
-	--aq-mode $aqmode \
-	--deblock $deblock \
-	--vf crop:$left,$top,$right,$bottom/resize:$width5,$height5 \
-	-o ${source1%.*}.final.SD.mkv -;
+	--crf "$crf" \
+	--sar "$sar" \
+	--ref "$ref5" \
+	--qcomp "$qcomp" \
+	--aq-strength "$aqs" \
+	--psy-rd "$psyrd":"$psytr": \
+	--preset "$preset" \
+	--tune "$tune" \
+	--profile "$profile" \
+	--rc-lookahead "$lookahead" \
+	--me "$me" \
+	--merange "$merange" \
+	--subme "$subme" \
+	--aq-mode "$aqmode" \
+	--deblock "$deblock" \
+	--vf crop:"$left","$top","$right","$bottom"/resize:"$width5","$height5" \
+	-o "${source1%.*}".final.SD.mkv -;
 
 	stop=$(date +%s)
 
@@ -1675,32 +1675,32 @@ case "$answer00" in
 	echo ""
 
 	# Get reframes for 720p
-	ref7=$(echo "scale=0;32768/((($width7 * ($sar) /16)+0.5)/1 * (($height7/16)+0.5)/1)"|bc)
+	ref7=$(echo "scale=0;32768/(((\"$width7\" * (\"$sar\") /16)+0.5)/1 * ((\"$height7\"/16)+0.5)/1)"|bc)
 	# keep cfg informed
-	sed -i '/ref7/d' $config
-	echo "ref7=$ref7" >> $config
+	sed -i '/ref7/d' "$config"
+	echo "ref7=$ref7" >> "$config"
 	
 	start=$(date +%s)
 
-	wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $avs - \
+	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
 	| x264 --stdin y4m \
-	--crf $crf \
-	--sar $sar \
-	--qcomp $qcomp \
-	--aq-strength $aqs \
-	--psy-rd $psyrd:$psytr \
-	--preset $preset \
-	--tune $tune \
-	--profile $profile \
-	--ref $ref7 \
-	--rc-lookahead $lookahead \
-	--me $me \
-	--merange $merange \
-	--subme $subme \
-	--aq-mode $aqmode \
-	--deblock $deblock \
-	--vf crop:$left,$top,$right,$bottom/resize:$width7,$height7 \
-	-o ${source1%.*}.final.720.mkv -;
+	--crf "$crf" \
+	--sar "$sar" \
+	--qcomp "$qcomp" \
+	--aq-strength "$aqs" \
+	--psy-rd "$psyrd":"$psytr": \
+	--preset "$preset" \
+	--tune "$tune" \
+	--profile "$profile" \
+	--ref "$ref7" \
+	--rc-lookahead "$lookahead" \
+	--me "$me" \
+	--merange "$merange" \
+	--subme "$subme" \
+	--aq-mode "$aqmode" \
+	--deblock "$deblock" \
+	--vf crop:"$left","$top","$right","$bottom"/resize:"$width7","$height7" \
+	-o "${source1%.*}".final.720.mkv -;
 
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
@@ -1712,10 +1712,10 @@ case "$answer00" in
 	# Get reframes for 1080
 	darwidth1=$(echo "$darwidth0-$left-$right"|bc)
 	darheight1=$(echo "$darheight0-$top-$bottom"|bc)
-	ref1=$(echo "scale=0;32768/((($darwidth1  * ($sar) /16)+0.5)/1 * (($darheight1/16)+0.5)/1)"|bc)
+	ref1=$(echo "scale=0;32768/(((\"$darwidth1\"  * (\"$sar\") /16)+0.5)/1 * ((\"$darheight1\"/16)+0.5)/1)"|bc)
 	# keep cfg informed
-	sed -i '/ref1/d' $config
-	echo "ref1=$ref1" >> $config
+	sed -i '/ref1/d' "$config"
+	echo "ref1=$ref1" >> "$config"
 
 	echo ""
 	echo "now encoding ${source2%.*}.final.1080.mkv"
@@ -1724,25 +1724,25 @@ case "$answer00" in
 
 	start=$(date +%s)
 
-	wine ~/$wine/drive_c/Program\ Files/avs2yuv/avs2yuv.exe $avs - \
+	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
 	| x264 --stdin y4m \
-	--crf $crf \
-	--sar $sar \
-	--qcomp $qcomp \
-	--aq-strength $aqs \
-	--psy-rd $psyrd:$psytr \
-	--preset $preset \
-	--tune $tune \
-	--profile $profile \
-	--ref $ref1 \
-	--rc-lookahead $lookahead \
-	--me $me \
-	--merange $merange \
-	--subme $subme \
-	--aq-mode $aqmode \
-	--deblock $deblock \
-	--vf crop:$left,$top,$right,$bottom \
-	-o ${source1%.*}.final.1080.mkv -;
+	--crf "$crf" \
+	--sar "$sar" \
+	--qcomp "$qcomp" \
+	--aq-strength "$aqs" \
+	--psy-rd "$psyrd":"$psytr": \
+	--preset "$preset" \
+	--tune "$tune" \
+	--profile "$profile" \
+	--ref "$ref1" \
+	--rc-lookahead "$lookahead" \
+	--me "$me" \
+	--merange "$merange" \
+	--subme "$subme" \
+	--aq-mode "$aqmode" \
+	--deblock "$deblock" \
+	--vf crop:"$left","$top","$right","$bottom" \
+	-o "${source1%.*}".final.1080.mkv -;
 
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
@@ -1751,7 +1751,7 @@ case "$answer00" in
 	echo "with $darwidth1×$darheight1 lasted $time"
 	echo ""
 
-	if [ -e /usr/bin/beep ]; then beep $beep; fi
+	if [ -e /usr/bin/beep ]; then beep "$beep"; fi
 	;;
 	esac
 	;;
