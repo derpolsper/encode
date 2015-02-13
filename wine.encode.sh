@@ -701,7 +701,7 @@ case "$answer00" in
 		start1=$(date +%s)
 
 		#comparison screen
-		echo "=ffvideosource(\"${source2%.*}.crf$crf2.mkv\").subtitle(\"${source2%.*}.crf$crf2.mkv\", align=8)" >> "${source1%.*}".crf2.avs
+		echo "=ffvideosource(\"${source1%.*}.crf$crf2.mkv\").subtitle(\"${source2%.*}.crf$crf2.mkv\", align=8)" >> "${source1%.*}".crf2.avs
 
 		wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$testavs" - \
 		| x264 --stdin y4m \
@@ -801,7 +801,7 @@ case "$answer00" in
 		start1=$(date +%s)
 
 		#comparison screen
-		echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\", align=8)" >> "${source1%.*}".qcomp.avs
+		echo "=ffvideosource(\"${source1%.*}.crf$crf.qc$qcompnumber.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\", align=8)" >> "${source1%.*}".qcomp.avs
 
 		wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$testavs" - \
 		| x264 --stdin y4m \
@@ -892,7 +892,7 @@ case "$answer00" in
 			start1=$(date +%s)
 
 			#comparison screen
-			echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\", align=8)" >> "${source1%.*}".qcomp2.avs
+			echo "=ffvideosource(\"${source1%.*}.crf$crf.qc$qcompnumber.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcompnumber.mkv\", align=8)" >> "${source1%.*}".qcomp2.avs
 
 			wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$testavs" - \
 			| x264 --stdin y4m \
@@ -1032,7 +1032,7 @@ case "$answer00" in
 			start1=$(date +%s)
 
 			#comparison screen
-			echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv\", align=8)" >> "${source1%.*}".aqpsy.avs
+			echo "=ffvideosource(\"${source1%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv\", align=8)" >> "${source1%.*}".aqpsy.avs
 
 			wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$testavs" - \
 			| x264 --stdin y4m \
@@ -1169,7 +1169,7 @@ case "$answer00" in
 				start1=$(date +%s)
 
 				#comparison screen
-				echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv\", align=8)" >> "${source1%.*}".psytr.avs
+				echo "=ffvideosource(\"${source1%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv\", align=8)" >> "${source1%.*}".psytr.avs
 
 				wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$testavs" - \
 				| x264 --stdin y4m \
@@ -1306,7 +1306,7 @@ case "$answer00" in
 				start1=$(date +%s)
 
 				#comparison screen
-				echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqponumber.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqponumber.mkv\", align=8)" >> "${source1%.*}".cqpo.avs
+				echo "=ffvideosource(\"${source1%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqponumber.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqponumber.mkv\", align=8)" >> "${source1%.*}".cqpo.avs
 
 				wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$testavs" - \
 				| x264 --stdin y4m \
@@ -1409,13 +1409,13 @@ case "$answer00" in
 
 	for ((crfnumber2=$crflow2; $crfnumber2<=$crfhigh2; crfnumber2+=$crffractional2));do
 		echo ""
-		echo "encoding ${source2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv"
+		echo "encoding ${source2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.crf$crfnumber2.mkv"
 		echo ""
 
 		start1=$(date +%s)
 
 		#comparison screen
-		echo "=ffvideosource(\"${source2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv\").subtitle(\"${source2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv\", align=8)" >> "${source1%.*}".finalcrf.avs
+		echo "=ffvideosource(\"${source1%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.crf$crfnumber2.mkv\").subtitle(\"${source2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.crf$crfnumber2.mkv\", align=8)" >> "${source1%.*}".finalcrf.avs
 
 		wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$testavs" - \
 		| x264 --stdin y4m \
@@ -1433,11 +1433,11 @@ case "$answer00" in
 		--deblock "$deblock" \
 		--chroma-qp-offset "$cqpo" \
 		--crf $(echo "scale=1;$crfnumber2/10"|bc) \
-		-o "${source1%.*}".qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv -;
+		-o "${source1%.*}".qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.crf$crfnumber2.mkv -;
 
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-		echo "encoding ${source2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv lasted $time"
+		echo "encoding ${source2%.*}.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.crf$crfnumber2.mkv lasted $time"
 
 	done
 
