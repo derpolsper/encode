@@ -101,7 +101,7 @@ echo "4 - variations in aq strength and psy-rd"
 echo ""
 echo "5 - variations in psy-trellis"
 echo ""
-echo "6 - different things: chroma_qp_offset etc"
+echo "6 - different things: chroma-qp-offset etc"
 echo ""
 echo "7 - another round of crf"
 echo ""
@@ -1272,29 +1272,24 @@ case "$answer00" in
 	6)	# 6 - some more testing with different parameters
 
 	echo "what do you want to test?"
-	echo "(c)hroma_qp_offset with a sensible range -2 - 2"
+	echo "(c)hroma-qp-offset with a sensible range -2 - 2"
 	echo "(n)othing right now"
 	echo "(d)on't know yet"
-	read -e- p "(c|n|d) > " answer65
+	read -e -p "(c|n|d) > " answer65
 
-	case in $answer65
+	case $answer65 in
 
-		c|C)	# chroma_qp_offset
+		c|C)	# chroma-qp-offset
 
-			echo "test for values -2 to 2"
-			echo "set lowest value for chroma_qp_offset, e.g. -20 for -2"
+			echo "test for chroma-qp-offset, default 0, sensible ranges -3 to 3"
+			echo "set lowest value for chroma-qp-offset, e.g. -2"
 			echo ""
-			read -e -p "chroma_qp_offset, lowest value > " cqpolow
-
-			echo ""
-			echo "set maximum value for chroma_qp_offset, e.g. 20 for 2"
-			echo ""
-			read -e -p "chroma_qp_offset, maximum value > " cqpohigh
+			read -e -p "chroma-qp-offset, lowest value > " cqpolow
 
 			echo ""
-			echo "set fractional steps, e.g. 5 for 0.5"
+			echo "set maximum value for chroma-qp-offset, e.g. 2"
 			echo ""
-			read -e -p "fractionals > " cqpofractional
+			read -e -p "chroma-qp-offset, maximum value > " cqpohigh
 
 			start0=$(date +%s)
 
@@ -1302,7 +1297,7 @@ case "$answer00" in
 			rm "${source1%.*}".cqpo.avs &>/dev/null
 			echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > "${source1%.*}".cqpo.avs
 
-			for ((cqponumber=$cqpolow; $cqponumber<=$cqpohigh; cqponumber+=$cqpofractional));do
+			for ((cqponumber=$cqpolow; $cqponumber<=$cqpohigh; cqponumber+=1));do
 				echo ""
 				echo "encoding ${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.mkv"
 				echo ""
@@ -1329,7 +1324,7 @@ case "$answer00" in
 				--aq-mode "$aqmode" \
 				--deblock "$deblock" \
 				--psy-rd "$psyrd":"$psytr" \
-				--chroma_qp_offset $(echo "scale=1;$cqponumber/10"|bc) \
+				--chroma-qp-offset "$cqponumber" \
 				-o "${source1%.*}".crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.mkv -;
 
 				stop=$(date +%s);
@@ -1340,7 +1335,7 @@ case "$answer00" in
 
 			stop=$(date +%s);
 			time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-			echo "test encodings for chroma_qp_offset lasted $time"
+			echo "test encodings for chroma-qp-offset lasted $time"
 			#comparison screen
 			prefixes=({a..z} {a..z}{a..z})
 			i=0
@@ -1361,10 +1356,10 @@ case "$answer00" in
 			wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".cqpo.avs
 
 			echo ""
-			echo "set chroma_qp_offset"
+			echo "set chroma-qp-offset"
 			echo "e.g. 0.5"
 			echo ""
-			read -e -p "chroma_qp_offset > " cqpo
+			read -e -p "chroma-qp-offset > " cqpo
 
 			# keep cfg informed
 			sed -i '/cqpo/d' "$config"
@@ -1435,7 +1430,7 @@ case "$answer00" in
 		--merange "$merange" \
 		--subme "$subme" \
 		--deblock "$deblock" \
-		--chroma_qp_offset "$cqpo" \
+		--chroma-qp-offset "$cqpo" \
 		--crf $(echo "scale=1;$crfnumber2/10"|bc) \
 		-o "${source1%.*}".qc$qcomp.aq$aqs.psy$psyrd.$psytr.crf$crfnumber2.mkv -;
 
@@ -1590,7 +1585,7 @@ case "$answer00" in
 	--subme "$subme" \
 	--aq-mode "$aqmode" \
 	--deblock "$deblock" \
-	--chroma_qp_offset "$cqpo" \
+	--chroma-qp-offset "$cqpo" \
 	--vf crop:"$left","$top","$right","$bottom" \
 	-o "${source1%.*}".final.1080.mkv -;
 
@@ -1644,7 +1639,7 @@ case "$answer00" in
 	--subme "$subme" \
 	--aq-mode "$aqmode" \
 	--deblock "$deblock" \
-	--chroma_qp_offset "$cqpo" \
+	--chroma-qp-offset "$cqpo" \
 	--vf crop:"$left","$top","$right","$bottom"/resize:"$width7","$height7" \
 	-o "${source1%.*}".final.720.mkv -;
 
@@ -1703,7 +1698,7 @@ case "$answer00" in
 	--subme "$subme" \
 	--aq-mode "$aqmode" \
 	--deblock "$deblock" \
-	--chroma_qp_offset "$cqpo" \
+	--chroma-qp-offset "$cqpo" \
 	--vf crop:"$left","$top","$right","$bottom"/resize:"$width5","$height5" \
 	-o "${source1%.*}".final.SD.mkv -;
 
@@ -1773,7 +1768,7 @@ case "$answer00" in
 	--subme "$subme" \
 	--aq-mode "$aqmode" \
 	--deblock "$deblock" \
-	--chroma_qp_offset "$cqpo" \
+	--chroma-qp-offset "$cqpo" \
 	--vf crop:"$left","$top","$right","$bottom"/resize:"$width5","$height5" \
 	-o "${source1%.*}".final.SD.mkv -;
 
@@ -1813,7 +1808,7 @@ case "$answer00" in
 	--subme "$subme" \
 	--aq-mode "$aqmode" \
 	--deblock "$deblock" \
-	--chroma_qp_offset "$cqpo" \
+	--chroma-qp-offset "$cqpo" \
 	--vf crop:"$left","$top","$right","$bottom"/resize:"$width7","$height7" \
 	-o "${source1%.*}".final.720.mkv -;
 
@@ -1856,7 +1851,7 @@ case "$answer00" in
 	--subme "$subme" \
 	--aq-mode "$aqmode" \
 	--deblock "$deblock" \
-	--chroma_qp_offset "$cqpo" \
+	--chroma-qp-offset "$cqpo" \
 	--vf crop:"$left","$top","$right","$bottom" \
 	-o "${source1%.*}".final.1080.mkv -;
 
