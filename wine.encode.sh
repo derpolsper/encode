@@ -1272,6 +1272,7 @@ case "$answer00" in
 	6)	# 6 - some more testing with different parameters
 
 	echo "what do you want to test?"
+	echo ""
 	echo "(c)hroma-qp-offset with a sensible range -2 - 2"
 	echo "(n)othing right now"
 	echo "(d)on't know yet"
@@ -1299,13 +1300,13 @@ case "$answer00" in
 
 			for ((cqponumber=$cqpolow; $cqponumber<=$cqpohigh; cqponumber+=1));do
 				echo ""
-				echo "encoding ${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.mkv"
+				echo "encoding ${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqponumber.mkv"
 				echo ""
 
 				start1=$(date +%s)
 
 				#comparison screen
-				echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.mkv\", align=8)" >> "${source1%.*}".cqpo.avs
+				echo "=ffvideosource(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqponumber.mkv\").subtitle(\"${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqponumber.mkv\", align=8)" >> "${source1%.*}".cqpo.avs
 
 				wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$testavs" - \
 				| x264 --stdin y4m \
@@ -1325,11 +1326,11 @@ case "$answer00" in
 				--deblock "$deblock" \
 				--psy-rd "$psyrd":"$psytr" \
 				--chroma-qp-offset "$cqponumber" \
-				-o "${source1%.*}".crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.mkv -;
+				-o "${source1%.*}".crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqponumber.mkv -;
 
 				stop=$(date +%s);
 				time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-				echo "encoding ${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.mkv lasted $time"
+				echo "encoding ${source2%.*}.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqponumber.mkv lasted $time"
 
 			done
 
