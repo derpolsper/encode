@@ -585,7 +585,7 @@ case "$answer00" in
 	sed -i '/darwidth0/d' "$config"
 	echo "darwidth0=$darwidth0" >> "$config"
 
-	ref0=$(echo "scale=0;32768/(((\"$darwidth0\" * (\"$sar\") /16)+0.5)/1 * ((\"$darheight0\"/16)+0.5)/1)"|bc)
+	ref0=$(echo "scale=0;32768/((("$darwidth0" * ("$sar") /16)+0.5)/1 * (("$darheight0"/16)+0.5)/1)"|bc)
 	# keep cfg informed
 	sed -i '/ref0/d' "$config"
 	echo "ref0=$ref0" >> "$config"
@@ -1556,7 +1556,7 @@ case "$answer00" in
 	# Get reframes for 1080
 	darwidth1=$(echo "$darwidth0-$left-$right"|bc)
 	darheight1=$(echo "$darheight0-$top-$bottom"|bc)
-	ref1=$(echo "scale=0;32768/(((\"$darwidth1\" * (\"$sar\") /16)+0.5)/1 * ((\"$darheight1\"/16)+0.5)/1)"|bc)
+	ref1=$(echo "scale=0;32768/((("$darwidth1" * ("$sar") /16)+0.5)/1 * (("$darheight1"/16)+0.5)/1)"|bc)
 
 	# keep cfg informed
 	sed -i '/ref1/d' "$config"
@@ -1617,7 +1617,7 @@ case "$answer00" in
 	echo ""
 
 	# Get reframes for 720p
-	ref7=$(echo "scale=0;32768/(((\"$width7\" * (\"$sar\") /16)+0.5)/1 * ((\"$height7\"/16)+0.5)/1)"|bc)
+	ref7=$(echo "scale=0;32768/((("$width7" * ("$sar") /16)+0.5)/1 * (("$height7"/16)+0.5)/1)"|bc)
 	# keep cfg informed
 	sed -i '/ref7/d' "$config"
 	echo "ref7=$ref7" >> "$config"
@@ -1675,7 +1675,7 @@ case "$answer00" in
 	# though --preset Placebo sets reframes to 16, but 
 	# 1- that may set level ≥ 4.1
 	# 2- cropping may change reframes value
-	ref5=$(echo "scale=0;32768/(((\"$width5\" * (\"$sar\") /16)+0.5)/1 * ((\"$height5\"/16)+0.5)/1)"|bc)
+	ref5=$(echo "scale=0;32768/((("$width5" * ("$sar") /16)+0.5)/1 * (("$height5"/16)+0.5)/1)"|bc)
 	# keep cfg informed
 	sed -i '/ref5/d' "$config"
 	echo "ref5=$ref5" >> "$config"
@@ -1745,7 +1745,7 @@ case "$answer00" in
 	echo ""
 
 	# Get reframes for SD
-	ref5=$(echo "scale=0;32768/(((\"$width5\"/16)+0.5)/1 * ((\"$height5\"/16)+0.5)/1)"|bc)
+	ref5=$(echo "scale=0;32768/((("$width5"/16)+0.5)/1 * (("$height5"/16)+0.5)/1)"|bc)
 	# keep cfg informed
 	sed -i '/ref5/d' "$config"
 	echo "ref5=$ref5" >> "$config"
@@ -1785,7 +1785,7 @@ case "$answer00" in
 	echo ""
 
 	# Get reframes for 720p
-	ref7=$(echo "scale=0;32768/(((\"$width7\" * (\"$sar\") /16)+0.5)/1 * ((\"$height7\"/16)+0.5)/1)"|bc)
+	ref7=$(echo "scale=0;32768/((("$width7" * ("$sar") /16)+0.5)/1 * (("$height7"/16)+0.5)/1)"|bc)
 	# keep cfg informed
 	sed -i '/ref7/d' "$config"
 	echo "ref7=$ref7" >> "$config"
@@ -1823,7 +1823,7 @@ case "$answer00" in
 	# Get reframes for 1080
 	darwidth1=$(echo "$darwidth0-$left-$right"|bc)
 	darheight1=$(echo "$darheight0-$top-$bottom"|bc)
-	ref1=$(echo "scale=0;32768/(((\"$darwidth1\"  * (\"$sar\") /16)+0.5)/1 * ((\"$darheight1\"/16)+0.5)/1)"|bc)
+	ref1=$(echo "scale=0;32768/((("$darwidth1"  * ("$sar") /16)+0.5)/1 * (("$darheight1"/16)+0.5)/1)"|bc)
 	# keep cfg informed
 	sed -i '/ref1/d' "$config"
 	echo "ref1=$ref1" >> "$config"
