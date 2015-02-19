@@ -241,7 +241,7 @@ case "$answer00" in
 	echo -e "SUBME:\t\t ""$subme"
 	echo -e "AQMODE:\t\t ""$aqmode"
 	echo -e "DEBLOCK:\t ""$deblock"
-	echo -e "lookahead:\t ""$lookahead"
+	echo -e "LOOKAHEAD:\t ""$lookahead"
 	echo ""
 	echo "*** SelectRangeEvery ***"
 	echo ""
@@ -249,11 +249,12 @@ case "$answer00" in
 	echo -e "LENGTH:\t\t" "$length"
 	echo -e "OFFSET:\t\t" "$offset"
 	echo ""
-	echo "please note, parameters for reframes are"
-	echo "calculated from source file"
+	echo "parameters for reframes are calculated"
+	echo "automatically from source file"
 	echo ""
 	echo "do you want to adjust them to your needs?"
-	echo "(e)dit now or"
+	echo "(e)dit now"
+	echo "or"
 	echo "(n)o thanks, everything is fine"
 	echo ""
 	read -e -p "(e|n) > " answer10
@@ -311,12 +312,13 @@ case "$answer00" in
 
 		echo ""
 		echo "extract all wanted tracks following this name pattern:"
-		echo "[1-n]:name.extension, e.g. 2:name.h264 3:name.flac 4:name.ac3 5:name.sup etc"
-		echo "the video stream MUST be given mpeg2 as file extension"
+		echo "[1-n]:name.extension, e.g. 2:name.mpeg2 3:name.ac3 4:name.eng.sup 5:name.spa.sup etc"
+		echo "the video stream HAS TO be given mpeg2 as file extension"
 		echo ""
 		read -e -p "> " param1
 
-		wine ~/"$wine"/drive_c/Program\ Files/eac3to/eac3to.exe "$param0" "$param1"
+		# keep $param1 without parenthesis, otherwise eac3to fails while parsing the parameter
+		wine ~/"$wine"/drive_c/Program\ Files/eac3to/eac3to.exe "$param0" $param1
 
 		echo ""
 		echo "where you want to place the demuxed file?"
@@ -329,13 +331,13 @@ case "$answer00" in
 		echo "source1=$source1" >> "$config"
 
 #TODONOTE dirty. problems when >1 mpeg2 file
-		mkvmerge -v -o "$source1" $(ls "$source0"|grep .mpeg2)
+		mkvmerge -v -o "$source1" $(ls "$source0"|grep -e mpeg2 -e m2v)
 
 		# eac3to's Log file names contain spaces
 		for i in ./*.txt; do mv -v "$i" $(echo "$i" | sed 's/ /_/g') &>/dev/null; done
 
 # TODONOTE move ALL eac3to associated files to directory for demuxed files. does it?
-		for file in ./*.mpeg* ./*.h264 ./*.dts* ./*.pcm ./*.flac ./*.ac3 ./*.aac ./*.wav ./*.w64 ./*.sup ./*.txt; do mv $file "${source1%/*}"/ &>/dev/null; done
+		for file in ./*m2v ./*.mpeg* ./*.h264 ./*.dts* ./*.pcm ./*.flac ./*.ac3 ./*.aac ./*.wav ./*.w64 ./*.sup ./*.txt; do mv $file "${source1%/*}"/ &>/dev/null; done
 
 		echo ""
 		echo "you find the demuxed files in"
@@ -352,11 +354,12 @@ case "$answer00" in
 		echo ""
 		echo "extract all wanted tracks following this name pattern:"
 		echo "[1-n]:name.extension, e.g. 2:name.h264 3:name.flac 4:name.ac3 5:name.sup etc"
-		echo "the video stream MUST be given h264 as file extension"
+		echo "the video stream HAS TO be given h264 as file extension"
 		echo ""
 		read -e -p "> " param1
 
-		wine ~/"$wine"/drive_c/Program\ Files/eac3to/eac3to.exe "${source0##*/}" "$param1"
+		# keep $param1 without parenthesis, otherwise eac3to fails while parsing the parameter
+		wine ~/"$wine"/drive_c/Program\ Files/eac3to/eac3to.exe "${source0##*/}" $param1
 
 		echo ""
 		echo "where you want to place the demuxed file?"
@@ -367,7 +370,6 @@ case "$answer00" in
 		# keep cfg informed
 		sed -i '/source1/d' "$config"
 		echo "source1=$source1" >> "$config"
-
 		
 #TODONOTE: dirty. problems when >1 h264 file
 		mkvmerge -v -o "$source1" $(ls "${source0%/*}"|grep .h264)
@@ -376,7 +378,7 @@ case "$answer00" in
 		for i in ./*.txt; do mv -v "$i" $(echo $i | sed 's/ /_/g') &>/dev/null; done
 
 # TODONOTE move ALL eac3to associated files to directory for demuxed files. does it?
-		for file in ./*.mpeg* ./*.h264 ./*.dts* ./*.pcm ./*.flac ./*.ac3 ./*.aac ./*.wav ./*.w64 ./*.sup ./*.txt; do mv $file "${source1%/*}"/ &>/dev/null; done
+		for file in ./*m2v ./*.mpeg* ./*.h264 ./*.dts* ./*.pcm ./*.flac ./*.ac3 ./*.aac ./*.wav ./*.w64 ./*.sup ./*.txt; do mv $file "${source1%/*}"/ &>/dev/null; done
 
 		echo ""
 		echo "you find the demuxed files in"
