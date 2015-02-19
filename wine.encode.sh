@@ -1495,21 +1495,33 @@ case "$answer00" in
 	echo "number of pixels to be cropped on the"
 	echo ""
 	read -e -p "left > " left
+	# keep cfg informed
+	sed -i '/left/d' "$config"
+	echo "left=$left" >> "$config"
 
 	echo ""
 	echo "number of pixels to be cropped on the"
 	echo ""
 	read -e -p "top > " top
+	# keep cfg informed
+	sed -i '/top/d' "$config"
+	echo "top=$top" >> "$config"
 
 	echo ""
 	echo "number of pixels to be cropped on the"
 	echo ""
 	read -e -p "right > " right
+	# keep cfg informed
+	sed -i '/right/d' "$config"
+	echo "right=$right" >> "$config"
 
 	echo ""
 	echo "number of pixels to be cropped on the"
 	echo ""
 	read -e -p "bottom > " bottom
+	# keep cfg informed
+	sed -i '/bottom/d' "$config"
+	echo "bottom=$bottom" >> "$config"
 
 	# resizing
 	echo "if you want to resize with or without cropping,"
@@ -1569,6 +1581,13 @@ case "$answer00" in
 
 	start=$(date +%s)
 
+	# create comparison screen avs
+	rm "${source1%.*}".comparison.1080.avs &>/dev/null
+	echo "a=import(\"$testavs\").subtitle(\"Source\", align=8).Crop(-"$LEFT", "$TOP", -"$RIGHT", -"$BOTTOM").Spline36Resize("$darwidth1","$darheight1")" > "${source1%.*}".comparison.1080.avs
+	echo "b=ffvideosource(\"${source1%.*}.final.1080.mkv\").subtitle(\"${source2%.*}.final.1080.mkv\", align=8)" >> "${source1%.*}".comparison.1080.avs
+	echo "interleave(a,b)"
+	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.1080.avs
+	
 	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
 	| x264 --stdin y4m \
 	--crf "$crf" \
@@ -1595,7 +1614,14 @@ case "$answer00" in
 	echo "encoding ${source2%.*}.final.1080.mkv"
 	echo "with $darwidth1×$darheight1 lasted $time"
 
+	echo "encoding for ${source2%.*}.final.1080.mkv lasted $time"
+
 	if [ -e /usr/bin/beep ]; then beep "$beep"; fi
+
+	echo "take some comparison screen shots"
+	echo "then close AvsPmod"
+	sleep 2
+	wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".comparison.1080.avs
 
 	;;
 
@@ -1624,6 +1650,13 @@ case "$answer00" in
 
 	start=$(date +%s)
 
+	# create comparison screen avs
+	rm "${source1%.*}".comparison.720.avs &>/dev/null
+	echo "a=import(\"$testavs\").subtitle(\"Source\", align=8).Crop(-"$LEFT", "$TOP", -"$RIGHT", -"$BOTTOM").Spline36Resize("$width7","$height7")" > "${source1%.*}".comparison.720.avs
+	echo "b=ffvideosource(\"${source1%.*}.final.720.mkv\").subtitle(\"${source2%.*}.final.720.mkv\", align=8)" >> "${source1%.*}".comparison.720.avs
+	echo "interleave(a,b)"
+	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.720.avs
+
 	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
 	| x264 --stdin y4m \
 	--crf "$crf" \
@@ -1650,6 +1683,11 @@ case "$answer00" in
 	echo "with $width7×$height7 lasted $time"
 
 	if [ -e /usr/bin/beep ]; then beep "$beep"; fi
+
+	echo "take some comparison screen shots"
+	echo "then close AvsPmod"
+	sleep 2
+	wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".comparison.720.avs
 
 	;;
 
@@ -1682,6 +1720,13 @@ case "$answer00" in
 
 	start=$(date +%s)
 
+	# create comparison screen avs
+	rm "${source1%.*}".comparison.SD.avs &>/dev/null
+	echo "a=import(\"$testavs\").subtitle(\"Source\", align=8).Crop(-"$LEFT", "$TOP", -"$RIGHT", -"$BOTTOM").Spline36Resize("$width5","$height5")" > "${source1%.*}".comparison.SD.avs
+	echo "b=ffvideosource(\"${source1%.*}.final.SD.mkv\").subtitle(\"${source2%.*}.final.SD.mkv\", align=8)" >> "${source1%.*}".comparison.SD.avs
+	echo "interleave(a,b)"
+	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.SD.avs
+
 	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
 	| x264 --stdin y4m \
 	--crf "$crf" \
@@ -1709,6 +1754,11 @@ case "$answer00" in
 	echo "with $width5×$height5 lasted $time"
 
 	if [ -e /usr/bin/beep ]; then beep "$beep"; fi
+
+	echo "take some comparison screen shots"
+	echo "then close AvsPmod"
+	sleep 2
+	wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".comparison.SD.avs
 
 	;;
 
@@ -1752,6 +1802,13 @@ case "$answer00" in
 
 	start=$(date +%s)
 
+	# create comparison screen avs
+	rm "${source1%.*}".comparison.SD.avs &>/dev/null
+	echo "a=import(\"$testavs\").subtitle(\"Source\", align=8).Crop(-"$LEFT", "$TOP", -"$RIGHT", -"$BOTTOM").Spline36Resize("$width5","$height5")" > "${source1%.*}".comparison.SD.avs
+	echo "b=ffvideosource(\"${source1%.*}.final.SD.mkv\").subtitle(\"${source2%.*}.final.SD.mkv\", align=8)" >> "${source1%.*}".comparison.SD.avs
+	echo "interleave(a,b)"
+	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.SD.avs
+
 	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
 	| x264 --stdin y4m \
 	--crf "$crf" \
@@ -1791,6 +1848,13 @@ case "$answer00" in
 	echo "ref7=$ref7" >> "$config"
 	
 	start=$(date +%s)
+
+	# create comparison screen avs
+	rm "${source1%.*}".comparison.720.avs &>/dev/null
+	echo "a=import(\"$testavs\").subtitle(\"Source\", align=8).Crop(-"$LEFT", "$TOP", -"$RIGHT", -"$BOTTOM").Spline36Resize("$width7","$height7")" > "${source1%.*}".comparison.720.avs
+	echo "b=ffvideosource(\"${source1%.*}.final.720.mkv\").subtitle(\"${source2%.*}.final.720.mkv\", align=8)" >> "${source1%.*}".comparison.720.avs
+	echo "interleave(a,b)"
+	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.720.avs
 
 	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
 	| x264 --stdin y4m \
@@ -1835,6 +1899,13 @@ case "$answer00" in
 
 	start=$(date +%s)
 
+	# create comparison screen avs
+	rm "${source1%.*}".comparison.1080.avs &>/dev/null
+	echo "a=import(\"$testavs\").subtitle(\"Source\", align=8).Crop(-"$LEFT", "$TOP", -"$RIGHT", -"$BOTTOM").Spline36Resize("$darwidth1","$darheight1")" > "${source1%.*}".comparison.1080.avs
+	echo "b=ffvideosource(\"${source1%.*}.final.1080.mkv\").subtitle(\"${source2%.*}.final.1080.mkv\", align=8)" >> "${source1%.*}".comparison.1080.avs
+	echo "interleave(a,b)"
+	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.1080.avs
+
 	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
 	| x264 --stdin y4m \
 	--crf "$crf" \
@@ -1864,6 +1935,14 @@ case "$answer00" in
 	echo ""
 
 	if [ -e /usr/bin/beep ]; then beep "$beep"; fi
+
+	echo "take some comparison screen shots of all the encodings you want"
+	echo "then close AvsPmod"
+	sleep 2
+	wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".comparison.1080.avs
+	wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".comparison.7200.avs
+	wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".comparison.SD.avs
+
 	;;
 	esac
 	;;
