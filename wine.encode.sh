@@ -299,7 +299,7 @@ case "$answer00" in
 		cd "$source0"
 		echo "choose out of these VOB containers:"
 		echo ""
-		ls -l "$source0"|grep VOB$ |grep -v _0.VOB|grep -v VIDEO|awk '{print $9, $5}'
+		ls -l "$source0"|awk '!/VIDEO/ {print}'| awk '/VOB$/ {print }'|awk '!/0.VOB/ { print $9 ,$5 }'
 		echo ""
 		echo "which group(s) of VOB containers do you"
 		echo "want to encode? add them like this:"
@@ -438,7 +438,7 @@ case "$answer00" in
 		echo ""
 		echo "mediainfo says:"
 
-		mediainfo "$source1"|grep 'Scan type'|awk '{print $4}'
+		mediainfo "$source1"|awk '/Scan/ {print $4}'
 
 		echo ""
 		read -p "press enter to continue"
@@ -575,12 +575,12 @@ case "$answer00" in
 	# final movie encoding may have different values due to cropping
 	# and resizing
 
-	darheight0=$(mediainfo "$source1"|grep Height|awk '{print $3$4}'|sed 's/[a-z]//g')
+	darheight0=$(mediainfo "$source1"|awk '/Height/ {print $3$4}'|sed 's/[a-z]//g')
 	# keep cfg informed
 	sed -i '/darheight0/d' "$config"
 	echo "darheight0=$darheight0" >> "$config"
 
-	darwidth0=$(mediainfo "$source1"|grep Width|awk '{print $3$4}'|sed 's/[a-z]//g')
+	darwidth0=$(mediainfo "$source1"|awk '/Width/ {print $3$4}'|sed 's/[a-z]//g')
 	# keep cfg informed
 	sed -i '/darwidth0/d' "$config"
 	echo "darwidth0=$darwidth0" >> "$config"
