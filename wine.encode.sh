@@ -71,7 +71,7 @@
 
 
 # path to your config file
-config="${HOME}/.config/wine.encode.cfg"
+config="${HOME}/.config/wine.encode/default.cfg"
 
 while IFS='= ' read lhs rhs
 do
@@ -146,6 +146,15 @@ case "$answer00" in
 		else echo ""
 		echo "***"
 		echo "*** mediainfo NOT installed"
+		echo "***"
+		echo "" ;
+	fi
+
+	if [ -e /usr/bin/exiftool ]
+		then echo -n "exiftool "; /usr/bin/exiftool -ver; echo ""
+		else echo ""
+		echo "***"
+		echo "*** exiftool NOT installed"
 		echo "***"
 		echo "" ;
 	fi
@@ -268,14 +277,14 @@ case "$answer00" in
 		;;
 
 		n|N|no|NO|No) # do nothing
-
+		exit
 		;;
 
 		*) # wrong! layer 8 problem
 
 		echo "stupid, that's neither \"e\" nor \"n\""
 		echo "i take this for a no :-) "
-
+		exit
 		;;
 	esac
 
@@ -393,6 +402,58 @@ case "$answer00" in
 
 	if [ -e /usr/bin/beep ]; then beep "$beep"; fi
 
+	# get to know your PAR
+	sarheight0=$(exiftool "$source1"|awk '/Image Height/ {print $4}')
+	sarwidth0=$(exiftool "$source1"|awk '/Image Width/ {print $4}')
+	darheight0=$(exiftool "$source1"|awk '/Display Height/ {print $4}')
+	darwidth0=$(exiftool "$source1"|awk '/Display Width/ {print $4}')
+
+	# keep cfg informed
+	sed -i '/sarheight0/d' "$config"
+	echo "sarheight0=$sarheight0" >> "$config"
+	sed -i '/sarwidth0/d' "$config"
+	echo "sarwidth0=$sarwidth0" >> "$config"
+	sed -i '/darheight0/d' "$config"
+	echo "darheight0=$darheight0" >> "$config"
+	sed -i '/darwidth0/d' "$config"
+	echo "darwidth0=$darwidth0" >> "$config"
+	
+
+	echo "the movies' storage aspect ratio is $sarwidth0 × $sarheight0"
+	echo ""
+	echo "the movies' display aspect ratio is $darwidth0 × $sarheight0"
+	echo ""
+	echo "look into the table to find your pixel aspect ratio"
+	echo ""
+	echo "________________SAR_______|_PAR_|____DAR____"
+	echo "widescreen ntsc 720x480 -> 40/33 ->  704x480"
+	echo "                        -> 32/27 ->  853x480"
+	echo "widescreen pal  720x576 -> 64/45 -> 1024x576"
+	echo "fullscreen ntsc 720x480 ->  8/9  ->  640x480" 
+	echo "fullscreen pal  720x576 -> 16/15 ->  768x576"
+	echo ""
+	echo "almost all bluray is 1/1"
+	echo ""
+	echo "set sar as fraction with a slash: /"
+	echo "e.g. 16/15"
+	read -e -p "sar > " sar
+
+	# keep cfg informed
+	sed -i '/sar/d' "$config"
+	echo "sar=$sar" >> "$config"
+
+	ref0=$(echo "scale=0;32768/((("$darwidth0"/16)+0.5)/1 * (("$darheight0"/16)+0.5)/1)"|bc)
+	# keep cfg informed
+	sed -i '/ref0/d' "$config"
+	echo "ref0=$ref0" >> "$config"
+
+	# isolate the source file name without file extension
+	# bash parameter expansion does not allow nesting, so do it in two steps
+	source2=${source1##*/}
+	sed -i '/source2/d' "$config"
+	echo "source2=$source2" >> "$config"
+
+
 	;;
 
 	2)	# 2 - create a avs file; test encodes for crf
@@ -439,9 +500,10 @@ case "$answer00" in
 		echo "check, if your movie is interlaced"
 		echo ""
 		echo "mediainfo says:"
+		mediainfo "$source1"|awk '/Scan type/{print $4}'
 
-		mediainfo "$source1"|awk '/Scan/ {print $4}'
-
+		echo "exiftool says:"
+		exiftool "$source1"|awk '/Scan Type/{print $5}'
 		echo ""
 		read -p "press enter to continue"
 
@@ -518,85 +580,16 @@ case "$answer00" in
 		;;
 
 	esac
-		# copy content of $testavs into final.avs in same direct
-		# write path to final.avs to CFG and delete line Select…
-		# from final.avs
-#TODONOTE: thats quite circumstantial, can be done by ${testavs%/*}/final.avs only
-		cat  "$testavs" > "${testavs%/*}"/final.avs
-		# keep cfg informed
-		sed -i '/^avs/d' "$config"
-		echo "avs=${testavs%/*}/final.avs" >> "$config"
-		sleep 1
-		sed -i '/SelectRangeEvery/d' "${testavs%/*}"/final.avs
 
-		echo ""
-		echo "________________SAR_______|_PAR_|____DAR____"
-		echo "widescreen ntsc 720x480 -> 40/33 ->  704x480"
-		echo "                        -> 32/27 ->  853x480"
-		echo "widescreen pal  720x576 -> 64/45 -> 1024x576"
-		echo "fullscreen ntsc 720x480 ->  8/9  ->  640x480" 
-		echo "fullscreen pal  720x576 -> 16/15 ->  768x576"
-		echo ""
-		echo "almost all bluray is 1/1"
-		echo ""
-		echo "if you don't know,check with"
-		echo "AvsPmod > Tools > Resize calculator"
-		echo ""
-		read -e -p "check now? (y|n) > " answer50
-
-	case $answer50 in 
-
-		y|Y|yes|YES) # check sar with AvsPmod
-
-			wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "$testavs"
-
-			;;
-
-		n|N|no|NO|"") # do nothing
-			
-			;;
-
-		*)
-
-			echo "stupid, that's neither yes or no :-) "
-			echo "i take this for a no :-) "
-
-			;;
-
-	esac
-
-	echo "set sar as fraction with a slash: /"
-	echo "e.g. 16/15"
-	read -e -p "sar > " sar
-
+	# copy content of $testavs into final.avs in same direct
+	# write path to final.avs to CFG and delete line Select…
+	# from final.avs
+	cat  "$testavs" > "${testavs%/*}"/final.avs
 	# keep cfg informed
-	sed -i '/sar/d' "$config"
-	echo "sar=$sar" >> "$config"
-
-	# find correct height, width and reframes for test encodes only
-	# final movie encoding may have different values due to cropping
-	# and resizing
-
-	darheight0=$(mediainfo "$source1"|awk '/Height/ {print $3$4}'|sed 's/[a-z]//g')
-	# keep cfg informed
-	sed -i '/darheight0/d' "$config"
-	echo "darheight0=$darheight0" >> "$config"
-
-	darwidth0=$(mediainfo "$source1"|awk '/Width/ {print $3$4}'|sed 's/[a-z]//g')
-	# keep cfg informed
-	sed -i '/darwidth0/d' "$config"
-	echo "darwidth0=$darwidth0" >> "$config"
-
-	ref0=$(echo "scale=0;32768/((("$darwidth0" * ("$sar") /16)+0.5)/1 * (("$darheight0"/16)+0.5)/1)"|bc)
-	# keep cfg informed
-	sed -i '/ref0/d' "$config"
-	echo "ref0=$ref0" >> "$config"
-
-	# isolate the source file name without file extension
-	# bash parameter expansion does not allow nesting, so do it in two steps
-	source2=${source1##*/}
-	sed -i '/source2/d' "$config"
-	echo "source2=$source2" >> "$config"
+	sed -i '/^avs/d' "$config"
+	echo "avs=${testavs%/*}/final.avs" >> "$config"
+	sleep 1
+	sed -i '/SelectRangeEvery/d' "${testavs%/*}"/final.avs
 
 	echo ""
 	echo "set minimum crf as integer, e.g. 15"
@@ -1531,6 +1524,9 @@ case "$answer00" in
 	echo ""
 	echo "do you want to check with AvsPmod for correct"
 	echo "destination file resolution?"
+	echo "AvsP > Tools > Resize calculator"
+	echo "remember, the original video resolution is $sarwidth0 × $sarheight0,"
+	echo "the sar is $sar"
 	echo "when checked, note values and close AvsPmod window"
 	echo "do NOT press »apply«"
 	read -e -p "check now (y|n) > " answer70
@@ -1570,7 +1566,7 @@ case "$answer00" in
 	# Get reframes for 1080
 	darwidth1=$(echo "$darwidth0-$left-$right"|bc)
 	darheight1=$(echo "$darheight0-$top-$bottom"|bc)
-	ref1=$(echo "scale=0;32768/((("$darwidth1" * ("$sar") /16)+0.5)/1 * (("$darheight1"/16)+0.5)/1)"|bc)
+	ref1=$(echo "scale=0;32768/((("$darwidth1"/16)+0.5)/1 * (("$darheight1"/16)+0.5)/1)"|bc)
 
 	# keep cfg informed
 	sed -i '/ref1/d' "$config"
@@ -1578,7 +1574,7 @@ case "$answer00" in
 
 	echo ""
 	echo "now encoding ${source2%.*}.final.1080.mkv"
-	echo "with $darwidth1×$darheight1…"
+	echo "with $darwidth1 × $darheight1…"
 	echo ""
 
 	start=$(date +%s)
@@ -1614,7 +1610,7 @@ case "$answer00" in
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo "encoding ${source2%.*}.final.1080.mkv"
-	echo "with $darwidth1×$darheight1 lasted $time"
+	echo "with $darwidth1 × $darheight1 lasted $time"
 
 	echo "encoding for ${source2%.*}.final.1080.mkv lasted $time"
 
@@ -1641,11 +1637,11 @@ case "$answer00" in
 
 	echo ""
 	echo "now encoding ${source2%.*}.final.720.mkv"
-	echo "with $width7×$height7…"
+	echo "with $width7 × $height7…"
 	echo ""
 
 	# Get reframes for 720p
-	ref7=$(echo "scale=0;32768/((("$width7" * ("$sar") /16)+0.5)/1 * (("$height7"/16)+0.5)/1)"|bc)
+	ref7=$(echo "scale=0;32768/((("$width7"/16)+0.5)/1 * (("$height7"/16)+0.5)/1)"|bc)
 	# keep cfg informed
 	sed -i '/ref7/d' "$config"
 	echo "ref7=$ref7" >> "$config"
@@ -1682,7 +1678,7 @@ case "$answer00" in
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo "encoding ${source2%.*}.final.720.mkv"
-	echo "with $width7×$height7 lasted $time"
+	echo "with $width7 × $height7 lasted $time"
 
 	if [ -e /usr/bin/beep ]; then beep "$beep"; fi
 
@@ -1707,7 +1703,7 @@ case "$answer00" in
 
 	echo ""
 	echo "now encoding ${source2%.*}.final.SD.mkv"
-	echo "with a resolution of $width5×$height5…"
+	echo "with a resolution of $width5 × $height5…"
 	echo ""
 
 
@@ -1715,7 +1711,7 @@ case "$answer00" in
 	# though --preset Placebo sets reframes to 16, but 
 	# 1- that may set level ≥ 4.1
 	# 2- cropping may change reframes value
-	ref5=$(echo "scale=0;32768/((("$width5" * ("$sar") /16)+0.5)/1 * (("$height5"/16)+0.5)/1)"|bc)
+	ref5=$(echo "scale=0;32768/((("$width5"/16)+0.5)/1 * (("$height5"/16)+0.5)/1)"|bc)
 	# keep cfg informed
 	sed -i '/ref5/d' "$config"
 	echo "ref5=$ref5" >> "$config"
@@ -1753,7 +1749,7 @@ case "$answer00" in
 	stop=$(date +%s);
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo "encoding ${source2%.*}.final.SD.mkv"
-	echo "with $width5×$height5 lasted $time"
+	echo "with $width5 × $height5 lasted $time"
 
 	if [ -e /usr/bin/beep ]; then beep "$beep"; fi
 
@@ -1793,7 +1789,7 @@ case "$answer00" in
 
 	echo ""
 	echo "now encoding ${source2%.*}.final.SD.mkv"
-	echo "with a resolution of $height5×$width5…"
+	echo "with a resolution of $height5 × $width5…"
 	echo ""
 
 	# Get reframes for SD
@@ -1836,15 +1832,15 @@ case "$answer00" in
 
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo "encoding ${source2%.*}.final.SD.mkv"
-	echo "with $height5×$width5 lasted $time"
+	echo "with $height5 × $width5 lasted $time"
 
 	echo ""
 	echo "now encoding ${source2%.*}.final.720.mkv"
-	echo "with a resolution of $width7×$height7…"
+	echo "with a resolution of $width7 × $height7…"
 	echo ""
 
 	# Get reframes for 720p
-	ref7=$(echo "scale=0;32768/((("$width7" * ("$sar") /16)+0.5)/1 * (("$height7"/16)+0.5)/1)"|bc)
+	ref7=$(echo "scale=0;32768/((("$width7"/16)+0.5)/1 * (("$height7"/16)+0.5)/1)"|bc)
 	# keep cfg informed
 	sed -i '/ref7/d' "$config"
 	echo "ref7=$ref7" >> "$config"
@@ -1883,20 +1879,20 @@ case "$answer00" in
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo ""
 	echo "encoding ${source2%.*}.final.720.mkv"
-	echo "with $width7×$height7 lasted $time"
+	echo "with $width7 × $height7 lasted $time"
 	echo ""
 
 	# Get reframes for 1080
 	darwidth1=$(echo "$darwidth0-$left-$right"|bc)
 	darheight1=$(echo "$darheight0-$top-$bottom"|bc)
-	ref1=$(echo "scale=0;32768/((("$darwidth1"  * ("$sar") /16)+0.5)/1 * (("$darheight1"/16)+0.5)/1)"|bc)
+	ref1=$(echo "scale=0;32768/((("$darwidth1"/16)+0.5)/1 * (("$darheight1"/16)+0.5)/1)"|bc)
 	# keep cfg informed
 	sed -i '/ref1/d' "$config"
 	echo "ref1=$ref1" >> "$config"
 
 	echo ""
 	echo "now encoding ${source2%.*}.final.1080.mkv"
-	echo "with a resolution of $darwidth1×$darheight1…"
+	echo "with a resolution of $darwidth1 × $darheight1…"
 	echo ""
 
 	start=$(date +%s)
@@ -1933,7 +1929,7 @@ case "$answer00" in
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo ""
 	echo "encoding ${source2%.*}.final.1080.mkv"
-	echo "with $darwidth1×$darheight1 lasted $time"
+	echo "with $darwidth1 × $darheight1 lasted $time"
 	echo ""
 
 	if [ -e /usr/bin/beep ]; then beep "$beep"; fi

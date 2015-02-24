@@ -40,7 +40,7 @@ Maybe you prefer not to mix your encoding environment with other installations o
 
 Install the linux programs preferably from your distribution:
 
-# apt-get install wine x264 mkvmerge mediainfo beep
+# apt-get install wine x264 mkvmerge mediainfo exiftool beep
 
 Download eac3to, AvsPmod, avs2yuv, MatroskaSplitter, Avisynth and Avisynth Plugins.
 
