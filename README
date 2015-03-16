@@ -10,9 +10,9 @@ This script shall provide test encodes to compare parameters, and do some, gradu
 It offers nine options, one prerequesite to another, largely corresponding to the methods recommended in advanced encoding guides:
 
 0 - check, if all necessary programs are installed and show your default settings
-1 - de-/ unencrypted VOB|m2ts -> mpeg2|h264 -> mkv
+1 - de-/ unencrypted VOB|m2ts -> mpeg2|h264 -> mkv,
 2 - test for crf integers and fractionals of crf
-3 - test for qcomp 
+3 - test for qcomp
 4 - test for aq strength and and psy-rd
 5 - test for psy-trellis
 6 - do some more things
@@ -21,22 +21,31 @@ It offers nine options, one prerequesite to another, largely corresponding to th
 
 It uses native linux cli tools as far as available (which is not much right now), all the rest is done using windows tools via wine.
 
-It works for standard and high definition sources, getting along with VOB containers as well as m2ts streams.
+It works for standard and high definition sources, getting along with VOB containers as well as m2ts streams and reads matroska containers (remuxes).
 
 The script consists of two parts:
-The bash script itself: wine.encode.sh and a configuration file wine.encode.cfg.
+The bash script itself: wine.encode.sh and a configuration file default.cfg in a directory named wine.encode.
 You can place the script whereever you want, maybe somewhere in your $PATH.
 The config file I suggest to place to
-~/.config/wine.encode.cfg
+~/.config/wine.encode/default.cfg
 but any other place may be suitable. In the latter case, you have to edit the line
-CONFIG="{HOME}/.config/wine.encode.cfg"
-which right now is approximately line 70 in the script.
+CONFIG="{HOME}/.config/wine.encode/default.cfg"
+which right now appears twice in the script, at line 74 and 93,approximately.
 
 The config file stores all important parameters, the volatile ones, which change throughout the encoding process as well as the more constant ones, which you do not change without reason. The "more constant ones" are those between double lines of #. If you want to change them, use your editor of choice.
 
+Start the script like this:
+$ ./wine.encode.sh
+You can check, if all neccessary programs are available and check the default settings for encoding.
+Also start the script without any parameters to begin the encoding process from an unencrypted VIDEO_TS directory respectively m2ts file.
+During going through option 1, an individual config file will be generated which stores your settings for each movie. The config file will be placed in the default config file's directory and given a file name as your test encode.
+With this name as parameter, you go on from option 2 to option 8. Let's say, you encode "The Fabulous Baker Boys". Choose a short name for practical reasons! You give your encoding the name tfbb. From there on, start the script with
+$ ./wine.encode.sh tfbb
+You want to work on another movie, before the baker boys are finished? No problem, that encoding also gets its individual config file, so your settings don't get confused.
+
 Requirements:
 
-Maybe you prefer not to mix your encoding environment with other installations of wine. If you do not have any wine-installation yet, you may leave the newly installed wine directory in place. If you do have a wine installation already, you may rename it or install your encoding environment someplace else. There is a variable in the wine.encode.cfg configuration file  (wine=.wine) which then has to be edited.
+Maybe you prefer not to mix your encoding environment with other installations of wine. If you do not have any wine-installation yet, you may leave the newly installed wine directory in place. If you do have a wine installation already, you may rename it or install your encoding environment someplace else. There is a variable in the default.cfg configuration file  (wine=.wine) which then has to be edited.
 
 Install the linux programs preferably from your distribution:
 
@@ -70,29 +79,33 @@ $ unrar x -r /path/to/Avisynth\ Plugins.rar
 $ cp -v /path/to/unrar'ed/Avisynth\ Plugins/plugins/* /home/<user>/.wine/drive_c/Program\ Files/AviSynth\ 2.5/plugins/
 
 This script does not need more programs to work. You can install all kind of avisynth filters. There is no guarantee for them to work, though. Generally, many avisynth filters should work, however, I did not do much in the way of verification here.
+I tested for
+· QTGMC().SelectEven()
+· TFM().TDecimate()
+· BalanceBorders
+· FillMargins
 
-The script generates a primitive .avs file if needed. Of course, that can be edited by $editor at any time as you like to.
+During encoding, the script generates a simple .avs for each testing stage, so you don't have to tamper with avs files to get your comparison screens. Of course, they can be edited by $editor at any time as you like to.
 
-As eac3to in wine  cannot mux streams into matroska containers, the script kind of walks around and demuxes the source into h264 or mpeg2 streams, which afterwards are muxed into a mkv file, just for traditional reason.
+As eac3to in wine does not mux streams into matroska containers, the script kind of walks around and demuxes the source into h264 or mpeg2 streams, which afterwards are muxed into a mkv file, just for traditional reason.
 
-I learned that AvsPmod is not very stable while editing opened avs files. When using the resize calculator, better do NOT click »apply«, do NOT let the calculator work on your .avs, but set these parameters when the script asks for them.
+I learned that AvsPmod is not very stable while editing opened avs files. When using the resize calculator, do not click »apply«, do not let the calculator work on your .avs, but set these parameters when the script asks for them.
 
 Limitations:
 
 The script does NOT (yet) do:
 
 decrypt sources
-de-telecine video tracks
 handle demuxed audio files
 handle demuxed subtitles
 handle chapter files
 mux anything together
 
-Right now, you have one, and just one config file to store your parameters, which means you can only encode one movie after the other, not simultaneously, as parameters change from one movie to another.
+At the moment, the maximum number of test encodings in one avs file is 77.
 
 Though some parameters can be set permanent, encoding needs a lot of trial and error to find the best possible result. There's lots of interaction. Sorry about that.
 
-The script as everything is work in progress, and I'd very much appreciate any help and criticism.
+The script is work in progress, and I'd very much appreciate any help and criticism.
 Some flaky things I did not know how to avoid are noted in the script, these comments start with #TODONOTE. I'd be especially thankful for them to be solved in a clean way.
 The "code" right here is more or less for a quick look only, recent versions you will find on github:
 
