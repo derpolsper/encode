@@ -82,7 +82,6 @@ This script does not need more programs to work. You can install all kind of avi
 I tested for
 · QTGMC().SelectEven()
 · TFM().TDecimate()
-· BalanceBorders
 · FillMargins
 
 During encoding, the script generates a simple .avs for each testing stage, so you don't have to tamper with avs files to get your comparison screens. Of course, they can be edited by $editor at any time as you like to.
