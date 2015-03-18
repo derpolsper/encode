@@ -523,6 +523,11 @@ case "$answer00" in
 	echo "darheight0=$darheight0" >> "${config%/*}/${source2%.*}.cfg"
 	sed -i '/darwidth0/d' "${config%/*}/${source2%.*}.cfg"
 	echo "darwidth0=$darwidth0" >> "${config%/*}/${source2%.*}.cfg"
+	sed -i '/source2/d' "${config%/*}/${source2%.*}.cfg"
+	echo "source2=$source2" >> "${config%/*}/${source2%.*}.cfg"
+	sed -i '/source1/d' "${config%/*}/${source2%.*}.cfg"
+	echo "source1=$source1" >> "${config%/*}/${source2%.*}.cfg"
+	
 
 	if [[ -z $sar ]]; then
 		echo ""
@@ -536,8 +541,13 @@ case "$answer00" in
 		echo "widescreen ntsc 720×480 -> 40:33 ->  704×480"
 		echo "                        -> 32:27 ->  853×480"
 		echo "widescreen pal  720×576 -> 64:45 -> 1024×576"
+		echo "                        -> 16:11 -> 1048×576"
+
 		echo "fullscreen ntsc 720×480 ->  8:9  ->  640×480"
+		echo "                        -> 10:11 ->  654×480"
 		echo "fullscreen pal  720×576 -> 16:15 ->  768×576"
+		echo "                        -> 12:11 ->  786×576"
+		
 		echo ""
 		echo "almost all bluray is 1:1"
 		echo ""
@@ -1039,7 +1049,7 @@ case "$answer00" in
 
 		*) # layer 8 problem
 
- 		echo "stupid, i take this for a no :-) "
+ 		echo "i take this for a no :-) "
 		;;
 
 	esac
@@ -1554,7 +1564,7 @@ case "$answer00" in
 	start0=$(date +%s)
 
 	# create comparison screen avs
-	echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > "${source1%.*}".finalcrf.avs
+	echo "=import(\"$testavs\").subtitle(\"Source\", align=8)" > "${source1%.*}".crf3.avs
 
 	for ((crfnumber2=$crflow2; $crfnumber2<=$crfhigh2; crfnumber2+=$crffractional2));do
 		echo ""
@@ -1564,7 +1574,7 @@ case "$answer00" in
 		start1=$(date +%s)
 
 		#comparison screen
-		echo "=ffvideosource(\"${source1%.*}.80.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.crf$crfnumber2.mkv\").subtitle(\"${source2%.*}.80.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.crf$crfnumber2.mkv\", align=8)" >> "${source1%.*}".finalcrf.avs
+		echo "=ffvideosource(\"${source1%.*}.80.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.crf$crfnumber2.mkv\").subtitle(\"${source2%.*}.80.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.crf$crfnumber2.mkv\", align=8)" >> "${source1%.*}".crf3.avs
 
 		wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$testavs" - \
 		| x264 --stdin y4m \
@@ -1599,12 +1609,12 @@ case "$answer00" in
 	prefixes=({a..z} {a..z}{a..z})
 	i=0
 	while IFS= read -r line; do
-	printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}".finalcrf2.avs
-	done < "${source1%.*}".finalcrf.avs
-	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".finalcrf.avs) *2 -1|bc)-154 >> "${source1%.*}".finalcrf2.avs
-	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".finalcrf2.avs
-	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".finalcrf2.avs
-	mv "${source1%.*}".finalcrf2.avs "${source1%.*}".finalcrf.avs
+	printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}".crf32.avs
+	done < "${source1%.*}".crf3.avs
+	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".crf3.avs) *2 -1|bc)-154 >> "${source1%.*}".crf32.avs
+	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".crf32.avs
+	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".crf32.avs
+	mv "${source1%.*}".crf32.avs "${source1%.*}".crf3.avs
 
 	if [ -e /usr/bin/beep ]; then beep $beep; fi
 
@@ -1614,7 +1624,7 @@ case "$answer00" in
 	echo "get best results at considerable bitrate."
 	echo "then close AvsPmod."
 	sleep 2
-	wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".finalcrf.avs
+	wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".crf3.avs
 
 	echo ""
 	echo "set crf parameter"
@@ -2109,87 +2119,89 @@ case "$answer00" in
 	wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".comparison.1080.avs
 	}
 
-	echo ""
-	echo "for encoding with or without resizing"
-	echo "set your target resolutions: (S)D, (7)20p or (1)080p"
-	echo "a subset of them or (a)ll three"
-	echo ""
-	echo "(S|7|1|a)"
-	read -e -p "> " answer80
-
-	case "$answer80" in
-
-	1|10|108|1080|1080p|"")
-	encode1080
-	beep
-	comparison1080
-	;;
-
-	7|72|720|720p)
-	targetresolution720
-	encode720
-	beep
-	comparison720
-	;;
-
-	s|S|sd|SD)
-
 	if [[ $sarheight0 -le 576 ]] && [[ $sarwidth0 -le 720 ]]; then
 		encodeSDfromSD
+		beep
+		comparisonSD
 	else
+	
+		echo ""
+		echo "for encoding with or without resizing"
+		echo "set your target resolutions: (S)D, (7)20p or (1)080p"
+		echo "a subset of them or (a)ll three"
+		echo ""
+		echo "(S|7|1|a)"
+		read -e -p "> " answer80
+
+		case "$answer80" in
+
+		1|10|108|1080|1080p|"")
+		encode1080
+		beep
+		comparison1080
+		;;
+
+		7|72|720|720p)
+		targetresolution720
+		encode720
+		beep
+		comparison720
+		;;
+
+		s|S|sd|SD)
 		targetresolutionSD
 		encodeSDfromHD
+		beep
+		comparisonSD
+		;;
+
+		1S|1s|s1|S1)
+		targetresolutionSD
+		encodeSDfromHD
+		encode1080
+		beep
+		comparisonSD
+		comparison1080
+		;;
+
+		7S|7s|s7|S7)
+		targetresolutionSD
+		targetresolution720
+		encodeSDfromHD
+		encode720
+		beep
+		comparisonSD
+		comparison720
+		;;
+
+		17|71)
+		targetresolution720
+		encode720
+		encode1080
+		beep
+		comparison720
+		comparison1080
+		;;
+
+		a|A|s17|s71|1s7|17s|7s1|71s|S17|S71|1S7|17S|7S1|71S)
+
+		echo ""
+		echo "encoding in all three resolutions"
+		echo "THAT will last long!"
+		echo ""
+		targetresolutionSD
+		targetresolution720
+		encodeSDfromHD
+		encode720
+		encode1080
+		beep
+		comparisonSD
+		comparison720
+		comparison1080
+		;;
+
+		esac
 	fi
-	beep
-	comparisonSD
-	;;
-
-	1S|1s|s1|S1)
-	targetresolutionSD
-	encodeSDfromHD
-	encode1080
-	beep
-	comparisonSD
-	comparison1080
-	;;
-
-	7S|7s|s7|S7)
-	targetresolutionSD
-	targetresolution720
-	encodeSDfromHD
-	encode720
-	beep
-	comparisonSD
-	comparison720
-	;;
-
-	17|71)
-	targetresolution720
-	encode720
-	encode1080
-	beep
-	comparison720
-	comparison1080
-	;;
-
-	a|A|s17|s71|1s7|17s|7s1|71s|S17|S71|1S7|17S|7S1|71S)
-
-	echo ""
-	echo "encoding in all three resolutions"
-	echo "THAT will last long!"
-	echo ""
-	targetresolutionSD
-	targetresolution720
-	encodeSDfromHD
-	encode720
-	encode1080
-	beep
-	comparisonSD
-	comparison720
-	comparison1080
-	;;
-
-	esac
 	;;
 
 	*)	# neither any of the above
