@@ -527,7 +527,6 @@ case "$answer00" in
 	echo "source2=$source2" >> "${config%/*}/${source2%.*}.cfg"
 	sed -i '/source1/d' "${config%/*}/${source2%.*}.cfg"
 	echo "source1=$source1" >> "${config%/*}/${source2%.*}.cfg"
-	
 
 	if [[ -z $sar ]]; then
 		echo ""
@@ -547,7 +546,7 @@ case "$answer00" in
 		echo "                        -> 10:11 ->  654×480"
 		echo "fullscreen pal  720×576 -> 16:15 ->  768×576"
 		echo "                        -> 12:11 ->  786×576"
-		
+
 		echo ""
 		echo "almost all bluray is 1:1"
 		echo ""
@@ -669,7 +668,6 @@ case "$answer00" in
 
 	echo "you might go on with option 2"
 	echo ""
-
 	;;
 
 	2)	# 2 - test encodes for crf
@@ -743,7 +741,7 @@ case "$answer00" in
 	while IFS= read -r line; do
 	printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}"2.crf.avs
 	done < "${source1%.*}".crf.avs
-	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".crf.avs) *2 -1|bc)-154 >> "${source1%.*}"2.crf.avs
+	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a,ca,a,cb,a,cc,a,cd,a,ce,a,cf,a,cg,a,ch,a,ci,a,cj,a,ck,a,cl,a,cm,a,cn,a,co,a,cp,a,cq,a,cr,a,cs,a,ct,a,cu,a,cv,a,cw,a,cx,a,cy,a,cz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".crf.avs) *2 -1|bc)-206 >> "${source1%.*}"2.crf.avs
 	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}"2.crf.avs
 	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}"2.crf.avs
 	mv "${source1%.*}"2.crf.avs "${source1%.*}".crf.avs
@@ -825,7 +823,7 @@ case "$answer00" in
 	while IFS= read -r line; do
 	printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}"2.crf2.avs
 	done < "${source1%.*}".crf2.avs
-	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".crf2.avs) *2 -1|bc)-154 >> "${source1%.*}"2.crf2.avs
+	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a,ca,a,cb,a,cc,a,cd,a,ce,a,cf,a,cg,a,ch,a,ci,a,cj,a,ck,a,cl,a,cm,a,cn,a,co,a,cp,a,cq,a,cr,a,cs,a,ct,a,cu,a,cv,a,cw,a,cx,a,cy,a,cz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".crf2.avs) *2 -1|bc)-206 >> "${source1%.*}"2.crf2.avs
 	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}"2.crf2.avs
 	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}"2.crf2.avs
 	mv "${source1%.*}"2.crf2.avs "${source1%.*}".crf2.avs
@@ -936,7 +934,7 @@ case "$answer00" in
 	while IFS= read -r line; do
 	printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}".qcomp2.avs
 	done < "${source1%.*}".qcomp.avs
-	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".qcomp.avs) *2 -1|bc)-154 >> "${source1%.*}".qcomp2.avs
+	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a,ca,a,cb,a,cc,a,cd,a,ce,a,cf,a,cg,a,ch,a,ci,a,cj,a,ck,a,cl,a,cm,a,cn,a,co,a,cp,a,cq,a,cr,a,cs,a,ct,a,cu,a,cv,a,cw,a,cx,a,cy,a,cz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".qcomp.avs) *2 -1|bc)-206 >> "${source1%.*}".qcomp2.avs
 	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".qcomp2.avs
 	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".qcomp2.avs
 	mv "${source1%.*}".qcomp2.avs "${source1%.*}".qcomp.avs
@@ -1028,7 +1026,7 @@ case "$answer00" in
 		while IFS= read -r line; do
 		printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}".qcomp3.avs
 		done < "${source1%.*}".qcomp2.avs
-		echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".qcomp2.avs) *2 -1|bc)-154 >> "${source1%.*}".qcomp3.avs
+		echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a,ca,a,cb,a,cc,a,cd,a,ce,a,cf,a,cg,a,ch,a,ci,a,cj,a,ck,a,cl,a,cm,a,cn,a,co,a,cp,a,cq,a,cr,a,cs,a,ct,a,cu,a,cv,a,cw,a,cx,a,cy,a,cz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".qcomp2.avs) *2 -1|bc)-206 >> "${source1%.*}".qcomp3.avs
 		echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".qcomp3.avs
 		echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".qcomp3.avs
 		mv "${source1%.*}".qcomp3.avs "${source1%.*}".qcomp2.avs
@@ -1049,7 +1047,7 @@ case "$answer00" in
 
 		*) # layer 8 problem
 
- 		echo "i take this for a no :-) "
+		echo "i take this for a no :-) "
 		;;
 
 	esac
@@ -1178,7 +1176,7 @@ case "$answer00" in
 	while IFS= read -r line; do
 	printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}".aqpsy2.avs
 	done < "${source1%.*}".aqpsy.avs
-	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".aqpsy.avs) *2 -1|bc)-154 >> "${source1%.*}".aqpsy2.avs
+	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a,ca,a,cb,a,cc,a,cd,a,ce,a,cf,a,cg,a,ch,a,ci,a,cj,a,ck,a,cl,a,cm,a,cn,a,co,a,cp,a,cq,a,cr,a,cs,a,ct,a,cu,a,cv,a,cw,a,cx,a,cy,a,cz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".aqpsy.avs) *2 -1|bc)-206 >> "${source1%.*}".aqpsy2.avs
 	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".aqpsy2.avs
 	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".aqpsy2.avs
 	mv "${source1%.*}".aqpsy2.avs "${source1%.*}".aqpsy.avs
@@ -1341,7 +1339,7 @@ case "$answer00" in
 			while IFS= read -r line; do
 			printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}"2.psytr.avs
 			done < "${source1%.*}".psytr.avs
-			echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".psytr.avs) *2 -1|bc)-154 >> "${source1%.*}"2.psytr.avs
+			echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a,ca,a,cb,a,cc,a,cd,a,ce,a,cf,a,cg,a,ch,a,ci,a,cj,a,ck,a,cl,a,cm,a,cn,a,co,a,cp,a,cq,a,cr,a,cs,a,ct,a,cu,a,cv,a,cw,a,cx,a,cy,a,cz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".psytr.avs) *2 -1|bc)-206 >> "${source1%.*}"2.psytr.avs
 			echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}"2.psytr.avs
 			echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}"2.psytr.avs
 			mv "${source1%.*}"2.psytr.avs "${source1%.*}".psytr.avs
@@ -1484,7 +1482,7 @@ case "$answer00" in
 			while IFS= read -r line; do
 			printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}"2.cqpo.avs
 			done < "${source1%.*}".cqpo.avs
-			echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".cqpo.avs) *2 -1|bc)-154 >> "${source1%.*}"2.cqpo.avs
+			echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a,ca,a,cb,a,cc,a,cd,a,ce,a,cf,a,cg,a,ch,a,ci,a,cj,a,ck,a,cl,a,cm,a,cn,a,co,a,cp,a,cq,a,cr,a,cs,a,ct,a,cu,a,cv,a,cw,a,cx,a,cy,a,cz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".cqpo.avs) *2 -1|bc)-206 >> "${source1%.*}"2.cqpo.avs
 			echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}"2.cqpo.avs
 			echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}"2.cqpo.avs
 			mv "${source1%.*}"2.cqpo.avs "${source1%.*}".cqpo.avs
@@ -1611,7 +1609,7 @@ case "$answer00" in
 	while IFS= read -r line; do
 	printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}".crf32.avs
 	done < "${source1%.*}".crf3.avs
-	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".crf3.avs) *2 -1|bc)-154 >> "${source1%.*}".crf32.avs
+	echo "interleave(a,b,a,c,a,d,a,e,a,f,a,g,a,h,a,i,a,j,a,k,a,l,a,m,a,n,a,o,a,p,a,q,a,r,a,s,a,t,a,u,a,v,a,w,a,x,a,y,a,z,a,aa,a,ab,a,ac,a,ad,a,ae,a,af,a,ag,a,ah,a,ai,a,aj,a,ak,a,al,a,am,a,an,a,ao,a,ap,a,aq,a,ar,a,as,a,at,a,au,a,av,a,aw,a,ax,a,ay,a,az,a,ba,a,bb,a,bc,a,bd,a,be,a,bf,a,bg,a,bh,a,bi,a,bj,a,bk,a,bl,a,bm,a,bn,a,bo,a,bp,a,bq,a,br,a,bs,a,bt,a,bu,a,bv,a,bw,a,bx,a,by,a,bz,a,ca,a,cb,a,cc,a,cd,a,ce,a,cf,a,cg,a,ch,a,ci,a,cj,a,ck,a,cl,a,cm,a,cn,a,co,a,cp,a,cq,a,cr,a,cs,a,ct,a,cu,a,cv,a,cw,a,cx,a,cy,a,cz,a)"|cut -d ',' --complement -f $(echo $(wc -l < "${source1%.*}".crf3.avs) *2 -1|bc)-206 >> "${source1%.*}".crf32.avs
 	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".crf32.avs
 	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".crf32.avs
 	mv "${source1%.*}".crf32.avs "${source1%.*}".crf3.avs
@@ -2124,7 +2122,7 @@ case "$answer00" in
 		beep
 		comparisonSD
 	else
-	
+
 		echo ""
 		echo "for encoding with or without resizing"
 		echo "set your target resolutions: (S)D, (7)20p or (1)080p"
