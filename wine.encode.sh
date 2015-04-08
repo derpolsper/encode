@@ -394,11 +394,11 @@ case "$answer00" in
 
 				wine ~/"$wine"/drive_c/Program\ Files/eac3to/eac3to.exe "${source0##*/}"
 
-				until [[ $param1 = *.h264* ]]; do
+				until [[ $param1 = *.h264* || $param1 = *.mpeg2* ]]; do
 					echo ""
 					echo "extract all wanted tracks following this name pattern:"
 					echo "[1-n]:name.extension, e.g. 2:name.h264 3:name.flac 4:name.ac3 5:name.sup etc"
-					echo "the video stream HAS TO be given h264 as file extension"
+					echo "the video stream HAS TO be given h264 OR mpeg2 as file extension"
 					echo ""
 					read -e -p "> " param1
 				done
@@ -407,7 +407,7 @@ case "$answer00" in
 				wine ~/"$wine"/drive_c/Program\ Files/eac3to/eac3to.exe "${source0##*/}" $param1
 
 #TODONOTE: dirty. problems when >1 h264 file
-				mkvmerge -v -o "$source1" $(ls "${source0%/*}"|grep .h264)
+				mkvmerge -v -o "$source1" $(ls "${source0%/*}"|grep '.h264\|.mpeg2' )
 
 				# get the spaces out of eac3to's log file name
 				for i in ./*.txt; do mv -v "$i" $(echo $i | sed 's/ /_/g') ; done
