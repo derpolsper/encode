@@ -1,6 +1,5 @@
 #!/bin/bash
-
-# Over the years, much great software for advanced video encoding has been
+#over the years, much great software for advanced video encoding has been
 # written, unfortunately most of them for windows only. So linux users,
 # who want to produce high quality encodings have to use a windows
 # installation either natively or in a virtual machine - or use that windows
@@ -2010,7 +2009,7 @@ case "$answer00" in
 	start=$(date +%s)
 
 	# create comparison screen avs
-	echo "a=import(\"$testavs\").Crop("$left", "$top", -"$right", -"$bottom").Spline36Resize("$width7","$height7").subtitle(\"Source\", align=8)" > "${source1%.*}".comparison.720.avs
+	echo "a=import(\"$avs\").Crop("$left", "$top", -"$right", -"$bottom").Spline36Resize("$width7","$height7").subtitle(\"Source\", align=8)" > "${source1%.*}".comparison.720.avs
 	echo "b=ffvideosource(\"${source1%.*}.720.mkv\").subtitle(\"${source2%.*}.720.mkv\", align=8)" >> "${source1%.*}".comparison.720.avs
 	echo "interleave(a,b)" >> "${source1%.*}".comparison.720.avs
 	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.720.avs
@@ -2059,7 +2058,7 @@ case "$answer00" in
 	start=$(date +%s)
 
 	# create comparison screen avs
-	echo "a=import(\"$testavs\").Crop("$left", "$top", -"$right", -"$bottom").Spline36Resize("$darwidth1","$darheight1").subtitle(\"Source\", align=8)" > "${source1%.*}".comparison.1080.avs
+	echo "a=import(\"$avs\").Crop("$left", "$top", -"$right", -"$bottom").Spline36Resize("$darwidth1","$darheight1").subtitle(\"Source\", align=8)" > "${source1%.*}".comparison.1080.avs
 	echo "b=ffvideosource(\"${source1%.*}.1080.mkv\").subtitle(\"${source2%.*}.1080.mkv\", align=8)" >> "${source1%.*}".comparison.1080.avs
 	echo "interleave(a,b)" >> "${source1%.*}".comparison.1080.avs
 	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.1080.avs
@@ -2212,3 +2211,4 @@ case "$answer00" in
 
 esac
 exit
+
