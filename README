@@ -100,7 +100,7 @@ handle demuxed subtitles
 handle chapter files
 mux anything together
 
-At the moment, the maximum number of test encodings in one avs file is 77.
+At the moment, the maximum number of test encodings in one avs file is 102.
 
 Though some parameters can be set permanent, encoding needs a lot of trial and error to find the best possible result. There's lots of interaction. Sorry about that.
 
