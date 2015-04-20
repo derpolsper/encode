@@ -813,8 +813,9 @@ case "$answer00" in
 	done
 
 	stop=$(date +%s);
+	days=$(( ($stop-$start)/86400 ))
 	time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-	echo "test encodings for crf fractionals lasted $time"
+	echo "test encodings for crf fractionals lasted $days days and $time"
 
 	#comparison screen
 	prefixes=({a..z} {a..z}{a..z})
@@ -924,8 +925,9 @@ case "$answer00" in
 	done
 
 	stop=$(date +%s);
+	days=$(( ($stop-$start)/86400 ))
 	time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-	echo "test encodings for qcomp lasted $time"
+	echo "test encodings for qcomp lasted $days days and $time"
 
 	#comparison screen
 	prefixes=({a..z} {a..z}{a..z})
@@ -1016,8 +1018,9 @@ case "$answer00" in
 		done
 
 		stop=$(date +%s);
+		days=$(( ($stop-$start)/86400 ))
 		time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-		echo "test encodings for qcomp lasted $time"
+		echo "test encodings for qcomp lasted $days days and $time"
 
 		#comparison screen
 		prefixes=({a..z} {a..z}{a..z})
@@ -1165,9 +1168,9 @@ case "$answer00" in
 	done
 
 	stop=$(date +%s);
+	days=$(( ($stop-$start)/86400 ))
 	time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-
-	echo "test encodings for aq strength and psy-rd lasted $time"
+	echo "test encodings for aq strength and psy-rd lasted $days days and $time"
 
 	#comparison screen
 	prefixes=({a..z} {a..z}{a..z})
@@ -1329,8 +1332,9 @@ case "$answer00" in
 			done
 
 			stop=$(date +%s);
+			days=$(( ($stop-$start)/86400 ))
 			time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-			echo "test encodings for psy-trellis lasted $time"
+			echo "test encodings for psy-trellis lasted $days days and $time"
 
 			#comparison screen
 			prefixes=({a..z} {a..z}{a..z})
@@ -1473,8 +1477,9 @@ case "$answer00" in
 			done
 
 			stop=$(date +%s);
+			days=$(( ($stop-$start)/86400 ))
 			time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-			echo "test encodings for chroma-qp-offset lasted $time"
+			echo "test encodings for chroma-qp-offset lasted $days days and $time"
 			#comparison screen
 			prefixes=({a..z} {a..z}{a..z})
 			i=0
@@ -1599,8 +1604,9 @@ case "$answer00" in
 	done
 
 	stop=$(date +%s);
+	days=$(( ($stop-$start)/86400 ))
 	time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-	echo "test encodings for a second round of crf lasted $time"
+	echo "test encodings for a second round of crf lasted $days days and $time"
 
 	#comparison screen
 	prefixes=({a..z} {a..z}{a..z})
@@ -1749,6 +1755,40 @@ case "$answer00" in
 		cropping
 	fi
 
+	# 2pass
+	function sd2pass {
+			echo ""
+			echo "have a look at your best test encoding"
+			echo "at sensible file size"
+			echo "that bitrate in kbps is your aim for the final encoding"
+			read -e -p "bitrate: " bitratesd
+
+			# keep cfg informed
+			sed -i '/bitrate5/d' "$config"
+			echo "bitratesd=$bitratesd" >> "$config"
+			}
+
+	function seven202pass {
+			echo ""
+			echo "bitrate in kbps for the final encoding in 720p"
+			read -e -p "bitrate: " bitrate720
+
+			# keep cfg informed
+			sed -i '/bitrate720/d' "$config"
+			echo "bitrate720=$bitrate720" >> "$config"
+			}
+
+	function ten802pass {
+			echo ""
+			echo "bitrate in kbps for the final encoding in 1080p"
+			read -e -p "bitrate: " bitrate1080
+
+			# keep cfg informed
+			sed -i '/bitrate1080/d' "$config"
+			echo "bitrate1080=$bitrate1080" >> "$config"
+			}
+
+
 	# resizing hd sources
 	if [[ $sarheight0 -gt 576 ]] && [[ $sarwidth0 -gt 720 ]]; then
 	echo ""
@@ -1758,7 +1798,7 @@ case "$answer00" in
 	echo "do you want to check with AvsPmod for correct"
 	echo "target file resolution?"
 	echo "AvsP > Tools > Resize calculator"
-	echo "remember, the original video resolution is $darwidth0×$darheight0,"
+	echo "after cropping, the resolution is $(echo "$darwidth0-$left-$right"|bc)×$(echo "$darheight0-$top-$bottom"|bc),"
 	echo "the sar is $sar"
 	echo "when checked, note values and close AvsPmod window"
 	echo "do NOT hit »apply«"
@@ -1915,11 +1955,39 @@ case "$answer00" in
 	echo "a=import(\"$avs\").Crop("$left", "$top", -"$right", -"$bottom").subtitle(\"Source\", align=8)" > "${source1%.*}".comparison.SD.avs
 	echo "b=ffvideosource(\"${source1%.*}.SD.mkv\").subtitle(\"${source2%.*}.SD.mkv\", align=8)" >> "${source1%.*}".comparison.SD.avs
 	echo "interleave(a,b)" >> "${source1%.*}".comparison.SD.avs
+	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".comparison.SD.avs
 	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.SD.avs
 
+	# 1. pass
 	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
 	| x264 --stdin y4m \
-	--crf "$crf" \
+	--pass 1 \
+	--bitrate "$bitratesd" \
+	--sar "$sar" \
+	--stats "${source1%.*}SD.stats" \
+	--ref "$ref5" \
+	--qcomp "$qcomp" \
+	--aq-strength "$aqs" \
+	--psy-rd "$psyrd":"$psytr": \
+	--preset "$preset" \
+	--tune "$tune" \
+	--profile "$profile" \
+	--rc-lookahead "$lookahead" \
+	--me "$me" \
+	--merange "$merange" \
+	--subme "$subme" \
+	--aq-mode "$aqmode" \
+	--deblock "$deblock" \
+	--chroma-qp-offset "$cqpo" \
+	--vf crop:"$left","$top","$right","$bottom" \
+	-o /dev/null -;
+
+	# 2. pass
+	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
+	| x264 --stdin y4m \
+	--pass 3 \
+	--bitrate "$bitratesd" \
+	--stats "${source1%.*}SD.stats" \
 	--sar "$sar" \
 	--ref "$ref5" \
 	--qcomp "$qcomp" \
@@ -1939,9 +2007,10 @@ case "$answer00" in
 	-o "${source1%.*}".SD.mkv -;
 
 	stop=$(date +%s);
+	days=$(( ($stop-$start)/86400 ))
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo "encoding ${source2%.*}.SD.mkv"
-	echo "with $sarwidth1×$sarheight1 lasted $time"
+	echo "with $sarwidth1×$sarheight1 lasted $days days and $time"
 	}
 
 	function encodeSDfromHD {
@@ -1967,9 +2036,36 @@ case "$answer00" in
 	echo "interleave(a,b)" >> "${source1%.*}".comparison.SD.avs
 	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.SD.avs
 
+	# 1. pass
 	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
 	| x264 --stdin y4m \
-	--crf "$crf" \
+	--pass 1 \
+	--bitrate "$bitratesd" \
+	--sar "$sar" \
+	--stats "${source1%.*}SD.stats" \
+	--ref "$ref5" \
+	--qcomp "$qcomp" \
+	--aq-strength "$aqs" \
+	--psy-rd "$psyrd":"$psytr": \
+	--preset "$preset" \
+	--tune "$tune" \
+	--profile "$profile" \
+	--rc-lookahead "$lookahead" \
+	--me "$me" \
+	--merange "$merange" \
+	--subme "$subme" \
+	--aq-mode "$aqmode" \
+	--deblock "$deblock" \
+	--chroma-qp-offset "$cqpo" \
+	--vf crop:"$left","$top","$right","$bottom"/resize:"$width5","$height5" \
+	-o /dev/null -;
+	
+	# 2. pass
+	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
+	| x264 --stdin y4m \
+	--pass 3 \
+	--bitrate "$bitratesd" \
+	--stats "${source1%.*}SD.stats" \
 	--sar "$sar" \
 	--ref "$ref5" \
 	--qcomp "$qcomp" \
@@ -1989,9 +2085,10 @@ case "$answer00" in
 	-o "${source1%.*}".SD.mkv -;
 
 	stop=$(date +%s);
+	days=$(( ($stop-$start)/86400 ))
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo "encoding ${source2%.*}.SD.mkv"
-	echo "with $width5×$height5 lasted $time"
+	echo "with $width5×$height5 lasted $days days and $time"
 	}
 
 	function encode720 {
@@ -2012,11 +2109,40 @@ case "$answer00" in
 	echo "a=import(\"$avs\").Crop("$left", "$top", -"$right", -"$bottom").Spline36Resize("$width7","$height7").subtitle(\"Source\", align=8)" > "${source1%.*}".comparison.720.avs
 	echo "b=ffvideosource(\"${source1%.*}.720.mkv\").subtitle(\"${source2%.*}.720.mkv\", align=8)" >> "${source1%.*}".comparison.720.avs
 	echo "interleave(a,b)" >> "${source1%.*}".comparison.720.avs
+	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".comparison.720.avs
 	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.720.avs
 
+	# 1. pass
 	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
 	| x264 --stdin y4m \
-	--crf "$crf" \
+	--pass 1 \
+	--bitrate "$bitrate720" \
+	--sar "$sar" \
+	--stats "${source1%.*}720.stats" \
+	--qcomp "$qcomp" \
+	--aq-strength "$aqs" \
+	--psy-rd "$psyrd":"$psytr": \
+	--preset "$preset" \
+	--tune "$tune" \
+	--profile "$profile" \
+	--ref "$ref7" \
+	--rc-lookahead "$lookahead" \
+	--me "$me" \
+	--merange "$merange" \
+	--subme "$subme" \
+	--aq-mode "$aqmode" \
+	--deblock "$deblock" \
+	--chroma-qp-offset "$cqpo" \
+	--vf crop:"$left","$top","$right","$bottom"/resize:"$width7","$height7" \
+	-o /dev/null -;
+
+	# 2. pass
+	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
+	| x264 --stdin y4m \
+	--pass 3 \
+	--bitrate "$bitrate720" \
+	--sar "$sar" \
+	--stats "${source1%.*}720.stats" \
 	--qcomp "$qcomp" \
 	--aq-strength "$aqs" \
 	--psy-rd "$psyrd":"$psytr": \
@@ -2033,11 +2159,11 @@ case "$answer00" in
 	--chroma-qp-offset "$cqpo" \
 	--vf crop:"$left","$top","$right","$bottom"/resize:"$width7","$height7" \
 	-o "${source1%.*}".720.mkv -;
-
 	stop=$(date +%s);
+	days=$(( ($stop-$start)/86400 ))
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo "encoding ${source2%.*}.720.mkv"
-	echo "with $width7×$height7 lasted $time"
+	echo "with $width7×$height7 lasted $days days and $time"
 	}
 
 	function encode1080 {
@@ -2061,10 +2187,41 @@ case "$answer00" in
 	echo "a=import(\"$avs\").Crop("$left", "$top", -"$right", -"$bottom").Spline36Resize("$darwidth1","$darheight1").subtitle(\"Source\", align=8)" > "${source1%.*}".comparison.1080.avs
 	echo "b=ffvideosource(\"${source1%.*}.1080.mkv\").subtitle(\"${source2%.*}.1080.mkv\", align=8)" >> "${source1%.*}".comparison.1080.avs
 	echo "interleave(a,b)" >> "${source1%.*}".comparison.1080.avs
+	echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".comparison.1080.avs
 	echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.1080.avs
+
+	# 1. pass
 	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
 	| x264 --stdin y4m \
-	--crf "$crf" \
+	--pass 1 \
+	--bitrate "$bitrate1080" \
+	--sar "$sar" \
+	--stats "${source1%.*}1080.stats" \
+	--sar "$sar" \
+	--qcomp "$qcomp" \
+	--aq-strength "$aqs" \
+	--psy-rd "$psyrd":"$psytr": \
+	--preset "$preset" \
+	--tune "$tune" \
+	--profile "$profile" \
+	--ref "$ref1" \
+	--rc-lookahead "$lookahead" \
+	--me "$me" \
+	--merange "$merange" \
+	--subme "$subme" \
+	--aq-mode "$aqmode" \
+	--deblock "$deblock" \
+	--chroma-qp-offset "$cqpo" \
+	--vf crop:"$left","$top","$right","$bottom" \
+	-o /dev/null -;
+
+	# 2. pass
+	wine ~/"$wine"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "$avs" - \
+	| x264 --stdin y4m \
+	--pass 3 \
+	--bitrate "$bitrate1080" \
+	--sar "$sar" \
+	--stats "${source1%.*}1080.stats" \
 	--sar "$sar" \
 	--qcomp "$qcomp" \
 	--aq-strength "$aqs" \
@@ -2084,11 +2241,10 @@ case "$answer00" in
 	-o "${source1%.*}".1080.mkv -;
 
 	stop=$(date +%s);
+	days=$(( ($stop-$start)/86400 ))
 	time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 	echo "encoding ${source2%.*}.1080.mkv"
-	echo "with $darwidth1×$darheight1 lasted $time"
-
-	echo "encoding for ${source2%.*}.1080.mkv lasted $time"
+	echo "with $darwidth1×$darheight1 lasted $days days and $time"
 	}
 
 	function beep {
@@ -2117,6 +2273,7 @@ case "$answer00" in
 	}
 
 	if [[ $sarheight0 -le 576 ]] && [[ $sarwidth0 -le 720 ]]; then
+		sd2pass
 		encodeSDfromSD
 		beep
 		comparisonSD
@@ -2133,6 +2290,7 @@ case "$answer00" in
 		case "$answer80" in
 
 		1|10|108|1080|1080p|"")
+		ten802pass
 		encode1080
 		beep
 		comparison1080
@@ -2140,6 +2298,7 @@ case "$answer00" in
 
 		7|72|720|720p)
 		targetresolution720
+		seven202pass
 		encode720
 		beep
 		comparison720
@@ -2147,6 +2306,7 @@ case "$answer00" in
 
 		s|S|sd|SD)
 		targetresolutionSD
+		sd2pass
 		encodeSDfromHD
 		beep
 		comparisonSD
@@ -2154,6 +2314,8 @@ case "$answer00" in
 
 		1S|1s|s1|S1)
 		targetresolutionSD
+		sd2pass
+		ten802pass
 		encodeSDfromHD
 		encode1080
 		beep
@@ -2164,6 +2326,8 @@ case "$answer00" in
 		7S|7s|s7|S7)
 		targetresolutionSD
 		targetresolution720
+		sd2pass
+		seven202pass
 		encodeSDfromHD
 		encode720
 		beep
@@ -2173,6 +2337,8 @@ case "$answer00" in
 
 		17|71)
 		targetresolution720
+		seven202pass
+		ten802pass
 		encode720
 		encode1080
 		beep
@@ -2188,6 +2354,9 @@ case "$answer00" in
 		echo ""
 		targetresolutionSD
 		targetresolution720
+		sd2pass
+		seven202pass
+		ten802pass
 		encodeSDfromHD
 		encode720
 		encode1080
