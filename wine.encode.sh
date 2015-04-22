@@ -727,6 +727,7 @@ case "$answer00" in
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 		echo "encoding ${source2%.*}.10.crf$crf1.mkv lasted $time"
+		echo "encoding crf from \"$crflow\" to \"$crfhigh\""
 
 	done
 
@@ -809,11 +810,12 @@ case "$answer00" in
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 		echo "encoding ${source2%.*}.20.crf$crf2.mkv lasted $time"
+		echo "encoding crf from \"$crflow2\" to \"$crfhigh2\" with increment \"$crffractional\""
 
 	done
 
 	stop=$(date +%s);
-	days=$(( ($stop-$start)/86400 ))
+	days=$(( ($stop-$start0)/86400 ))
 	time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
 	echo "test encodings for crf fractionals lasted $days days and $time"
 
@@ -921,11 +923,12 @@ case "$answer00" in
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 		echo "encoding ${source2%.*}.30.crf$crf.qc$qcompnumber.mkv lasted $time"
+		echo "encoding qcomp from \"$qcomplow\" to \"$qcomphigh\" with increment \"$qcompincrement\""
 
 	done
 
 	stop=$(date +%s);
-	days=$(( ($stop-$start)/86400 ))
+	days=$(( ($stop-$start0)/86400 ))
 	time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
 	echo "test encodings for qcomp lasted $days days and $time"
 
@@ -1014,11 +1017,12 @@ case "$answer00" in
 			stop=$(date +%s);
 			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 			echo "encoding ${source2%.*}.40.crf$crf.qc$qcompnumber.mkv lasted $time"
+			echo "encoding qcomp from \"$qcomplow2\" to \"$qcomphigh2\" with increment \"$qcompincrement2\""
 
 		done
 
 		stop=$(date +%s);
-		days=$(( ($stop-$start)/86400 ))
+		days=$(( ($stop-$start0)/86400 ))
 		time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
 		echo "test encodings for qcomp lasted $days days and $time"
 
@@ -1163,12 +1167,14 @@ case "$answer00" in
 			stop=$(date +%s);
 			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 			echo "encoding ${source2%.*}.50.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv lasted $time"
+			echo "encoding aq strength from \"$aqlow\" to \"$aqhigh\" with increment \"$aqincrement\""
+			echo "and psy-rd from \"$psy1low\" to \"$psy1high\" with increment \"$psy1increment\""
 
 		done
 	done
 
 	stop=$(date +%s);
-	days=$(( ($stop-$start)/86400 ))
+	days=$(( ($stop-$start0)/86400 ))
 	time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
 	echo "test encodings for aq strength and psy-rd lasted $days days and $time"
 
@@ -1328,11 +1334,12 @@ case "$answer00" in
 				stop=$(date +%s);
 				time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 				echo "encoding ${source2%.*}.60.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv lasted $time"
+				echo "encoding psy-trellis from \"$psy2low\" to \"$psy2high\" with increment \"$psy2increment\""
 
 			done
 
 			stop=$(date +%s);
-			days=$(( ($stop-$start)/86400 ))
+			days=$(( ($stop-$start0)/86400 ))
 			time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
 			echo "test encodings for psy-trellis lasted $days days and $time"
 
@@ -1473,11 +1480,12 @@ case "$answer00" in
 				stop=$(date +%s);
 				time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 				echo "encoding ${source2%.*}.70.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqponumber.mkv lasted $time"
+				echo "encoding chroma-qp-offset from \"$cqpolow\" to \"$cqpohigh\""
 
 			done
 
 			stop=$(date +%s);
-			days=$(( ($stop-$start)/86400 ))
+			days=$(( ($stop-$start0)/86400 ))
 			time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
 			echo "test encodings for chroma-qp-offset lasted $days days and $time"
 			#comparison screen
@@ -1600,11 +1608,12 @@ case "$answer00" in
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 		echo "encoding ${source2%.*}.80.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.crf$crfnumber2.mkv lasted $time"
+		echo "encoding aq strength from \"$crflow2\" to \"$crfhigh2\" with increment \"$crffractional2\""
 
 	done
 
 	stop=$(date +%s);
-	days=$(( ($stop-$start)/86400 ))
+	days=$(( ($stop-$start0)/86400 ))
 	time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
 	echo "test encodings for a second round of crf lasted $days days and $time"
 
