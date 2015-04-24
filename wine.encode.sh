@@ -561,7 +561,7 @@ case "$answer00" in
 		sed -i '/sar=/d' "${config%/*}/${source2%.*}.cfg"
 		echo "sar=$sar" >> "${config%/*}/${source2%.*}.cfg"
 	else
-		echo "sar is \"$sar\""
+		echo "sar is $sar"
 		echo ""
 	fi
 
@@ -727,7 +727,7 @@ case "$answer00" in
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 		echo "encoding ${source2%.*}.10.crf$crf1.mkv lasted $time"
-		echo "encoding crf from \"$crflow\" to \"$crfhigh\""
+		echo "encoding crf from $crflow to $crfhigh"
 
 	done
 
@@ -810,7 +810,7 @@ case "$answer00" in
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 		echo "encoding ${source2%.*}.20.crf$crf2.mkv lasted $time"
-		echo "encoding crf from \"$crflow2\" to \"$crfhigh2\" with increment \"$crffractional\""
+		echo "encoding crf from $crflow2 to $crfhigh2 with increment $crffractional"
 
 	done
 
@@ -923,7 +923,7 @@ case "$answer00" in
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 		echo "encoding ${source2%.*}.30.crf$crf.qc$qcompnumber.mkv lasted $time"
-		echo "encoding qcomp from \"$qcomplow\" to \"$qcomphigh\" with increment \"$qcompincrement\""
+		echo "encoding qcomp from $qcomplow to $qcomphigh with increment $qcompincrement"
 
 	done
 
@@ -1017,7 +1017,7 @@ case "$answer00" in
 			stop=$(date +%s);
 			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 			echo "encoding ${source2%.*}.40.crf$crf.qc$qcompnumber.mkv lasted $time"
-			echo "encoding qcomp from \"$qcomplow2\" to \"$qcomphigh2\" with increment \"$qcompincrement2\""
+			echo "encoding qcomp from $qcomplow2 to $qcomphigh2 with increment $qcompincrement2"
 
 		done
 
@@ -1167,8 +1167,8 @@ case "$answer00" in
 			stop=$(date +%s);
 			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 			echo "encoding ${source2%.*}.50.crf$crf.qc$qcomp.aq$aqnumber.psy$psy1number.mkv lasted $time"
-			echo "encoding aq strength from \"$aqlow\" to \"$aqhigh\" with increment \"$aqincrement\""
-			echo "and psy-rd from \"$psy1low\" to \"$psy1high\" with increment \"$psy1increment\""
+			echo "encoding aq strength from $aqlow to $aqhigh with increment $aqincrement"
+			echo "and psy-rd from $psy1low to $psy1high with increment $psy1increment"
 
 		done
 	done
@@ -1223,7 +1223,7 @@ case "$answer00" in
 
 		-*) # psy-rd <1 -> psytr unset
 		echo "as psy-rd is set to a value <1 (or not at all)"
-		echo "psy-trellis is set to \"unset\" automatically"
+		echo "psy-trellis is set to 'unset' automatically"
 		echo ""
 		echo "you might do further testing with"
 		echo "option 6 (some more less common tests) or"
@@ -1260,7 +1260,7 @@ case "$answer00" in
 
 		-*) # psy-rd <1 -> psytr unset
 		echo "as psy-rd is set to a value < 1 (or not at all)"
-		echo "psy-trellis is set to \"unset\" automatically"
+		echo "psy-trellis is set to 'unset' automatically"
 		echo ""
 
 		# keep cfg informed
@@ -1334,7 +1334,7 @@ case "$answer00" in
 				stop=$(date +%s);
 				time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 				echo "encoding ${source2%.*}.60.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psy2number.mkv lasted $time"
-				echo "encoding psy-trellis from \"$psy2low\" to \"$psy2high\" with increment \"$psy2increment\""
+				echo "encoding psy-trellis from $psy2low to $psy2high with increment $psy2increment"
 
 			done
 
@@ -1376,7 +1376,7 @@ case "$answer00" in
 
 			u|U) # unset psy-trellis
 
-			echo "psy trellis now is set to \"unset\"."
+			echo "psy trellis now is set to 'unset'."
 			echo ""
 
 			# keep cfg informed
@@ -1387,8 +1387,8 @@ case "$answer00" in
 
 			*) # neither any of the above
 
-			echo "that's neither \"t\" nor \"u\" :-) "
-			echo "psy trellis is set to \"unset\"."
+			echo "that's neither 't' nor 'u' :-) "
+			echo "psy trellis is set to 'unset'."
 			echo ""
 
 			# keep cfg informed
@@ -1480,7 +1480,7 @@ case "$answer00" in
 				stop=$(date +%s);
 				time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 				echo "encoding ${source2%.*}.70.crf$crf.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqponumber.mkv lasted $time"
-				echo "encoding chroma-qp-offset from \"$cqpolow\" to \"$cqpohigh\""
+				echo "encoding chroma-qp-offset from $cqpolow to $cqpohigh"
 
 			done
 
@@ -1608,7 +1608,7 @@ case "$answer00" in
 		stop=$(date +%s);
 		time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 		echo "encoding ${source2%.*}.80.qc$qcomp.aq$aqs.psy$psyrd.$psytr.cqpo$cqpo.crf$crfnumber2.mkv lasted $time"
-		echo "encoding aq strength from \"$crflow2\" to \"$crfhigh2\" with increment \"$crffractional2\""
+		echo "encoding aq strength from $crflow2 to $crfhigh2 with increment $crffractional2"
 
 	done
 
@@ -1736,10 +1736,10 @@ case "$answer00" in
 		echo "your config file"
 		echo "$config"
 		echo "has got some cropping values:"
-		echo "left:  \"$left\""
-		echo "top:   \"$top\""
-		echo "right: \"$right\""
-		echo "bottom:\"$bottom\""
+		echo "left:  $left"
+		echo "top:   $top"
+		echo "right: $right"
+		echo "bottom:$bottom"
 		echo ""
 		echo "are you (o)kay with that or"
 		echo "do you want to (e)dit them?"
@@ -1756,8 +1756,8 @@ case "$answer00" in
 			;;
 
 			*)
-			echo "that's neither \"edit\" nor \"ok\""
-			echo "i take this for a \"ok\""
+			echo "that's neither 'edit' nor 'ok'"
+			echo "i take this for a 'ok'"
 			;;
 		esac
 	else
@@ -1769,11 +1769,11 @@ case "$answer00" in
 			echo ""
 			echo "have a look at your best test encoding"
 			echo "at sensible file size"
-			echo "that bitrate in kbps is your aim for the final encoding"
+			echo "that bitrate in kbps is your aim for the final encoding in sd"
 			read -e -p "bitrate: " bitratesd
 
 			# keep cfg informed
-			sed -i '/bitrate5/d' "$config"
+			sed -i '/bitratesd/d' "$config"
 			echo "bitratesd=$bitratesd" >> "$config"
 			}
 
