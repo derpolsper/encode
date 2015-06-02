@@ -489,14 +489,14 @@ case "$answer00" in
 		i|I) # interlaced
 			sed -i "/interlaced/d" "${config%/*}/${source2%.*}.cfg"
 			echo "interlaced=1" >> "${config%/*}/${source2%.*}.cfg"
-#			echo "FFVideosource(\"$source1\")" > "${source1%.*}".SD.final.avs
-#			echo "QTGMC().SelectEven()" >> "${source1%.*}".SD.final.avs
+			echo "FFVideosource(\"$source1\")" > "${source1%.*}".SD.final.avs
+			echo "QTGMC().SelectEven()" >> "${source1%.*}".SD.final.avs
 		;;
 
 		t|T) # telecined
 			sed -i "/telecined/d" "${config%/*}/${source2%.*}.cfg"
 			echo "telecined=1" >> "${config%/*}/${source2%.*}.cfg"
-#			echo "TFM().TDecimate()" >> "${source1%.*}".test.avs
+			echo "TFM().TDecimate()" >> "${source1%.*}".test.avs
 		;;
 
 #		b|B) # interlaced and then telecined
