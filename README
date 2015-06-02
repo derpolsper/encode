@@ -10,12 +10,12 @@ This script shall provide test encodes to compare parameters, and do some, gradu
 It offers nine options, one prerequesite to another, largely corresponding to the methods recommended in advanced encoding guides:
 
 0 - check, if all necessary programs are installed and show your default settings
-1 - de-/ unencrypted VOB|m2ts -> mpeg2|h264 -> mkv,
+1 - de-/ unencrypted VOB|m2ts|remux -> mpeg2|h264 -> mkv,
 2 - test for crf integers and fractionals of crf
 3 - test for qcomp
-4 - test for aq strength and and psy-rd
+4 - test for aq strength and psy-rd
 5 - test for psy-trellis
-6 - do some more things
+6 - do some more things: chroma-qp-offset
 7 - another round of crf
 8 - encoding the whole movie
 
@@ -100,7 +100,7 @@ handle demuxed subtitles
 handle chapter files
 mux anything together
 
-At the moment, the maximum number of test encodings in one avs file is 102.
+At the moment, the maximum number of test encodings in one avs file is 102, especially limiting the number of combinations in cross testing aq strength and psy-rd.
 
 Though some parameters can be set permanent, encoding needs a lot of trial and error to find the best possible result. There's lots of interaction. Sorry about that.
 
