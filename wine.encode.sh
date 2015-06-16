@@ -535,7 +535,6 @@ case "$answer00" in
 	else
 		cropping
 	fi
-
 		
 	sarwidth1=$(echo "$sarwidth0-$left-$right"|bc)
 	sarheight1=$(echo "$sarheight0-$top-$bottom"|bc)
@@ -584,17 +583,18 @@ case "$answer00" in
 
 	function getresolutionSDfromHD {
 		echo ""
-		echo "set final height for SD"
-		echo ""
-		read -e -p "height > " heightSD
-		sed -i "/heightSD/d" "${config%/*}/${source2%.*}.cfg"
-		echo "heightSD=$heightSD" >> "${config%/*}/${source2%.*}.cfg"
-		echo ""
 		echo "set final width for SD"
 		echo ""
 		read -e -p "width > " widthSD
 		sed -i "/widthSD/d" "${config%/*}/${source2%.*}.cfg"
 		echo "widthSD=$widthSD" >> "${config%/*}/${source2%.*}.cfg"
+
+		echo ""
+		echo "set final height for SD"
+		echo ""
+		read -e -p "height > " heightSD
+		sed -i "/heightSD/d" "${config%/*}/${source2%.*}.cfg"
+		echo "heightSD=$heightSD" >> "${config%/*}/${source2%.*}.cfg"
 
 		refSD=$(echo "scale=0;32768/((("$widthSD"/16)+0.5)/1 * (("$heightSD"/16)+0.5)/1)"|bc)
 		# keep cfg informed
@@ -626,18 +626,19 @@ case "$answer00" in
 	}
 
 	function getresolution720 {
-		echo""
-		echo "set final height for 720p"
-		echo ""
-		read -e -p "height > " height720
-		sed -i "/height720/d" "${config%/*}/${source2%.*}.cfg"
-		echo "height720=$height720" >> "${config%/*}/${source2%.*}.cfg"
 		echo ""
 		echo "set final width for 720p"
 		echo ""
 		read -e -p "width > " width720
 		sed -i "/width720/d" "${config%/*}/${source2%.*}.cfg"
 		echo "width720=$width720" >> "${config%/*}/${source2%.*}.cfg"
+
+		echo""
+		echo "set final height for 720p"
+		echo ""
+		read -e -p "height > " height720
+		sed -i "/height720/d" "${config%/*}/${source2%.*}.cfg"
+		echo "height720=$height720" >> "${config%/*}/${source2%.*}.cfg"
 
 		ref720=$(echo "scale=0;32768/((("$width720"/16)+0.5)/1 * (("$height720"/16)+0.5)/1)"|bc)
 		# keep cfg informed
@@ -669,6 +670,17 @@ case "$answer00" in
 	}
 
 	function getresolution1080 {
+		width1080=$(echo "$sarwidth0-$left-$right"|bc)
+		height1080=$(echo "$sarheight0-$top-$bottom"|bc)
+
+		echo ""
+		sed -i "/width1080/d" "${config%/*}/${source2%.*}.cfg"
+		echo "width1080=$width1080" >> "${config%/*}/${source2%.*}.cfg"
+
+		echo""
+		sed -i "/height1080/d" "${config%/*}/${source2%.*}.cfg"
+		echo "height1080=$height1080" >> "${config%/*}/${source2%.*}.cfg"
+
 		ref1080=$(echo "scale=0;32768/((("$sarwidth1"/16)+0.5)/1 * (("$sarheight1"/16)+0.5)/1)"|bc)
 		# keep cfg informed
 		sed -i "/ref1080/d" "${config%/*}/${source2%.*}.cfg"
@@ -2733,13 +2745,13 @@ case "$answer00" in
 
 		echo ""
 		echo "now encoding ${source2%.*}.1080.mkv"
-		echo "with $sarwidth1×$sarheight1…"
+		echo "with $width1080×$height1080…"
 		echo ""
 
 		start=$(date +%s)
 
 		# create comparison screen avs
-		echo "a=import(\"${avs##*=}\").Spline36Resize("$darwidth1","$darheight1").subtitle(\"source\", align=8)" > "${source1%.*}".comparison.1080.avs
+		echo "a=import(\"${avs##*=}\").Spline36Resize("$width1080","$height1080").subtitle(\"source\", align=8)" > "${source1%.*}".comparison.1080.avs
 		echo "b=ffvideosource(\"${source1%.*}.1080.mkv\").subtitle(\"encode $2 ${source2%.*}\", align=8)" >> "${source1%.*}".comparison.1080.avs
 		echo "interleave(a,b)" >> "${source1%.*}".comparison.1080.avs
 		echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.1080.avs
