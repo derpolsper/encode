@@ -300,7 +300,7 @@ case "$answer00" in
 		# eac3to's Log file names contain spaces
 		for i in ./*.txt; do mv -v "$i" $(echo "$i" | sed 's/ /_/g') ; done
 # TODONOTE move ALL eac3to associated files to directory for demuxed files. does it?
-		for file in ./*m2v ./*.mpeg* ./*.h264 ./*.dts* ./*.pcm ./*vc1 ./*.flac ./*.ac3 ./*.aac ./*.wav ./*.w64 ./*.sup ./*.txt; do
+		for file in ./*m2v ./*.mpeg* ./*.h264 ./*.dts* ./*.pcm ./*vc1 ./*.flac ./*.ac3 ./*.aac ./*.wav ./*.w64 ./*.sup ./*.txt ./*.srt; do
 		mv $file "${source1%/*}"/ &>/dev/null; done
 
 		echo ""
@@ -331,7 +331,7 @@ case "$answer00" in
 		for i in ./*.txt; do mv -v "$i" $(echo $i | sed 's/ /_/g') ; done
 
 # TODONOTE move ALL eac3to associated files to directory for demuxed files. does it?
-		for file in ./*m2v ./*.mpeg* ./*.h264 ./*.vc1 ./*.dts* ./*.pcm ./*.flac ./*.ac3 ./*.aac ./*.wav ./*.w64 ./*.sup ./*.txt; do
+		for file in ./*m2v ./*.mpeg* ./*.h264 ./*.vc1 ./*.dts* ./*.pcm ./*.flac ./*.ac3 ./*.aac ./*.wav ./*.w64 ./*.sup ./*.txt ./*.srt; do
 		mv $file "${source1%/*}"/ &>/dev/null; done
 
 		echo ""
@@ -445,82 +445,6 @@ case "$answer00" in
 		echo "sar is $sar"
 		echo ""
 	fi
-
-	echo ""
-	echo "check, if your movie is interlaced"
-	echo ""
-	echo -n "mediainfo says: "
-	mediainfo "$source1"|awk '/Scan type/{print $4}'
-	echo -n "exiftool says: "
-	exiftool "$source1"|awk '/Scan Type/{print $5}'
-	echo ""
-	read -p "hit return to continue"
-
-	echo ""
-	echo "do you want to check with AvsPmod frame by frame,"
-	echo "if your movie is interlaced and/or telecined?"
-	echo "if yes, close AvsPmod window afterwards"
-	echo ""
-	read -e -p "check now? (y|n) > " answer_checkit
-
-	case "$answer_checkit" in
-		y|Y|yes|YES)
-			# generate an almost empty avs just to check if movie is interlaced or telecined
-	#		sed -i "/checkavs/d" "$config"
-	#		echo "checkavs=${source1%.*}.avs" >> "${config%/*}/${source2%.*}.cfg"
-			echo "FFVideosource(\"$source1\")" > "${source1%.*}".avs
-			wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".avs
-		;;
-
-		*)
-		;;
-	esac
-
-	echo ""
-	echo "characteristics of your video source:"
-	echo "(i)nterlaced?"
-	echo "(t)elecined?"
-#	echo "(b)oth: first interlaced, then telecined?"
-	echo "(n)either nor?"
-	echo ""
-	read -e -p "(i|t|n) > " answer_intertele
-
-	case "$answer_intertele" in
-		i|I) # interlaced
-			sed -i "/interlaced/d" "${config%/*}/${source2%.*}.cfg"
-			echo "interlaced=1" >> "${config%/*}/${source2%.*}.cfg"
-			echo "FFVideosource(\"$source1\")" > "${source1%.*}".SD.final.avs
-			echo "QTGMC().SelectEven()" >> "${source1%.*}".SD.final.avs
-		;;
-
-		t|T) # telecined
-			sed -i "/telecined/d" "${config%/*}/${source2%.*}.cfg"
-			echo "telecined=1" >> "${config%/*}/${source2%.*}.cfg"
-			echo "TFM().TDecimate()" >> "${source1%.*}".test.avs
-		;;
-
-#		b|B) # interlaced and then telecined
-#			sed -i "/interlaced/d" "${config%/*}/${source2%.*}.cfg"
-#			echo "interlaced=1" >> "${config%/*}/${source2%.*}.cfg"
-#			sed -i "/telecined/d" "${config%/*}/${source2%.*}.cfg"
-#			echo "telecined=1" >> "${config%/*}/${source2%.*}.cfg"
-#			echo "QTGMC().SelectEven()" >> "${source1%.*}".test.avs
-#			echo "TFM().TDecimate()" >> "${source1%.*}".test.avs
-#			echo "SelectRangeEvery($interval, $length, $offset)" >> "${source1%.*}".test.avs
-#		;;
-
-		n|N) # neither interlaced nor telecined
-			sed -i "/interlaced/d" "${config%/*}/${source2%.*}.cfg"
-			echo "interlaced=0" >> "${config%/*}/${source2%.*}.cfg"
-			sed -i "/telecined/d" "${config%/*}/${source2%.*}.cfg"
-			echo "telecined=0" >> "${config%/*}/${source2%.*}.cfg"
-		;;
-
-		*)
-			echo "that's not what was asked for"
-			echo "you may try again"
-		;;
-	esac
 
 	function cropping {
 		echo ""
@@ -780,15 +704,8 @@ case "$answer00" in
 		sed -i "/finalavsSD/d" "${config%/*}/${source2%.*}.cfg"
 		echo "finalavsSD=${source1%.*}.SD.final.avs" >> "${config%/*}/${source2%.*}.cfg"
 		echo "FFVideosource(\"$source1\")" > "${source1%.*}".SD.final.avs
-
-		if [[ $interlaced -gt 0 ]]; then
-			echo "QTGMC().SelectEven()" >> "${source1%.*}".SD.final.avs
-		fi
-
-		if [[ $telecined -gt 0 ]]; then
-			echo "TFM().TDecimate()" >> "${source1%.*}".SD.final.avs
-		fi
-
+		echo "#interlaced" > "${source1%.*}".SD.final.avs
+		echo "#telecined" > "${source1%.*}".SD.final.avs
 		echo "Crop($left, $top, -$right, -$bottom)" >> "${source1%.*}".SD.final.avs
 		echo "Spline36Resize($widthSD, $heightSD)" >> "${source1%.*}".SD.final.avs
 	}
@@ -799,15 +716,8 @@ case "$answer00" in
 		sed -i "/finalavsSD/d" "${config%/*}/${source2%.*}.cfg"
 		echo "finalavsSD=${source1%.*}.SD.final.avs" >> "${config%/*}/${source2%.*}.cfg"
 		echo "FFVideosource(\"$source1\")" > "${source1%.*}".SD.final.avs
-
-		if [[ $interlaced -gt 0 ]]; then
-			echo "QTGMC().SelectEven()" >> "${source1%.*}".SD.final.avs
-		fi
-
-		if [[ $telecined -gt 0 ]]; then
-			echo "TFM().TDecimate()" >> "${source1%.*}".SD.final.avs
-		fi
-
+		echo "#interlaced" > "${source1%.*}".SD.final.avs
+		echo "#telecined" > "${source1%.*}".SD.final.avs
 		echo "Crop($left, $top, -$right, -$bottom)" >> "${source1%.*}".SD.final.avs
 	}
 
@@ -817,15 +727,8 @@ case "$answer00" in
 		sed -i "/finalavs720/d" "${config%/*}/${source2%.*}.cfg"
 		echo "finalavs720=${source1%.*}.720.final.avs" >> "${config%/*}/${source2%.*}.cfg"
 		echo "FFVideosource(\"$source1\")" > "${source1%.*}".720.final.avs
-
-		if [[ $interlaced -gt 0 ]]; then
-			echo "QTGMC().SelectEven()" >> "${source1%.*}".720.final.avs
-		fi
-
-		if [[ $telecined -gt 0 ]]; then
-			echo "TFM().TDecimate()" >> "${source1%.*}".720.final.avs
-		fi
-
+		echo "#interlaced" > "${source1%.*}".720.final.avs
+		echo "#telecined" > "${source1%.*}".720.final.avs
 		echo "Crop($left, $top, -$right, -$bottom)" >> "${source1%.*}".720.final.avs
 		echo "Spline36Resize($width720, $height720)" >> "${source1%.*}".720.final.avs
 	}
@@ -836,15 +739,8 @@ case "$answer00" in
 		sed -i "/finalavs1080/d" "${config%/*}/${source2%.*}.cfg"
 		echo "finalavs1080=${source1%.*}.1080.final.avs" >> "${config%/*}/${source2%.*}.cfg"
 		echo "FFVideosource(\"$source1\")" > "${source1%.*}".1080.final.avs
-
-		if [[ $interlaced -gt 0 ]]; then
-			echo "QTGMC().SelectEven()" >> "${source1%.*}".1080.final.avs
-		fi
-
-		if [[ $telecined -gt 0 ]]; then
-			echo "TFM().TDecimate()" >> "${source1%.*}".1080.final.avs
-		fi
-
+		echo "#interlaced" > "${source1%.*}".1080.final.avs
+		echo "#telecined" > "${source1%.*}".1080.final.avs
 		echo "Crop($left, $top, -$right, -$bottom)" >> "${source1%.*}".1080.final.avs
 		# no spline36resize necessary
 	}
@@ -939,13 +835,13 @@ case "$answer00" in
 			;;
 
 			s|S|sd|SD)
-				targetresolutionSD
+				targetresolutionSDfromHD
 				avsSDfromHD
 				testavsSD
 			;;
 
 			1S|1s|s1|S1)
-				targetresolutionSD
+				targetresolutionSDfromHD
 				avsSDfromHD
 				testavsSD
 				targetresolution1080
@@ -954,7 +850,7 @@ case "$answer00" in
 			;;
 
 			7S|7s|s7|S7)
-				targetresolutionSD
+				targetresolutionSDfromHD
 				avsSDfromHD
 				testavsSD
 				targetresolution720
@@ -972,7 +868,7 @@ case "$answer00" in
 			;;
 
 			a|A|s17|s71|1s7|17s|7s1|71s|S17|S71|1S7|17S|7S1|71S)
-				targetresolutionSD
+				targetresolutionSDfromHD
 				targetresolution720
 				targetresolution1080
 				avsSDfromHD
@@ -984,6 +880,89 @@ case "$answer00" in
 		;;
 		esac
 	fi
+
+	# check source for being interlaced and/or telecined
+	echo ""
+	echo "check, if your movie is interlaced"
+	echo ""
+	echo -n "mediainfo says: "
+	mediainfo "$source1"|awk '/Scan type/{print $4}'
+	echo -n "exiftool says: "
+	exiftool "$source1"|awk '/Scan Type/{print $5}'
+	echo ""
+	read -p "hit return to continue"
+
+	echo ""
+	echo "do you want to check with AvsPmod frame by frame,"
+	echo "if your movie is interlaced and/or telecined?"
+	echo "if yes, close AvsPmod window afterwards"
+	echo ""
+	read -e -p "check now? (y|n) > " answer_check_interlaced_telecined
+
+	case "$answer_check_interlaced_telecined" in
+		y|Y|yes|YES)
+			# generate an almost empty avs just to check if movie is interlaced or telecined
+	#		sed -i "/checkavs/d" "$config"
+	#		echo "checkavs=${source1%.*}.avs" >> "${config%/*}/${source2%.*}.cfg"
+			echo "FFVideosource(\"$source1\")" > "${source1%.*}".avs
+			wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".avs
+		;;
+
+		*)
+		;;
+	esac
+
+	echo ""
+	echo "characteristics of your video source:"
+	echo "(i)nterlaced?"
+	echo "(t)elecined?"
+#	echo "(b)oth: first interlaced, then telecined?"
+	echo "(n)either nor?"
+	echo ""
+	read -e -p "(i|t|n) > " answer_interlaced_telecined
+
+	case "$answer_interlaced_telecined" in
+		i|I) # interlaced
+			sed -i "/interlaced/d" "${config%/*}/${source2%.*}.cfg"
+			echo "interlaced=1" >> "${config%/*}/${source2%.*}.cfg"
+			for i in "${source1%.*}".final.avs "${source1%.*}".test.avs; do
+				sed -i "s/#interlaced/QTGMC().SelectEven()/" "$i"
+			done
+		;;
+
+		t|T) # telecined
+			sed -i "/telecined/d" "${config%/*}/${source2%.*}.cfg"
+			echo "telecined=1" >> "${config%/*}/${source2%.*}.cfg"
+			for i in "${source1%.*}".final.avs "${source1%.*}".test.avs; do
+				sed -i "s/#telecined/TFM().TDecimate()/" "$i"
+			done
+		;;
+
+#		b|B) # interlaced and then telecined
+#			sed -i "/interlaced/d" "${config%/*}/${source2%.*}.cfg"
+#			echo "interlaced=1" >> "${config%/*}/${source2%.*}.cfg"
+#			sed -i "/telecined/d" "${config%/*}/${source2%.*}.cfg"
+#			echo "telecined=1" >> "${config%/*}/${source2%.*}.cfg"
+#			for i in "${source1%.*}".final.avs "${source1%.*}".test.avs; do
+#				sed -i "s/#interlaced/QTGMC().SelectEven()/" "$i"
+#			done
+#			for i in "${source1%.*}".final.avs "${source1%.*}".test.avs; do
+#				sed -i "s/#telecined/TFM().TDecimate()/" "$i"
+#			done
+#		;;
+
+		n|N) # neither interlaced nor telecined
+			sed -i "/interlaced/d" "${config%/*}/${source2%.*}.cfg"
+			echo "interlaced=0" >> "${config%/*}/${source2%.*}.cfg"
+			sed -i "/telecined/d" "${config%/*}/${source2%.*}.cfg"
+			echo "telecined=0" >> "${config%/*}/${source2%.*}.cfg"
+		;;
+
+		*)
+			echo "that's not what was asked for"
+			echo "you may try again"
+		;;
+	esac
 
 	function ratecontrol {
 
@@ -1725,8 +1704,6 @@ case "$answer00" in
 	psyrd=$(cat "$config"|grep psyrd|grep $2)
 	ref=$(cat "$config"|grep ref|grep $2)
 
-	echo "${psyrd##*=}"
-
 	case $(echo "${psyrd##*=}" - 0.99999 | bc) in
 
 		-*) # psy-rd <1 -> psytr unset
@@ -1742,7 +1719,7 @@ case "$answer00" in
 
 		*) # psyrd >= 1
 		echo ""
-		echo "as psy-rd is set to ≥1"
+		echo "as psy-rd is set to ≥1 (${psyrd##*=})"
 		echo "you may (t)est for psy-trellis"
 		echo "or (u)nset psy-trellis"
 		echo ""
