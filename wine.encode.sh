@@ -535,7 +535,96 @@ case "$answer00" in
 	else
 		cropping
 	fi
-		
+
+	# fillmargins in case of 1 line of px
+	# note: editing the avs files will happen at the end of option 1
+	function fillmargins {
+		echo ""
+		echo "if cropping left one line of black or dirty"
+		echo "pixels elsewhere, you can use fillmargins"
+		echo ""
+		echo "avoid more px than absolutely necessary"
+		echo ""
+		echo "do you want to use fillmargins?"
+		read -e -p "(y|n) > " answer_fillmargins
+
+		case $answer_fillmargins in
+			y|Y|yes|YES|Yes)
+				echo ""
+				echo "number of pixels on the"
+				echo ""
+				read -e -p "left > " left_fillmargins
+				# keep cfg informed
+				sed -i "/left_fillmargins/d" "${config%/*}/${source2%.*}.cfg"
+				echo "left_fillmargins=$left_fillmargins" >> "${config%/*}/${source2%.*}.cfg"
+
+				echo ""
+				echo "number of pixels on the"
+				echo ""
+				read -e -p "top > " top_fillmargins
+				# keep cfg informed
+				sed -i "/top_fillmargins/d" "${config%/*}/${source2%.*}.cfg"
+				echo "top_fillmargins=$top_fillmargins" >> "${config%/*}/${source2%.*}.cfg"
+
+				echo ""
+				echo "number of pixels on the"
+				echo ""
+				read -e -p "right > " right_fillmargins
+				# keep cfg informed
+				sed -i "/right_fillmargins/d" "${config%/*}/${source2%.*}.cfg"
+				echo "right_fillmargins=$right_fillmargins" >> "${config%/*}/${source2%.*}.cfg"
+
+				echo ""
+				echo "number of pixels on the"
+				echo ""
+				read -e -p "bottom > " bottom_fillmargins
+				# keep cfg informed
+				sed -i "/bottom_fillmargins/d" "${config%/*}/${source2%.*}.cfg"
+				echo "bottom_fillmargins=$bottom_fillmargins" >> "${config%/*}/${source2%.*}.cfg"
+
+			;;
+			n|N|no|NO|No)
+			# do nothing here
+			;;
+			*)
+			echo "that's neither 'yes' nor 'no'"
+			echo "i take this for a 'no'"
+			;;
+		esac
+	}
+
+	if [[ ( -n $left_fillmargins && -n $right_fillmargins && -n $top_fillmargins && -n $bottom_fillmargins ) ]]; then
+		echo ""
+		echo "your config file"
+		echo "${config%/*}/${source2%.*}.cfg"
+		echo "has got some fillmargin values:"
+		echo "left:  $left_fillmargins"
+		echo "top:   $top_fillmargins"
+		echo "right: $right_fillmargins"
+		echo "bottom:$bottom_fillmargins"
+		echo ""
+		echo "are you (o)kay with that or"
+		echo "do you want to (e)dit them?"
+		read -e -p "(o|e) > " answer_fillmarginsedit
+
+		case $answer_fillmarginsedit in
+			o|O|ok|okay|OK|Ok)
+			# do nothing here
+			;;
+
+			e|E|edit|EDIT|Edit)
+			fillmargins
+			;;
+
+			*)
+			echo "that's neither 'edit' nor 'ok'"
+			echo "i take this for a 'ok'"
+			;;
+		esac
+	else
+		fillmargins
+	fi
+
 	sarwidth1=$(echo "$sarwidth0-$left-$right"|bc)
 	sarheight1=$(echo "$sarheight0-$top-$bottom"|bc)
 	sed -i "/sarwidth1/d" "${config%/*}/${source2%.*}.cfg"
@@ -716,10 +805,11 @@ case "$answer00" in
 		sed -i "/finalavsSD/d" "${config%/*}/${source2%.*}.cfg"
 		echo "finalavsSD=${source1%.*}.SD.final.avs" >> "${config%/*}/${source2%.*}.cfg"
 		echo "FFVideosource(\"$source1\")" > "${source1%.*}".SD.final.avs
-		echo "#interlaced" > "${source1%.*}".SD.final.avs
-		echo "#telecined" > "${source1%.*}".SD.final.avs
+		echo "#interlaced" >> "${source1%.*}".SD.final.avs
+		echo "#telecined" >> "${source1%.*}".SD.final.avs
 		echo "Crop($left, $top, -$right, -$bottom)" >> "${source1%.*}".SD.final.avs
 		echo "Spline36Resize($widthSD, $heightSD)" >> "${source1%.*}".SD.final.avs
+		echo "#fillmargins" >> "${source1%.*}".SD.final.avs
 	}
 
 	function  avsSDfromSD {
@@ -728,9 +818,10 @@ case "$answer00" in
 		sed -i "/finalavsSD/d" "${config%/*}/${source2%.*}.cfg"
 		echo "finalavsSD=${source1%.*}.SD.final.avs" >> "${config%/*}/${source2%.*}.cfg"
 		echo "FFVideosource(\"$source1\")" > "${source1%.*}".SD.final.avs
-		echo "#interlaced" > "${source1%.*}".SD.final.avs
-		echo "#telecined" > "${source1%.*}".SD.final.avs
+		echo "#interlaced" >> "${source1%.*}".SD.final.avs
+		echo "#telecined" >> "${source1%.*}".SD.final.avs
 		echo "Crop($left, $top, -$right, -$bottom)" >> "${source1%.*}".SD.final.avs
+		echo "#fillmargins" >> "${source1%.*}".SD.final.avs
 	}
 
 	function  avs720 {
@@ -739,9 +830,10 @@ case "$answer00" in
 		sed -i "/finalavs720/d" "${config%/*}/${source2%.*}.cfg"
 		echo "finalavs720=${source1%.*}.720.final.avs" >> "${config%/*}/${source2%.*}.cfg"
 		echo "FFVideosource(\"$source1\")" > "${source1%.*}".720.final.avs
-		echo "#interlaced" > "${source1%.*}".720.final.avs
-		echo "#telecined" > "${source1%.*}".720.final.avs
+		echo "#interlaced" >> "${source1%.*}".720.final.avs
+		echo "#telecined" >> "${source1%.*}".720.final.avs
 		echo "Crop($left, $top, -$right, -$bottom)" >> "${source1%.*}".720.final.avs
+		echo "#fillmargins" >> "${source1%.*}".720.final.avs
 		echo "Spline36Resize($width720, $height720)" >> "${source1%.*}".720.final.avs
 	}
 
@@ -751,9 +843,10 @@ case "$answer00" in
 		sed -i "/finalavs1080/d" "${config%/*}/${source2%.*}.cfg"
 		echo "finalavs1080=${source1%.*}.1080.final.avs" >> "${config%/*}/${source2%.*}.cfg"
 		echo "FFVideosource(\"$source1\")" > "${source1%.*}".1080.final.avs
-		echo "#interlaced" > "${source1%.*}".1080.final.avs
-		echo "#telecined" > "${source1%.*}".1080.final.avs
+		echo "#interlaced" >> "${source1%.*}".1080.final.avs
+		echo "#telecined" >> "${source1%.*}".1080.final.avs
 		echo "Crop($left, $top, -$right, -$bottom)" >> "${source1%.*}".1080.final.avs
+		echo "#fillmargins" >> "${source1%.*}".1080.final.avs
 		# no spline36resize necessary
 	}
 
@@ -976,6 +1069,19 @@ case "$answer00" in
 		;;
 	esac
 
+	# fillmargins editing the avs files
+	if [[ $left_fillmargins -ge 1 ]] || [[ $top_fillmargins -ge 1 ]] || [[ $right_fillmargins -ge 1 ]] || [[ $bottom_fillmargins -ge 1 ]]; then
+		for i in "${source1%.*}".*.final.avs; do
+			sed -i "s/#fillmargins0/LoadPlugin(\"$pathfillmargins\")/" "$i"
+			sed -i "s/#fillmargins1/FillMargins($left_fillmargins,$top_fillmargins,$right_fillmargins,$bottom_fillmargins)/" "$i"
+		done
+	else
+		for i in "${source1%.*}".*.final.avs; do
+			sed -i "/#fillmargins0/d" "$i"
+			sed -i "/#fillmargins1/d" "$i"
+		done
+	fi
+
 	function ratecontrol {
 
 		echo ""
@@ -1061,6 +1167,7 @@ case "$answer00" in
 		echo "go on with option 2"
 		echo ""
 	fi
+
 	;;
 
 	2)	# 2 - test encodes for crf
@@ -2780,28 +2887,26 @@ case "$answer00" in
 		time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
 		echo "encoding ${source2%.*}.1080.mkv"
 		echo "with $darwidth1×$darheight1 lasted $days days and $time"
-
-		echo "encoding for ${source2%.*}.1080.mkv lasted $time"
 	}
 
 	function comparisonSD {
 		echo "take some comparison screen shots"
 		echo "then close AvsPmod"
-		sleep 2
+		sleep 1
 		wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".comparison.SD.avs
 	}
 
 	function comparison720 {
 		echo "take some comparison screen shots"
 		echo "then close AvsPmod"
-		sleep 2
+		sleep 1
 		wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".comparison.720.avs
 	}
 
 	function comparison1080 {
 		echo "take some comparison screen shots"
 		echo "then close AvsPmod"
-		sleep 2
+		sleep 1
 		wine ~/"$wine"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".comparison.1080.avs
 	}
 
@@ -2866,4 +2971,3 @@ case "$answer00" in
 
 esac
 exit
-
