@@ -51,7 +51,7 @@ Install the linux programs preferably from your distribution:
 
 # apt-get install wine x264 mkvmerge mediainfo exiftool beep
 
-Download eac3to, AvsPmod, avs2yuv, MatroskaSplitter, Avisynth and Avisynth Plugins.
+Download eac3to, AvsPmod, avs2yuv, MatroskaSplitter, Avisynth, Avisynth Plugins and FillMargins.
 
 Unzip your eac3to.zip to "Program Files":
 
@@ -64,6 +64,10 @@ $ unzip /path/to/AvsPmod_v2.5.1.zip -d /home/<user>/.wine/drive_c/Program\ Files
 and avs2yuv-0.24.zip:
 
 $ unzip /path/to/avs2yuv-0.24.zip -x /home/<user>/.wine/drive_c/Program\ Files/
+
+Unzip your FillMargins.zip to "Program Files":
+
+$ unzip /path/to/FillMargins.zip -d /home/<user>/.wine/drive_c/Program\ Files/FillMargins
 
 Install MatroskaSplitter.exe:
 
