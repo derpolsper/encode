@@ -1,4 +1,4 @@
-Over the years, much great software for advanced video encoding has been written, unfortunately most of it for windows only. So linux users, who want to produce high quality encodings have to use a windows installation either natively or in a virtual machine. Both of which needs a windows license and often is disliked by those who never were at or went away from windows.
+Over the years, much great software for advanced video encoding has been written, unfortunately advanced tools like avisynth for windows only. So linux users, who want to produce high quality encodings have to use a windows installation either natively or in a virtual machine. Both of which needs a windows license and often is disliked by those who never were at or went away from windows.
 Thanks to many great coders there is a windows runtime environment called wine, in which the most important windows tools do work at least sufficiently.
 
 I have to admit I'm not that guy on the command line I wish I was. My first attempt to write a script to ease my encoding, well, it was crap.
@@ -10,7 +10,7 @@ This script shall provide test encodes to compare parameters, and do some, gradu
 It offers nine options, one prerequesite to another, largely corresponding to the methods recommended in advanced encoding guides:
 
 0 - check, if all necessary programs are installed and show your default settings
-1 - de-/ unencrypted VOB|m2ts|remux -> mpeg2|h264 -> mkv,
+1 - de-/ unencrypted VOB|m2ts|remux -> mpeg2|h264|vc1 -> mkv,
 2 - test for crf integers and fractionals of crf
 3 - test for qcomp
 4 - test for aq strength and psy-rd
@@ -49,7 +49,7 @@ Maybe you prefer not to mix your encoding environment with other installations o
 
 Install the linux programs preferably from your distribution:
 
-# apt-get install wine x264 mkvmerge mediainfo exiftool beep
+# apt-get install bash wine x264 mkvmerge mediainfo libimage-exiftool-perl beep
 
 Download eac3to, AvsPmod, avs2yuv, MatroskaSplitter, Avisynth, Avisynth Plugins and FillMargins.
 
@@ -65,9 +65,13 @@ and avs2yuv-0.24.zip:
 
 $ unzip /path/to/avs2yuv-0.24.zip -x /home/<user>/.wine/drive_c/Program\ Files/
 
-Unzip your FillMargins.zip to "Program Files":
+Unzip FillMargins.zip to "Program Files":
 
 $ unzip /path/to/FillMargins.zip -d /home/<user>/.wine/drive_c/Program\ Files/FillMargins
+
+Unzip /path/to/flash3kyuu_deband_1.5.1_x86.7z to "Program Files":
+
+$ mkdir /home/<user>/.wine/drive_c/Program\ Files/f3kdb && cd /home/<user>/.wine/drive_c/Program\ Files/f3kdb && p7zip -d /path/to/flash3kyuu_deband_1.5.1_x86.7z && cd -
 
 Install MatroskaSplitter.exe:
 
@@ -87,6 +91,9 @@ I tested for
 · QTGMC().SelectEven()
 · TFM().TDecimate()
 · FillMargins
+· f3kdb
+
+Unfortunately, BalanceBorders I did not manage to work as expected. All it does is drawing light green lines, where expected to clean the chosen lines.
 
 During encoding, the script generates a simple .avs for each testing stage, so you don't have to tamper with avs files to get your comparison screens. Of course, they can be edited by $editor at any time as you like to.
 
@@ -110,9 +117,6 @@ Though some parameters can be set permanent, encoding needs a lot of trial and e
 
 The script is work in progress, and I'd very much appreciate any help and criticism.
 Some flaky things I did not know how to avoid are noted in the script, these comments start with #TODONOTE. I'd be especially thankful for them to be solved in a clean way.
-The "code" right here is more or less for a quick look only, recent versions you will find on github:
-
-https://github.com/derpolsper/wine.encode
 
 I apologize for my poor English, I am obviously not a native speaker and have not spoken or written English in quite a long time.
 
@@ -123,4 +127,3 @@ http://en.wikibooks.org/wiki/Eac3to/How_to_Use
 http://avisynth.nl
 http://mewiki.project357.com/wiki/X264_Settings
 and many people at ptp.me
-
