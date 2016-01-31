@@ -2268,10 +2268,10 @@ case "$answer_00" in
 	echo "(n)othing right now"
 		read -e -p "(c|d|n) > " answer_various
 		until [[ $answer_various =~ ^[c,C,d,D,n,N]$ ]] ; do
-			case $answer_various in
+                    case $answer_various in
 
 				c|C)	# chroma-qp-offset
-						# until cqpohigh -12 to 12 and cqpolow -12 to 12 and cqpohigh ggreater or equal cqpolow; do
+						# until cqpohigh -12 to 12 and cqpolow -12 to 12 and cqpohigh greater or equal cqpolow; do
 					until [[ $cqpohigh =~ ^-{0,1}[0-9]$|^-{0,1}1[0-2]$ && $cqpolow =~ ^-{0,1}[0-9]$|^-{0,1}1[0-2]$ && $cqpohigh -ge $cqpolow ]]; do
 						echo ""
 						echo "test for chroma-qp-offset: default 0,"
@@ -2554,7 +2554,7 @@ case "$answer_00" in
 	until [[ $crf =~ ^[0-4][0-9]\.[0-9]|[5][0-2]\.[0-9]|53\.0$ ]] ; do
             echo ""
             echo "set crf parameter"
-            echo "e.g. 17.3"
+            echo "so far you tested with a crf of ${crf##*=}"
             echo ""
             read -e -p "crf > " crf
             echo ""
