@@ -51,40 +51,46 @@ Install the linux programs preferably from your distribution:
 
 # apt-get install bash wine x264 mkvmerge mediainfo libimage-exiftool-perl beep
 
-Download eac3to, AvsPmod, avs2yuv, MatroskaSplitter, Avisynth, Avisynth Plugins and FillMargins.
+###Download eac3to, AvsPmod, avs2yuv, MatroskaSplitter, Avisynth, Avisynth Plugins and FillMargins.
+Download eac3to, AvsPmod, avs2yuv, Avisynth, Avisynth Plugins and FillMargins.
 
 Unzip your eac3to.zip to "Program Files":
 
-$ unzip /path/to/eac3to.zip -d /home/<user>/.wine/drive_c/Program\ Files/eac3to
+$ unzip /path/to/eac3to.zip -d ~/.wine/drive_c/Program\ Files/eac3to
 
 similar, with AvsPmod:
 
-$ unzip /path/to/AvsPmod_v2.5.1.zip -d /home/<user>/.wine/drive_c/Program\ Files/
+$ unzip /path/to/AvsPmod_v2.5.1.zip -d ~/.wine/drive_c/Program\ Files/
 
 and avs2yuv-0.24.zip:
 
-$ unzip /path/to/avs2yuv-0.24.zip -x /home/<user>/.wine/drive_c/Program\ Files/
+$ unzip /path/to/avs2yuv-0.24.zip -x ~/.wine/drive_c/Program\ Files/
 
 Unzip FillMargins.zip to "Program Files":
 
-$ unzip /path/to/FillMargins.zip -d /home/<user>/.wine/drive_c/Program\ Files/FillMargins
+$ unzip /path/to/FillMargins.zip -d ~/.wine/drive_c/Program\ Files/FillMargins
 
 Unzip /path/to/flash3kyuu_deband_1.5.1_x86.7z to "Program Files":
 
 $ mkdir /home/<user>/.wine/drive_c/Program\ Files/f3kdb && cd /home/<user>/.wine/drive_c/Program\ Files/f3kdb && p7zip -d /path/to/flash3kyuu_deband_1.5.1_x86.7z && cd -
 
-Install MatroskaSplitter.exe:
+###Install MatroskaSplitter.exe:
 
-$ wine /path/to/MatroskaSplitter.exe
+###$ wine /path/to/MatroskaSplitter.exe
 
-and follow the instructions. Same same with Avisynth:
+###and follow the instructions. Same same with
+
+Install Avisynth:
 
 $ wine path/to/Avisynth_258.exe
 
+and follow the instructions.
+
 Unrar Avisynth Plugins and copy the content of the plugins directory:
 
-$ unrar x -r /path/to/Avisynth\ Plugins.rar
-$ cp -v /path/to/unrar'ed/Avisynth\ Plugins/plugins/* /home/<user>/.wine/drive_c/Program\ Files/AviSynth\ 2.5/plugins/
+$ unrar x -r /path/to/AviSynth\ Plugins.rar
+
+$ cp -v /path/to/unrar'ed/AviSynth\ Plugins/plugins/* ~/.wine/drive_c/Program\ Files/AviSynth\ 2.5/plugins/
 
 This script does not need more programs to work. You can install all kind of avisynth filters. There is no guarantee for them to work, though. Generally, many avisynth filters should work, however, I did not do much in the way of verification here.
 I tested for
