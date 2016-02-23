@@ -1,23 +1,24 @@
 Over the years, much great software for advanced video encoding has been written, unfortunately advanced tools like avisynth for windows only. So linux users, who want to produce high quality encodings have to use a windows installation either natively or in a virtual machine. Both of which needs a windows license and often is disliked by those who never were at or went away from windows.
-Thanks to many great coders there is a windows runtime environment called wine, in which the most important windows tools do work at least sufficiently.
+Due to wine, most relevant windows tools do work at least sufficiently.
 
-I have to admit I'm not that guy on the command line I wish I was. My first attempt to write a script to ease my encoding, well, it was crap.
-Thanks to drstrangelove420, who pointed me to avs2yuv, I reconsidered the script, re-wrote it completely and I hope, it is now usable and more of an assistance than a burden.
+I have to admit I'm not that guy on the command line I wish I was.
 
-I have written this script to produce test encodes in a kind of methodical manner. It is boring and sometimes tempting to be done unstructered. As a test encode may take twenty minutes, you may have to operate your pc after every 20 minutes to prompt the next encode.
-This script shall provide test encodes to compare parameters, and do some, gradually more complex encoding with crosswise parameters, and in the end encoding the whole movie.
+The script produces test encodes in a kind of methodical manner. Doing this manually is boring and sometimes tempting to be done unstructered. As a test encode may take fifteen, twenty minutes on average consumer hardware, you may have to operate your pc after every 20 minutes to prompt the next encode.
+This script provides test encodes with several parameters, and does some, gradually more complex encoding with crosswise parameters, and in the end encodes the whole movie. Most important, the script generates a simple .avs for each testing stage, so you don't have to tamper with avs files to get your comparison screens. Of course, they can be edited by $editor at any time as you like to.
 
-It offers nine options, one prerequesite to another, largely corresponding to the methods recommended in advanced encoding guides:
+
+It offers nine options, (mostly) one prerequesite to another, largely corresponding to the methods recommended in advanced encoding guides:
 
 0 - check, if all necessary programs are installed and show your default settings
 1 - de-/ unencrypted VOB|m2ts|remux -> mpeg2|h264|vc1 -> mkv,
-2 - test for crf integers and fractionals of crf
-3 - test for qcomp
-4 - test for aq strength and psy-rd
-5 - test for psy-trellis
-6 - do some more things: chroma-qp-offset
-7 - another round of crf
-8 - encoding the whole movie
+2 - create necessary avs files
+3 - test for crf integers and fractionals of crf
+4 - test for qcomp
+5 - test for aq strength and psy-rd
+6 - test for psy-trellis
+7 - do some more things: chroma-qp-offset
+8 - another round of crf
+9 - encoding the whole movie
 
 It uses native linux cli tools as far as available (which is not much right now), all the rest is done using windows tools via wine.
 
@@ -28,57 +29,33 @@ The bash script itself: wine.encode.sh and a configuration file default.cfg in a
 You can place the script whereever you want, maybe somewhere in your $PATH.
 The config file I suggest to place to
 ~/.config/wine.encode/default.cfg
-but any other place may be suitable. In the latter case, you have to edit the line
-CONFIG="{HOME}/.config/wine.encode/default.cfg"
-which right now appears twice in the script, at line 74 and 93,approximately.
+but any other place may be suitable. In the latter case, you have to edit the script:
+config="${HOME}/.config/wine.encode/default.cfg"
 
-The config file stores all important parameters, the volatile ones, which change throughout the encoding process as well as the more constant ones, which you do not change without reason. The "more constant ones" are those between double lines of #. If you want to change them, use your editor of choice.
+Each movie gets its own config file derived from the default.cfg and stores all relevant parameters that occur during encoding.
+If you want to change them manually, use your editor of choice or choose the edit-option in option 0.
+
+Maybe you prefer not to mix your encoding environment with other installations of wine. If you do not have any wine-installation yet, you may leave the newly installed wine directory in place. If you do have a wine installation already, you may rename it or install your encoding environment someplace else. Edit the script:
+wine="${HOME}/.wine".
 
 Start the script like this:
 $ ./wine.encode.sh
 You can check, if all neccessary programs are available and check the default settings for encoding.
-Also start the script without any parameters to begin the encoding process from an unencrypted VIDEO_TS directory respectively m2ts file.
-During going through option 1, an individual config file will be generated which stores your settings for each movie. The config file will be placed in the default config file's directory and given a file name as your test encode.
-With this name as parameter, you go on from option 2 to option 8. Let's say, you encode "The Fabulous Baker Boys". Choose a short name for practical reasons! You give your encoding the name tfbb. From there on, start the script with
+Start the script without parameters to begin the encoding process from an unencrypted VIDEO_TS directory, remux file respectively m2ts file.
+While going through option 1 and 2, an individual config file will be generated which stores your settings for each movie. The config file will be placed in the same wine.encode directory as the default.cfg file and given the name of your test encode.
+With this name as parameter, you go on from option 3 to option 9. Let's say, you encode "The Fabulous Baker Boys". Choose a short name for practical reasons! Name your encoding tfbb, for example. From there on, start the script with
 $ ./wine.encode.sh tfbb
 You want to work on another movie, before the baker boys are finished? No problem, that encoding also gets its individual config file, so your settings don't get confused.
 
+
 Requirements:
-
-Maybe you prefer not to mix your encoding environment with other installations of wine. If you do not have any wine-installation yet, you may leave the newly installed wine directory in place. If you do have a wine installation already, you may rename it or install your encoding environment someplace else. There is a variable in the default.cfg configuration file  (wine=.wine) which then has to be edited.
-
 Install the linux programs preferably from your distribution:
 
-# apt-get install bash wine x264 mkvmerge mediainfo libimage-exiftool-perl beep
+# apt-get install bash wine x264 unrar mkvtoolnix mediainfo libimage-exiftool-perl beep
 
-###Download eac3to, AvsPmod, avs2yuv, MatroskaSplitter, Avisynth, Avisynth Plugins and FillMargins.
-Download eac3to, AvsPmod, avs2yuv, Avisynth, Avisynth Plugins and FillMargins.
+If wine64 is installed, you should uninstall it to prevent windows applicationsfrom being installed there.
 
-Unzip your eac3to.zip to "Program Files":
-
-$ unzip /path/to/eac3to.zip -d ~/.wine/drive_c/Program\ Files/eac3to
-
-similar, with AvsPmod:
-
-$ unzip /path/to/AvsPmod_v2.5.1.zip -d ~/.wine/drive_c/Program\ Files/
-
-and avs2yuv-0.24.zip:
-
-$ unzip /path/to/avs2yuv-0.24.zip -x ~/.wine/drive_c/Program\ Files/
-
-Unzip FillMargins.zip to "Program Files":
-
-$ unzip /path/to/FillMargins.zip -d ~/.wine/drive_c/Program\ Files/FillMargins
-
-Unzip /path/to/flash3kyuu_deband_1.5.1_x86.7z to "Program Files":
-
-$ mkdir /home/<user>/.wine/drive_c/Program\ Files/f3kdb && cd /home/<user>/.wine/drive_c/Program\ Files/f3kdb && p7zip -d /path/to/flash3kyuu_deband_1.5.1_x86.7z && cd -
-
-###Install MatroskaSplitter.exe:
-
-###$ wine /path/to/MatroskaSplitter.exe
-
-###and follow the instructions. Same same with
+Download eac3to, AvsPmod, avs2yuv, Avisynth, Avisynth Plugins, f3kdb, FillMargins and ColorMatrix.
 
 Install Avisynth:
 
@@ -90,41 +67,64 @@ Unrar Avisynth Plugins and copy the content of the plugins directory:
 
 $ unrar x -r /path/to/AviSynth\ Plugins.rar
 
-$ cp -v /path/to/unrar'ed/AviSynth\ Plugins/plugins/* ~/.wine/drive_c/Program\ Files/AviSynth\ 2.5/plugins/
+$ cp -rv /path/to/unrar'ed/AviSynth\ Plugins/plugins ~/.wine/drive_c/Program\ Files/AviSynth\ 2.5/
+
+$ cp -rv /path/to/unrar'ed/AviSynth\ Plugins/32-Bit\ DLLs/*.dll ~/.wine/drive_c/windows/system32/
+
+Unzip your eac3to.zip to "Program Files":
+
+$ unzip /path/to/eac3to.zip -d ~/.wine/drive_c/Program\ Files/eac3to
+
+similar, with AvsPmod:
+
+$ unzip /path/to/AvsPmod_v2.5.1.zip -d ~/.wine/drive_c/Program\ Files/
+
+and avs2yuv-0.24.zip:
+
+$ unzip /path/to/avs2yuv-0.24.zip -d ~/.wine/drive_c/Program\ Files/
+
+Filters do not need to be in the wine directory. If stored somewhere else, in case of wine updates often followed by malfunctions, filters do not have to be re-installed.
+Unzip FillMargins.zip into .filters-directory in your wine.encode directory:
+
+$ unzip /path/to/FillMargins.zip -d ~/.config/wine.encode/.filters/FillMargins
+
+Unzip flash3kyuu_deband_1.5.1_x86.7z:
+
+$ cd ~/.config/wine.encode/.filters && 7z e -of3kdb/ /path/to/flash3kyuu_deband_1.5.1_x64.7z && cd -
+
+Unzip ColorMatrixv25.zip to 
+
+$ unzip /path/to/ColorMatrixv25.zip -d ~/.config/wine.encode/.filters/FillMargins
 
 This script does not need more programs to work. You can install all kind of avisynth filters. There is no guarantee for them to work, though. Generally, many avisynth filters should work, however, I did not do much in the way of verification here.
 I tested for
 · QTGMC().SelectEven()
 · TFM().TDecimate()
 · FillMargins
-· f3kdb
+· ColorMatrix
 
-Unfortunately, BalanceBorders I did not manage to work as expected. All it does is drawing light green lines, where expected to clean the chosen lines.
-
-During encoding, the script generates a simple .avs for each testing stage, so you don't have to tamper with avs files to get your comparison screens. Of course, they can be edited by $editor at any time as you like to.
+Unfortunately, BalanceBorders did not work. All it does is drawing light green lines, where expected to clean the chosen lines.
 
 As eac3to in wine does not mux streams into matroska containers, the script kind of walks around and demuxes the source into h264 or mpeg2 streams, which afterwards are muxed into a mkv file, just for traditional reason.
 
 I learned that AvsPmod is not very stable while editing opened avs files. When using the resize calculator, do not click »apply«, do not let the calculator work on your .avs, but set these parameters when the script asks for them.
 
 Limitations:
-
-The script does NOT (yet) do:
-
+The script does NOT (yet?) do:
 decrypt sources
 handle demuxed audio files
 handle demuxed subtitles
 handle chapter files
 mux anything together
 
-At the moment, the maximum number of test encodings in one avs file is 102, especially limiting the number of combinations in cross testing aq strength and psy-rd.
+At the moment, the maximum number of test encodings in one avs file is 154, limiting the number of combinations especially in cross testing aq strength and psy-rd.
 
-Though some parameters can be set permanent, encoding needs a lot of trial and error to find the best possible result. There's lots of interaction. Sorry about that.
+Though some parameters can be set permanent, encoding needs a lot of trial and error to find the best possible result. There's lots of interaction. But hey, encoding is fun!
 
 The script is work in progress, and I'd very much appreciate any help and criticism.
 Some flaky things I did not know how to avoid are noted in the script, these comments start with #TODONOTE. I'd be especially thankful for them to be solved in a clean way.
 
-I apologize for my poor English, I am obviously not a native speaker and have not spoken or written English in quite a long time.
+I apologize for my poor English, I am obviously not a native speaker.
 
 Credits to uncountable contributors at stackoverflow.com
 http://stackoverflow.com/questions/16571739/
@@ -132,4 +132,4 @@ http://mywiki.wooledge.org/BashFAQ/073
 http://en.wikibooks.org/wiki/Eac3to/How_to_Use
 http://avisynth.nl
 http://mewiki.project357.com/wiki/X264_Settings
-and many people at ptp.me
+and the people at ptp.me
