@@ -1174,7 +1174,7 @@ case "$answer_00" in
 		echo "#f3kdb0" >> "${source1%.*}".SD.final.avs
                 echo "#f3kdb1" >> "${source1%.*}".SD.final.avs
                 echo "LoadPlugin(\"$pathcolormatrix\")" >> "${source1%.*}".SD.final.avs
-                echo "ColorMatrix(mode=\"Rec.709-\>Rec.601\", clamp=0)" >> "${source1%.*}".SD.final.avs
+                echo "ColorMatrix(mode=\"Rec.709->Rec.601\", clamp=0)" >> "${source1%.*}".SD.final.avs
                 echo "Spline36Resize($widthSD, $heightSD)" >> "${source1%.*}".SD.final.avs
 	}
 
