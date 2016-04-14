@@ -1487,7 +1487,7 @@ case "$answer_00" in
 		# keep cfg informed
 		sed -i "/br_test$2/d" "$config"
 		echo "br_test$2=$br_test" >> "$config"
-		br_test="$br_test"
+#		br_test="$br_test"
 	}
 
 	while true; do
@@ -1632,7 +1632,7 @@ case "$answer_00" in
 			| x264 --stdin y4m ${mbtree:+"--no-mbtree"} \
 			--bitrate "${br_test##*=}" \
 			--pass 1 \
-			--stats "${source1%.*}.$2.$count.br${br_test##*=}.qc$qcomp.aq${aqmode##*=}:${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}stats" \
+			--stats "${source1%.*}.$2.$count.br${br_test##*=}.qc$qcomp.aq${aqmode##*=}:${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.stats" \
 			--preset "$preset" \
 			--tune "$tune" \
 			--profile "$profile" \
@@ -1653,7 +1653,7 @@ case "$answer_00" in
 			| x264 --stdin y4m ${mbtree:+"--no-mbtree"} \
 			--bitrate "${br_test##*=}" \
 			--pass 2 \
-			--stats "${source1%.*}.$2.$count.br${br_test##*=}.qc$qcomp.aq${aqmode##*=}:${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}stats" \
+			--stats "${source1%.*}.$2.$count.br${br_test##*=}.qc$qcomp.aq${aqmode##*=}:${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.stats" \
 			--preset "$preset" \
 			--tune "$tune" \
 			--profile "$profile" \
@@ -1668,7 +1668,11 @@ case "$answer_00" in
 			--no-psy \
 			--chroma-qp-offset "${cqpo##*=}" \
 			--qcomp $(echo "scale=2;$qcomp/100"|bc) \
-			-o "${source1%.*}".$2.$count.br${br_test##*=}.qc$qcomp.aq${aqmode##*=}:$aq.psy$psy1.pt${psytr##*=}.mkv - 2>&1|tee -a "${source1%.*}".$2.log;
+			-o ""${source1%.*}".$2.$count.br${br_test##*=}.qc$qcomp.aq${aqmode##*=}:${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.mkv" - 2>&1|tee -a "${source1%.*}".$2.log;
+
+			# remove the used stats file
+			rm "${source1%.*}.$2.$count.br${br_test##*=}.qc$qcomp.aq${aqmode##*=}:${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.stats"
+			rm "${source1%.*}.$2.$count.br${br_test##*=}.qc$qcomp.aq${aqmode##*=}:${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.stats.mbtree"
 
 			# stop measuring encoding time
 			stop=$(date +%s);
@@ -1831,30 +1835,30 @@ case "$answer_00" in
 		done
 
 		# DIRTY! what range for psy-rdo? all parameters 1-200
-		until [[ $psy1high -ge $psy1low && $psy1low =~ ^[1-9]$|^[1-9][0-9]$|^1[0-9][0-9]$|^200$ && $psy1high =~ ^[1-9]$|^[1-9][0-9]$|^1[0-9][0-9]$|^200$ && $psy1increment =~ ^[1-9]$|^[1-9][0-9]$|^1[0-9][0-9]$|^200$ ]]; do
+		until [[ $psyrdhigh -ge $psyrdlow && $psyrdlow =~ ^[1-9]$|^[1-9][0-9]$|^1[0-9][0-9]$|^200$ && $psyrdhigh =~ ^[1-9]$|^[1-9][0-9]$|^1[0-9][0-9]$|^200$ && $psyrdincrement =~ ^[1-9]$|^[1-9][0-9]$|^1[0-9][0-9]$|^200$ ]]; do
 			echo ""
 			echo "psy-rd: default is 1.0"
 			echo "test with values around 0.9 through 1.2"
 			echo ""
 			echo "set lowest value of psy-rd, e.g. 90 for 0.9"
 			echo ""
-			read -e -p "psy-rd, lowest value > " psy1low
+			read -e -p "psy-rd, lowest value > " psyrdlow
 
 			echo ""
 			echo "maximum value of psy-rd, e.g. 120 for 1.2"
 			echo ""
-			read -e -p "psy-rd, maximum value > " psy1high
+			read -e -p "psy-rd, maximum value > " psyrdhigh
 
 			echo ""
 			echo "increment steps for psy-rd values"
 			echo "e.g. 5 for 0.05 or 10 for 0.1"
 			echo "≠0"
 			echo ""
-			read -e -p "increments > " psy1increment
+			read -e -p "increments > " psyrdincrement
 		done
 
 		# number of test encodings
-		number_encodings=$(echo "(((($aqhigh-$aqlow)/$aqincrement)+1)*((($psy1high-$psy1low)/$psy1increment)+1))"|bc)
+		number_encodings=$(echo "(((($aqhigh-$aqlow)/$aqincrement)+1)*((($psyrdhigh-$psyrdlow)/$psyrdincrement)+1))"|bc)
 
 		echo ""
 		echo "these settings will result"
@@ -1869,26 +1873,26 @@ case "$answer_00" in
 		echo "=import(\"${avs##*=}\").subtitle(\"source\", align=8)" > "${source1%.*}".$2.aqpsy.avs
 
 		for ((aq=$aqlow; $aq<=$aqhigh; aq+=$aqincrement));do
-			for ((psy1=$psy1low; $psy1<=$psy1high; psy1+=$psy1increment));do
+			for ((psyrd=$psyrdlow; $psyrd<=$psyrdhigh; psyrd+=$psyrdincrement));do
 
 				# name the files in ascending order depending on the number of existing mkv in directory
 				count=$( printf '%03d\n'  $(ls ${source1%/*}|grep "$2"| grep -c .mkv$))
 
 				echo ""
-				echo "encoding ${source2%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psy1.pt${psytr##*=}.mkv"
+				echo "encoding ${source2%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psyrd.pt${psytr##*=}.mkv"
 				echo ""
 
 				# start measuring encoding time
 				start1=$(date +%s)
 
 				#comparison screen
-				echo "=ffvideosource(\"${source1%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psy1.pt${psytr##*=}.mkv\").subtitle(\"encode br${br_test##*=} qc${qcomp##*=} aq$aqmode:$aq psy$psy1 $2\", align=8)" >> "${source1%.*}".$2.aqpsy.avs
+				echo "=ffvideosource(\"${source1%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psyrd.pt${psytr##*=}.mkv\").subtitle(\"encode br${br_test##*=} qc${qcomp##*=} aq$aqmode:$aq psy$psyrd $2\", align=8)" >> "${source1%.*}".$2.aqpsy.avs
 
 				wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
 				| x264 --stdin y4m ${mbtree:+"--no-mbtree"} \
 				--bitrate "${br_test##*=}" \
 				--pass 1 \
-				--stats "${source1%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psy1.pt${psytr##*=}.stats" \
+				--stats "${source1%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psyrd.pt${psytr##*=}.stats" \
 				--qcomp "${qcomp##*=}" \
 				--preset "$preset" \
 				--tune "$tune" \
@@ -1903,14 +1907,14 @@ case "$answer_00" in
 				--deblock "$deblock" \
 				--chroma-qp-offset "${cqpo##*=}" \
 				--aq-strength $(echo "scale=2;$aq/100"|bc) \
-				--psy-rd $(echo "scale=2;$psy1/100"|bc):unset \
+				--psy-rd $(echo "scale=2;$psyrd/100"|bc):unset \
 				-o /dev/null - 2>&1|tee -a "${source1%.*}".$2.log;
 
 				wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
 				| x264 --stdin y4m ${mbtree:+"--no-mbtree"} \
 				--bitrate "${br_test##*=}" \
 				--pass 2 \
-				--stats "${source1%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psy1.pt${psytr##*=}.stats" \
+				--stats "${source1%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psyrd.pt${psytr##*=}.stats" \
 				--qcomp "${qcomp##*=}" \
 				--preset "$preset" \
 				--tune "$tune" \
@@ -1925,20 +1929,20 @@ case "$answer_00" in
 				--chroma-qp-offset "${cqpo##*=}" \
 				--deblock "$deblock" \
 				--aq-strength $(echo "scale=2;$aq/100"|bc) \
-				--psy-rd $(echo "scale=2;$psy1/100"|bc):unset \
-				-o "${source1%.*}".$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psy1.pt${psytr##*=}.mkv - 2>&1|tee -a "${source1%.*}".$2.log;
+				--psy-rd $(echo "scale=2;$psyrd/100"|bc):unset \
+				-o "${source1%.*}".$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psyrd.pt${psytr##*=}.mkv - 2>&1|tee -a "${source1%.*}".$2.log;
 
 				# remove the used stats file
-				rm "${source1%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psy1.pt${psytr##*=}.stats"
-				rm "${source1%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psy1.pt${psytr##*=}.stats.mbtree"
+				rm "${source1%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psyrd.pt${psytr##*=}.stats"
+				rm "${source1%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psyrd.pt${psytr##*=}.stats.mbtree"
 
 				# stop measuring encoding time
 				stop=$(date +%s);
 				time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-				echo "encoding ${source2%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psy1.pt${psytr##*=}.mkv lasted $time"
+				echo "encoding ${source2%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psyrd.pt${psytr##*=}.mkv lasted $time"
 				echo ""
 				echo "range aq strength $aqlow → $aqhigh; increment $aqincrement"
-				echo "range psy-rd	  $psy1low → $psy1high; increment $psy1increment"
+				echo "range psy-rd	  $psyrdlow → $psyrdhigh; increment $psyrdincrement"
 			done
 		done
 
@@ -2042,9 +2046,9 @@ case "$answer_00" in
 					unset aqhigh
 					unset aqlow
 					unset aqincrement
-					unset psy1high
-					unset psy1low
-					unset psy1increment
+					unset psyrdhigh
+					unset psyrdlow
+					unset psyrdincrement
 					aqpsy $1 $2
 				;;
 			esac
