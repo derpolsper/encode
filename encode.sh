@@ -1393,9 +1393,6 @@ case "$answer_00" in
 		# start measuring overall encoding time
 		start0=$(date +%s)
 
-		# empty existing crf1-log files
-		> "${source1%.*}".$2.crf1.log
-
 		# create comparison screen avs
 		echo "=import(\"${avs##*=}\").subtitle(\"source\", align=8)" > "${source1%.*}".$2.crf1.avs
 
