@@ -42,10 +42,10 @@ if [[ -z ${1+x} ]]; then
 		fi
 	done < "$config"
 
-	echo ""
+	echo
 	echo "***  no config file generated ***"
 	echo "***   yet for this encoding   ***"
-	echo ""
+	echo
 
 else
 # if set, but config not existing yet, cp default to $1
@@ -54,9 +54,9 @@ else
 		cp "$config" "${config%/*}"/"$1".cfg
 	fi
 	config="${HOME}/.config/encode/$1.cfg"
-	echo ""
+	echo
 	echo "your config file is $config"
-	echo ""
+	echo
 
 	while IFS='=' read lhs rhs; do
 		if [[ ! $lhs =~ ^\ *# && -n $lhs ]]; then
@@ -69,30 +69,30 @@ else
 	done < "$config"
 fi
 
-echo ""
+echo
 echo "what do you want to do?"
-echo ""
+echo
 echo "00 - check for necessary programs and"
 echo "	 show|edit default settings"
-echo ""
+echo
 echo "0  - display current encoding parameters"
-echo ""
+echo
 echo "1  - rip your remux|m2ts|VOB files into a matroska container,"
-echo ""
+echo
 echo "2  - create avs files"
-echo ""
+echo
 echo "3  - testing for crf"
-echo ""
+echo
 echo "4  - variations in qcomp"
-echo ""
+echo
 echo "5  - variations in aq strength and psy-rd"
-echo ""
+echo
 echo "6  - variations in psy-trellis"
-echo ""
+echo
 echo "7  - several things: chroma-qp-offset, mbtree etc"
-echo ""
+echo
 echo "8  - another round of crf"
-echo ""
+echo
 echo "9  - encode the whole movie"
 echo
 read -p "> " answer_00
@@ -107,183 +107,183 @@ case "$answer_00" in
 	#clear terminal
 	clear
 
-	echo ""
+	echo
 	echo "*** check for required programs ***"
-	echo ""
+	echo
 
 	if [ -e /bin/bash ]; then
-		/bin/bash --version|head -1 ; echo ""
-		else
-		echo ""
+		/bin/bash --version|head -1 ; echo
+	else
+		echo
 		echo "***"
 		echo "*** bash NOT installed!"
 		echo "***"
-		echo "" ;
+		echo ;
 	fi
 
 	if [ -e /usr/bin/x264 ]; then
-		/usr/bin/x264 -V|grep x264 -m 1 ; echo ""
-		else
-				echo ""
+		/usr/bin/x264 -V|grep x264 -m 1 ; echo
+	else
+		echo
 		echo "***"
 		echo "*** x264 NOT installed!"
 		echo "***"
-		echo "" ;
+		echo ;
 	fi
 
 	if [ -e /usr/bin/mkvmerge ]; then 
-		/usr/bin/mkvmerge -V; echo ""
-		else
-				echo ""
+		/usr/bin/mkvmerge -V; echo
+	else
+		echo
 		echo "***"
 		echo "*** mkvmerge NOT installed"
 		echo "***"
-		echo "" ;
+		echo ;
 	fi
 
 	if [ -e /usr/bin/mediainfo ]; then
-		/usr/bin/mediainfo --Version; echo ""
+		/usr/bin/mediainfo --Version; echo
 	else
-				echo ""
+		echo
 		echo "***"
 		echo "*** mediainfo NOT installed"
 		echo "***"
-		echo "" ;
+		echo ;
 	fi
 
 	if [ -e /usr/bin/exiftool ]; then
-		echo -n "exiftool "; /usr/bin/exiftool -ver; echo ""
-		else
-		echo ""
+		echo -n "exiftool "; /usr/bin/exiftool -ver; echo
+	else
+		echo
 		echo "***"
 		echo "*** exiftool NOT installed"
 		echo "***"
-		echo "" ;
+		echo ;
 	fi
 
 	if [ -e /usr/bin/wine ]; then
-		/usr/bin/wine --version; echo ""
-		else
-				echo ""
+		/usr/bin/wine --version; echo
+	else
+		echo
 		echo "***"
 		echo "*** wine NOT installed"
 		echo "***"
-		echo "" ;
+		echo ;
 	fi
 
 	if [ -e "$winedir"/drive_c/Program\ Files/eac3to/eac3to.exe ]; then
-		wine "$winedir"/drive_c/Program\ Files/eac3to/eac3to.exe|grep 'eac3to v'; echo ""
-		else
-				echo ""
+		wine "$winedir"/drive_c/Program\ Files/eac3to/eac3to.exe|grep 'eac3to v'; echo
+	else
+		echo
 		echo "***"
 		echo "*** eac3to seems NOT to be installed"
 		echo "***"
-		echo "" ;
+		echo ;
 	fi
 
 	if [ -e "$winedir"/drive_c/windows/system32/avisynth.dll ]; then
 		echo "avisynth seems to be installed"
-		echo ""
-		else
-		echo ""
+		echo
+	else
+		echo
 		echo "***"
 		echo "*** avisynth seems NOT to be installed"
 		echo "***"
-		echo "" ;
+		echo ;
 	fi
 
 	if [ -e "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ]; then
 		echo "AvsPmod seems to be installed"
-		echo ""
-		else
-				echo ""
+		echo
+	else
+		echo
 		echo "***"
 		echo "*** AvsPmod seems not to be installed"
 		echo "***"
-		echo "" ;
+		echo ;
 	fi
 
 	if [ -e "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe ]; then
 		echo "avs2yuv seems to be installed"
-		echo ""
+		echo
 	else
-		echo ""
+		echo
 		echo "***"
 		echo "*** avs2yuv seems NOT to be installed"
 		echo "***"
-		echo "" ;
+		echo ;
 	fi
 
 	if [ -e "${config%/*}"/.filters/FillMargins/FillMargins.dll ]; then
 		echo "FillMargins seems to be installed"
-		echo ""
-		else
-		echo ""
+		echo
+	else
+		echo
 		echo "***"
 		echo "*** FillMargins seems NOT to be installed"
 		echo "***"
-		echo "" ;
+		echo ;
 	fi
 
 	if [ -e "${config%/*}"/.filters/f3kdb/flash3kyuu_deband.dll ]; then
 		echo "f3kdb seems to be installed"
-		echo ""
+		echo
 	else
-		echo ""
+		echo
 		echo "***"
 		echo "*** f3kdb seems NOT to be installed"
 		echo "***"
-		echo "" ;
+		echo ;
 	fi
 
 	if [ -e "${config%/*}"/.filters/ColorMatrix/ColorMatrix.dll ]; then
 		echo "ColorMatrix seems to be installed"
-		echo ""
+		echo
 	else
-		echo ""
+		echo
 		echo "***"
 		echo "*** ColorMatrix seems NOT to be installed"
 		echo "***"
-		echo "" ;
+		echo ;
 	fi
 
 	if [ ! -e /usr/bin/beep ]; then
-		echo ""
+		echo
 		echo "***"
 		echo "*** info: beep not installed"
 		echo "***"
 	fi
 
-	echo ""
+	echo
 	read -p "hit return to continue"
 
 	#clear terminal
 	clear
 
-	echo ""
+	echo
 	echo "*** default settings ***"
-	echo ""
+	echo
 	echo -e "TUNE:\t\t ""$tune"
 	echo -e "PROFILE:\t ""$profile"
 	echo -e "PRESET:\t\t ""$preset"
-	echo ""
+	echo
 	echo -e "ME:\t\t ""$me"
 	echo -e "MERANGE:\t ""$merange"
 	echo -e "SUBME:\t\t ""$subme"
 	echo -e "DEBLOCK:\t ""$deblock"
 	echo -e "LOOKAHEAD:\t ""$lookahead"
-	echo ""
+	echo
 	echo "*** SelectRangeEvery ***"
-	echo ""
+	echo
 	echo -e "INTERVAL:\t" "$interval"
 	echo -e "LENGTH:\t\t" "$length"
 	echo -e "OFFSET:\t\t" "$offset"
-	echo ""
+	echo
 	echo "reframes are calculated automatically"
-	echo ""
+	echo
 	echo "if you want to adjust settings to your needs,"
 	echo "hit (e)dit now, else return"
-	echo ""
+	echo
 	read -e -p "(RETURN|e) > " answer_defaultsettings
 		case "$answer_defaultsettings" in
 			e|E|edit) # edit the encode/default.cfg
@@ -296,7 +296,7 @@ case "$answer_00" in
 		esac
 
 	echo "you might go on with option 1"
-	echo ""
+	echo
 	;;
 
 	0)  # 0 - current settings
@@ -323,25 +323,25 @@ case "$answer_00" in
 	width=$(cat "$config"|grep width|grep $2)
 	height=$(cat "$config"|grep height|grep $2)
 
-	echo ""
+	echo
 	echo "*** general settings ***"
-	echo ""
+	echo
 	echo -e "TUNE:\t\t\t ""$tune"
 	echo -e "PROFILE:\t\t ""$profile"
 	echo -e "PRESET:\t\t\t ""$preset"
-	echo ""
+	echo
 	echo -e "ME:\t\t\t ""$me"
 	echo -e "MERANGE:\t\t ""$merange"
 	echo -e "SUBME:\t\t\t ""$subme"
 	echo -e "DEBLOCK:\t\t ""$deblock"
 	echo -e "LOOKAHEAD:\t\t ""$lookahead"
-	echo ""
+	echo
 	echo "*** SelectRangeEvery ***"
-	echo ""
+	echo
 	echo -e "INTERVAL:\t\t" "$interval"
 	echo -e "LENGTH:\t\t\t" "$length"
 	echo -e "OFFSET:\t\t\t" "$offset"
-	echo ""
+	echo
 
 	if [[ -n ${left_crop##*=} || -n ${top_crop##*=}|| -n ${right_crop##*=}|| -n ${bottom_crop##*=} ]]; then
 		echo -e "CROPPING (ltrb):\t ""$left_crop","$top_crop","$right_crop","$bottom_crop"
@@ -357,19 +357,19 @@ case "$answer_00" in
 		rc_mode=2pass
 	fi
 
-	echo ""
+	echo
 	echo -e "RATECONTROL:\t\t ""$rc_mode"
-	echo ""
+	echo
 
 	echo "*** current settings for "$2" ***"
-	echo ""
+	echo
 
 	if [[ -n ${width##*=} || -n ${height##*=} ]]; then
 		echo -e "STORAGE WIDTH:\t\t ""${width##*=}"
 		echo -e "STORAGE HEIGHT:\t\t ""${height##*=}"
 	fi
 
-	echo ""
+	echo
 	echo -e "CRF:\t\t\t ""${crf##*=}"
 	echo -e "QCOMP:\t\t\t ""${qcomp##*=}"
 	echo -e "AQMODE:\t\t\t ""${aqmode##*=}"
@@ -389,14 +389,14 @@ case "$answer_00" in
 		echo -e "Bit rate:\t\t ""${br_test##*=}"
 	fi
 
-	echo ""
+	echo
 	echo "you may adjust them to your needs, e.g."
 	echo "change SelectRangeEvery values in case of"
 	echo "short film"
-	echo ""
+	echo
 	echo "if you want to adjust them to your needs"
 	echo "manually, hit (e)dit now, else return"
-	echo ""
+	echo
 	read -e -p "(RETURN|e) > " answer_defaultsettings
 		case "$answer_defaultsettings" in
 			e|E|edit) # edit the encode/default.cfg
@@ -409,29 +409,29 @@ case "$answer_00" in
 		esac
 
 	echo "you may go on with your process of encoding"
-	echo ""
+	echo
 	;;
 
 	1)  # 1 - prepare sources: rip your remux/ m2ts/ VOB → mkv
 
 	# check source0 for dir VIDEO_TS or file m2ts
 	until [[  -e $source0 ]] && ( [[ $source0 == @(*VIDEO_TS*|*.m2ts|*.mkv) ]] ); do
-		echo ""
+		echo
 		echo "set path to your source: a VIDEO_TS directory,"
 		echo "mkv or m2ts file respectively"
-		echo ""
+		echo
 		read -e -p "> " source0
 	done
 
 	# check source1 for file extension == mkv
 	until [[ $source1 == *.mkv ]]; do
 		echo "save the demuxed file"
-		echo ""
+		echo
 		echo "choose name or location different from source file!"
-		echo ""
+		echo
 		echo "absolute path AND name WITH file extension:"
 		echo "e.g. /home/encoding/moviename.mkv"
-		echo ""
+		echo
 		read -e -p "> " source1
 	done
 
@@ -444,24 +444,24 @@ case "$answer_00" in
 		cd "$source0"
 		until [[ $param0 == *VTS*.VOB* ]]; do
 			echo "choose out of these VOB containers:"
-			echo ""
+			echo
 			ls -l "$source0"|awk '!/VIDEO/ {print}'| awk '/VOB$/ {print }'|awk '!/0.VOB/ { printf $9 "%12i\n", $5}'
-			echo ""
+			echo
 			echo "which group of VOB containers do you"
 			echo "want to encode? add them like this:"
 			echo "VTS_02_1.VOB+VTS_02_2.VOB+VTS_02_3.VOB(+…)"
-			echo ""
+			echo
 			read -e -p "> " param0
 		done
 
 		wine "$winedir"/drive_c/Program\ Files/eac3to/eac3to.exe "$param0"
 
 		until [[ $param1 == @(*.mpeg2*|*.ac3*|*.sup*) ]]; do
-			echo ""
+			echo
 			echo "extract all wanted tracks following this name pattern:"
 			echo "[1-n]:name.extension, e.g. 2:name.mpeg2 3:name.ac3 4:name.eng.sup 5:name.spa.sup etc"
 			echo "the video stream HAS TO be given mpeg2 as file extension"
-			echo ""
+			echo
 			read -e -p "> " param1
 		done
 
@@ -477,11 +477,11 @@ case "$answer_00" in
 		wine "$winedir"/drive_c/Program\ Files/eac3to/eac3to.exe "${source0##*/}"
 
 		until [[ $param1 == @(*.h264*|*.mpeg2*|*.vc1*|*.sup*|*.flac*|*.ac3*|*.dts*|*.*) ]]; do
-			echo ""
+			echo
 			echo "extract all wanted tracks following this name pattern:"
 			echo "[1-n]:name.extension, e.g. 2:name.h264 3:name.flac 4:name.ac3 5:name.sup etc"
 			echo "the video stream HAS TO be given h264, mpeg2 or vc1 as file extension"
-			echo ""
+			echo
 			read -e -p "> " param1
 		done
 
@@ -499,7 +499,7 @@ case "$answer_00" in
 		source_nondvd
 	else
 		echo "something went wrong"
-		echo ""
+		echo
 	fi
 
 	# delete the h264|mpeg2|vc1 file
@@ -510,10 +510,10 @@ case "$answer_00" in
 	for file in ./*m2v ./*.mpeg* ./*.h264 ./*.dts* ./*.pcm ./*vc1 ./*.flac ./*.ac3 ./*.aac ./*.wav ./*.w64 ./*.sup ./*.txt ./*.srt; do
 		mv $file "${source1%/*}"/ &>/dev/null; done
 
-	echo ""
+	echo
 	echo "you find the demuxed files in"
 	echo "${source1%/*}/"
-	echo ""
+	echo
 
 	if [ -e /usr/bin/beep ]; then beep $beep; fi
 
@@ -522,7 +522,7 @@ case "$answer_00" in
 		echo "it seems, your encoding does not have a config file yet"
 		echo "hit return, if you want to generate a new one"
 		echo  "else (n)o"
-		echo ""
+		echo
 		read -e -p "(RETURN|n) > " answer_generatecfg
 			case "$answer_generatecfg" in
 				n|N|no|No|NO)
@@ -535,7 +535,7 @@ case "$answer_00" in
 					else
 					echo "generate a new config file by running option 1 again"
 					fi
-					echo ""
+					echo
 					read -p "hit return to continue"
 					exit
 				;;
@@ -544,7 +544,7 @@ case "$answer_00" in
 					echo "a new config file is generated:"
 					echo "${config%/*}/${source2%.*}.cfg"
 					cp "$config" "${config%/*}/${source2%.*}.cfg"
-					echo ""
+					echo
 					sed -i "/source2/d" "${config%/*}/${source2%.*}.cfg"
 					echo "source2=$source2" >> "${config%/*}/${source2%.*}.cfg"
 					sed -i "/source1/d" "${config%/*}/${source2%.*}.cfg"
@@ -552,11 +552,11 @@ case "$answer_00" in
 
 					echo "use the corresponding config file"
 					echo "start the script like this:"
-					echo ""
+					echo
 					echo "./encode.sh ${source2%.*}"
-					echo ""
+					echo
 					echo "go on with option 2"
-					echo ""
+					echo
 				;;
 			esac
 	fi
@@ -581,13 +581,13 @@ case "$answer_00" in
 	2)  # 2 - create avs files
 
 	function par {
-		echo ""
+		echo
 		echo "the movies' storage aspect ratio is $sarwidth0×$sarheight0"
-		echo ""
+		echo
 		echo "the movies' display aspect ratio is $darwidth0×$darheight0"
-		echo ""
+		echo
 		echo "check the table to find your pixel aspect ratio"
-		echo ""
+		echo
 		echo "________________SAR____|___PAR__|___DAR_____"
 		echo "widescreen ntsc 720×480 -> 40:33 ->  704×480"
 		echo "                        -> 32:27 ->  853×480"
@@ -597,14 +597,14 @@ case "$answer_00" in
 		echo "                        -> 10:11 ->  654×480"
 		echo "fullscreen pal  720×576 -> 16:15 ->  768×576"
 		echo "                        -> 12:11 ->  786×576"
-		echo ""
+		echo
 		echo "almost all bluray is 1:1"
-		echo ""
+		echo
 
 #		until [[ $par =~ ^[[:digit:]]+:[[:digit:]]+$ ]] ; do
 			echo "set par as fraction, use a colon!"
 			echo "e.g. 16:15"
-			echo ""
+			echo
 			read -e -p "> " par
 				if [[ ! $par =~ ^[[:digit:]]+:[[:digit:]]+$ ]]; then
 					echo "exactly: set as fraction, use a colon!"
@@ -618,7 +618,7 @@ case "$answer_00" in
 	}
 
 	function cropping {
-		echo ""
+		echo
 		echo "if cropping may be needed"
 		echo "hit return"
 		echo "else hit (n)o"
@@ -637,13 +637,13 @@ case "$answer_00" in
 				;;
 			esac
 
-		echo ""
+		echo
 		echo "if no cropping is needed, just type 0 (zero)"
 		echo "all numbers unsigned, must be even"
 
 			until [[ $left_crop =~ ^[1-9][0-9]*[02468]$|^[02468]$ ]]; do
 				echo "number of pixels to be cropped on the"
-				echo ""
+				echo
 				read -e -p "left > " left_crop
 
 				# keep cfg informed
@@ -653,7 +653,7 @@ case "$answer_00" in
 
 			until [[ $top_crop =~ ^[1-9][0-9]*[02468]$|^[02468]$ ]] ; do
 				echo "number of pixels to be cropped on the"
-				echo ""
+				echo
 				read -e -p "top > " top_crop
 
 				# keep cfg informed
@@ -663,7 +663,7 @@ case "$answer_00" in
 
 			until [[ $right_crop =~ ^[1-9][0-9]*[02468]$|^[02468]$ ]] ; do
 				echo "number of pixels to be cropped on the"
-				echo ""
+				echo
 				read -e -p "right > " right_crop
 
 				# keep cfg informed
@@ -673,7 +673,7 @@ case "$answer_00" in
 
 			until [[ $bottom_crop =~ ^[1-9][0-9]*[02468]$|^[02468]$ ]] ; do
 				echo "number of pixels to be cropped on the"
-				echo ""
+				echo
 				read -e -p "bottom > " bottom_crop
 
 				# keep cfg informed
@@ -683,12 +683,12 @@ case "$answer_00" in
 	}
 
 	function fillmargins {
-		echo ""
+		echo
 		echo "if cropping left one line of black or dirty"
 		echo "pixels elsewhere, you can use fillmargins"
-		echo ""
+		echo
 		echo "choose as few pixels as possible"
-		echo ""
+		echo
 		echo "do you want to use (f)illmargins?"
 		echo "else, return"
 		read -e -p "(RETURN|f) > " answer_fillmargins
@@ -697,7 +697,7 @@ case "$answer_00" in
 						# who needs more than 5 pixels for fillmargins?
 					until [[ $left_fillmargins =~ ^[0-5]$ ]] ; do
 						echo "number of pixels on the"
-						echo ""
+						echo
 						read -e -p "left > " left_fillmargins
 
 						# keep cfg informed
@@ -707,7 +707,7 @@ case "$answer_00" in
 
 					until [[ $top_fillmargins =~ ^[0-5]$ ]] ; do
 						echo "number of pixels on the"
-						echo ""
+						echo
 						read -e -p "top > " top_fillmargins
 
 						# keep cfg informed
@@ -717,7 +717,7 @@ case "$answer_00" in
 
 					until [[ $right_fillmargins =~ ^[0-5]$ ]] ; do
 						echo "number of pixels on the"
-						echo ""
+						echo
 						read -e -p "right > " right_fillmargins
 
 						# keep cfg informed
@@ -727,7 +727,7 @@ case "$answer_00" in
 
 					until [[ $bottom_fillmargins =~ ^[0-5]$ ]] ; do
 						echo "number of pixels on the"
-						echo ""
+						echo
 						read -e -p "bottom > " bottom_fillmargins
 
 						# keep cfg informed
@@ -743,7 +743,7 @@ case "$answer_00" in
 
 	function ratecontrol {
 		until [[ $answer_ratecontrol0 =~ [2,c,C] ]]; do
-			echo ""
+			echo
 			echo "bitrate control with (c)rf or (2)pass?"
 			read -e -p "(c|2) > " answer_ratecontrol0
 				case "$answer_ratecontrol0" in
@@ -768,12 +768,12 @@ case "$answer_00" in
 		if [[ ${ratecontrol##*=} = 2 && ${ratecontrol##*=} != c ]]; then
 			sed -i "/ratecontrol/d" "${config%/*}/${source2%.*}.cfg"
 			echo "ratecontrol=c" >> "${config%/*}/${source2%.*}.cfg"
-			echo ""
+			echo
 			echo "ratecontrol toggled to crf"
 		elif [[ ${ratecontrol##*=} != 2 && ${ratecontrol##*=} = c ]]; then
 			sed -i "/ratecontrol/d" "${config%/*}/${source2%.*}.cfg"
 			echo "ratecontrol=2" >> "${config%/*}/${source2%.*}.cfg"
-			echo ""
+			echo
 			echo "ratecontrol toggled to 2pass"
 		fi
 	}
@@ -796,9 +796,9 @@ case "$answer_00" in
 
 	function setresolutionSDfromHD {
 		until [[ $widthSD =~ ^[[:digit:]]+$ ]] ; do
-			echo ""
+			echo
 			echo "set final width for SD"
-			echo ""
+			echo
 			read -e -p "width > " widthSD
 
 			sed -i "/widthSD/d" "${config%/*}/${source2%.*}.cfg"
@@ -807,7 +807,7 @@ case "$answer_00" in
 
 		until [[ $heightSD =~ ^[[:digit:]]+$ ]] ; do
 			echo "set final height for SD"
-			echo ""
+			echo
 			read -e -p "height > " heightSD
 
 			sed -i "/heightSD/d" "${config%/*}/${source2%.*}.cfg"
@@ -841,9 +841,9 @@ case "$answer_00" in
 
 	function setresolution720 {
 		until [[ $width720 =~ ^[[:digit:]]+$ ]] ; do
-			echo ""
+			echo
 			echo "set final width for 720p"
-			echo ""
+			echo
 			read -e -p "width > " width720
 
 			sed -i "/width720/d" "${config%/*}/${source2%.*}.cfg"
@@ -852,7 +852,7 @@ case "$answer_00" in
 
 		until [[ $height720 =~ ^[[:digit:]]+$ ]] ; do
 			echo "set final height for 720p"
-			echo ""
+			echo
 			read -e -p "height > " height720
 
 			sed -i "/height720/d" "${config%/*}/${source2%.*}.cfg"
@@ -992,10 +992,10 @@ case "$answer_00" in
 		par
 	else
 		echo "right now, PAR is ${par##*=}"
-		echo ""
+		echo
 		echo "hit return to continue"
 		echo "to change it, hit (p)ar"
-		echo ""
+		echo
 		read -e -p "(RETURN|p) > " answer_par
 			case $answer_par in
 				p|P|par|PAR)
@@ -1014,13 +1014,13 @@ case "$answer_00" in
 	par_denominator=$(echo $par|cut -d: -f2)
 
 	if [[ ( -n $left_crop && -n $right_crop && -n $top_crop && -n $bottom_crop ) ]]; then
-		echo ""
+		echo
 		echo "cropping values for "$source2":"
 		echo "left:  $left_crop"
 		echo "top:   $top_crop"
 		echo "right: $right_crop"
 		echo "bottom:$bottom_crop"
-		echo ""
+		echo
 		echo "do you want to (e)dit them?"
 		echo "else, return"
 		read -e -p "(RETURN|e) > " answer_cropedit
@@ -1043,13 +1043,13 @@ case "$answer_00" in
 	# fillmargins in case of 1 line of black or dirty pixels
 	# note: editing the avs files will happen at the very end of option 2
 	if [[ ( -n $left_fillmargins && -n $right_fillmargins && -n $top_fillmargins && -n $bottom_fillmargins ) ]]; then
-		echo ""
+		echo
 		echo "fillmargin values for "$source2":"
 		echo "left:  $left_fillmargins"
 		echo "top:   $top_fillmargins"
 		echo "right: $right_fillmargins"
 		echo "bottom:$bottom_fillmargins"
-		echo ""
+		echo
 		echo "do you want to (e)dit them?"
 		echo "else, return"
 		read -e -p "(RETURN|e) > " answer_fillmarginsedit
@@ -1072,10 +1072,10 @@ case "$answer_00" in
 			echo "right now, rate control is set to 2pass"
 		fi
 
-		echo ""
+		echo
 		echo "do you want to (c)hange this?"
 		echo "else, return"
-		echo ""
+		echo
 		read -e -p "(RETURN|c) > " answer_ratecontrol
 			case $answer_ratecontrol in
 				c|C|change|Change)
@@ -1091,14 +1091,14 @@ case "$answer_00" in
 
 	# resizing parameters for hd sources
 	if [[ $sarheight0 -gt 576 && $sarwidth0 -gt 720 ]]; then
-		echo ""
+		echo
 		echo "if you want to resize, check"
 		echo "for correct target resolution!"
-		echo ""
+		echo
 		echo "to check with AvsPmod for correct"
 		echo "target file resolution, hit return"
 		echo "else, (n)o"
-		echo ""
+		echo
 		echo "AvsP > Tools > Resize calculator"
 		echo "after cropping, the source's resolution is $sarwidth1×$sarheight1,"
 		echo "the PAR is $par"
@@ -1119,7 +1119,7 @@ case "$answer_00" in
 	# if sarheight0 and sarwidth0 indicate standard resolution, treat as SD
 	if [[ $sarheight0 -le 576 && $sarwidth0 -le 720 ]]; then
 		#echo "no resizing of SD sources"
-		#echo ""
+		#echo
 		getresolutionSDfromSD
 		avsSDfromSD
 		testavsSD
@@ -1144,7 +1144,7 @@ case "$answer_00" in
 		echo "set your target resolutions: (S)D, (7)20p, (1)080p,"
 		echo "a subset of them or (a)ll three"
 		echo "(it does not cost not anything to choose all)"
-		echo ""
+		echo
 		echo "(S|7|1|a)"
 		read -e -p "> " answer_resize
 			case "$answer_resize" in
@@ -1208,23 +1208,23 @@ case "$answer_00" in
 	fi
 
 	# check source for being interlaced and/or telecined
-	echo ""
+	echo
 	echo "check, if your movie is interlaced"
-	echo ""
+	echo
 	echo -n "mediainfo says: "
 	mediainfo "$source1"|awk '/Scan type/{print $4}'
-	echo ""
+	echo
 	echo -n "exiftool says: "
 	exiftool "$source1"|awk '/Scan Type/{print $5}'
-	echo ""
+	echo
 	read -p "hit return to continue"
 
-	echo ""
+	echo
 	echo "do you want to (c)heck with AvsPmod frame by frame,"
 	echo "if your movie is interlaced and/or telecined?"
 	echo "if yes, close AvsPmod window afterwards"
 	echo "else, return"
-	echo ""
+	echo
 	read -e -p "(RETURN|c) > " answer_check_interlaced_telecined
 		case "$answer_check_interlaced_telecined" in
 			c|C|check|Check)
@@ -1237,13 +1237,13 @@ case "$answer_00" in
 			;;
 		esac
 
-	echo ""
+	echo
 	echo "characteristics of your video source:"
 	echo "(i)nterlaced"
 	echo "(t)elecined"
 	echo "(b)oth: interlaced and telecined"
 	echo "(n)either nor"
-	echo ""
+	echo
 	read -e -p "(i|t|b|n) > " answer_interlaced_telecined
 		case "$answer_interlaced_telecined" in
 			i|I) # interlaced
@@ -1292,21 +1292,21 @@ case "$answer_00" in
 	# if sarheight0 and sarwidth0 indicate standard resolution, treat as SD
 	# else adequate to chosen <resolution>
 	if [[ $sarheight0 -le 576 ]] && [[ $sarwidth0 -le 720 ]]; then
-		echo ""
+		echo
 		echo "hint:"
 		echo "use the corresponding config file"
 		echo "start the script like this:"
-		echo ""
+		echo
 		echo "./encode.sh ${source2%.*}"
-		echo ""
+		echo
 		echo "go on with option 3"
-		echo ""
+		echo
 	else
-		echo ""
+		echo
 		echo "hint:"
 		echo "use the corresponding config file"
 		echo "start the script like this:"
-		echo ""
+		echo
 		if [[ ! -e "${source1%.*}".SD.final.avs ]] && [[ -e "${source1%.*}".720.final.avs ]] && [[ ! -e "${source1%.*}".1080.final.avs ]]; then
 			echo "./encode.sh ${source2%.*} 720"
 		elif [[ ! -e "${source1%.*}".SD.final.avs ]] && [[ ! -e "${source1%.*}".720.final.avs ]] && [[ -e "${source1%.*}".1080.final.avs ]]; then
@@ -1314,23 +1314,23 @@ case "$answer_00" in
 		else
 			echo "./encode.sh ${source2%.*} <resolution>"
 			if [[ -e "${source1%.*}".SD.final.avs ]] && [[ -e "${source1%.*}".720.final.avs ]] && [[ -e "${source1%.*}".1080.final.avs ]]; then
-				echo ""
+				echo
 				echo "where resolution might be SD, 720 or 1080"
 			elif [[ -e "${source1%.*}".SD.final.avs ]] && [[ -e "${source1%.*}".720.final.avs ]] && [[ ! -e "${source1%.*}".1080.final.avs ]]; then
-				echo ""
+				echo
 				echo "where resolution might be SD or 720"
 			elif [[ -e "${source1%.*}".SD.final.avs ]] && [[ ! -e "${source1%.*}".720.final.avs ]] && [[ -e "${source1%.*}".1080.final.avs ]]; then
-				echo ""
+				echo
 				echo "where resolution might be SD or 1080"
 			else [[ ! -e "${source1%.*}".SD.final.avs ]] && [[ -e "${source1%.*}".720.final.avs ]] && [[ -e "${source1%.*}".1080.final.avs ]]
-				echo ""
+				echo
 				echo "where resolution might be 720 or 1080"
 			fi
 		fi
 
-		echo ""
+		echo
 		echo "go on with option 3"
-		echo ""
+		echo
 	fi
 	;;
 
@@ -1361,33 +1361,33 @@ case "$answer_00" in
 	function crf1 {
 		# until high>low and crf1low 1-530 and crf1high 1-530 and increment 1-530; do
 		until [[ $crf1high -ge $crf1low && $crf1low =~ ^[1-9]$|^[1-9][0-9]$|[1-4][0-9][0-9]$|5[0-2][0-9]$|^530$ && $crf1high =~ ^[1-9]$|^[1-9][0-9]$|[1-4][0-9][0-9]$|5[0-2][0-9]$|^530$ && $crf1increment =~ ^[1-9]$|^[1-9][0-9]$|[1-4][0-9][0-9]$|5[0-2][0-9]$|^530$ ]]; do
-			echo ""
+			echo
 			echo "crf: values 1 through 53, default is 23"
 			echo "test with values around 15 through 19"
-			echo ""
+			echo
 			echo "set lowest crf value as hundreds,"
 			echo "e.g. 168 for 16.8"
-			echo ""
+			echo
 			read -e -p "crf > " crf1low
 
 			echo "set highst crf value as hundreds,"
 			echo "e.g. 176 for 17.6"
-			echo ""
+			echo
 			read -e -p "crf > " crf1high
 
 			echo "set increment steps, e.g. 1 for 0.1"
 			echo "≠0"
-			echo ""
+			echo
 			read -e -p "increments > " crf1increment
 		done
 
 		# number of test encodings
 		number_encodings=$(echo "((($crf1high-$crf1low)/$crf1increment)+1)"|bc)
 
-		echo ""
+		echo
 		echo "these settings will result"
 		echo "in $number_encodings encodings"
-		echo ""
+		echo
 		sleep 2
 
 		# start measuring overall encoding time
@@ -1400,9 +1400,9 @@ case "$answer_00" in
 			#name the files in ascending order depending on the number of existing mkv in directory
 			count=$( printf '%03d\n'  $(ls ${source1%/*}|grep "$2"| grep -c .mkv$))
 
-			echo ""
+			echo
 			echo "encoding ${source2%.*}.$2.$count.crf$crf1.qc${qcomp##*=}.aq${aqmode##*=}:${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.mkv"
-			echo ""
+			echo
 
 			# start measuring encoding time
 			start1=$(date +%s)
@@ -1438,7 +1438,7 @@ case "$answer_00" in
 			stop=$(date +%s);
 			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 			echo "encoding "${source1%.*}".$2.$count.crf$crf1.qc${qcomp##*=}.aq${aqmode##*=}:${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.mkv lasted $time"
-			echo ""
+			echo
 			echo "range crf $crf1low → $crf1high, increment $crf1increment"
 		done
 
@@ -1464,10 +1464,10 @@ case "$answer_00" in
 		if [[ -e "${source1%.*}".$2.crf1.log ]] ; then
 			echo "bit rates:"
 			column -t "${source1%.*}".$2.crf1.log
-			echo ""
+			echo
 		fi
 
-		echo ""
+		echo
 		echo "look at these encodings. where you find any detail loss"
 		echo "in still images, you may have found your crf."
 		echo "then close AvsPmod."
@@ -1479,28 +1479,27 @@ case "$answer_00" in
 	}
 
 	function br_test {
-		echo ""
+		echo
 		echo "set bitrate for further testing"
-		echo ""
-		read -e -p "bitrate for "$2" > " br_test
+		echo
+		read -e -p "bitrate for $2 > " br_test
 
 		# keep cfg informed
 		sed -i "/br_test$2/d" "$config"
 		echo "br_test$2=$br_test" >> "$config"
-#		br_test="$br_test"
 	}
 
 	while true; do
-		echo ""
+		echo
 		echo "choose crf values for"
 		echo "your test encodings of "${source2%.*}" in $2"
-		echo ""
+		echo
 		echo "right now, crf is ${crf##*=}"
 
-		echo ""
+		echo
 		echo "hit return to continue"
 		echo "else e(x)it"
-		echo ""
+		echo
 		read -e -p "(RETURN|x) > " answer_crf1
 			case $answer_crf1 in
 				x|X) # get out of the loop
@@ -1519,7 +1518,7 @@ case "$answer_00" in
 	until [[ $crf =~ ^[0-4][0-9]\.[0-9]|[5][0-2]\.[0-9]|53\.0$ ]] ; do
 		echo "set crf parameter for $2"
 		echo "e.g. 17.3"
-		echo ""
+		echo
 		read -e -p "crf > " crf
 	done
 
@@ -1528,28 +1527,28 @@ case "$answer_00" in
 		echo "crf$2=$crf" >> "$config"
 
 	if [[ -n ${br_test##*=} ]]; then
-		echo ""
+		echo
 		echo "further testing in 2pass mode"
 		echo "given bitrate is ${br_test##*=}"
-		echo ""
+		echo
 		echo "hit return if ok"
 		echo "or (e)dit"
 		read -e -p "(RETURN|e) > " answer_br_test
 			case $answer_br_test in
 				e|E|edit|EDIT|Edit)
-					br_test
+					br_test $1 $2
 				;;
 
 				*)	# do nothing here
 				;;
 			esac
 	else
-		br_test
+		br_test $1 $2
 	fi
 
 		echo "from here, run the script with"
 		echo "option 4"
-		echo ""
+		echo
 	;;
 
 	4)  # 4 - test variations in qcomp
@@ -1584,27 +1583,27 @@ case "$answer_00" in
 
 			echo "first, set lowest qcomp value"
 			echo "e.g. 55 for 0.55"
-			echo ""
+			echo
 			read -e -p "qcomp, lowest value > " qcomplow
 
 			echo "set maximum qcomp value"
 			echo "e.g. 80 for 0.80"
-			echo ""
+			echo
 			read -e -p "qcomp, maximum value > " qcomphigh
 
 			echo "set increments, e.g. 5 for 0.05"
 			echo "≠0"
-			echo ""
+			echo
 			read -e -p "increments > " qcompincrement
 		done
 
 		# number of test encodings
 		number_encodings=$(echo "((($qcomphigh-$qcomplow)/$qcompincrement)+1)"|bc)
 
-		echo ""
+		echo
 		echo "these settings will result"
 		echo "in $number_encodings encodings"
-		echo ""
+		echo
 		sleep 2
 
 		# start measuring overall encoding time
@@ -1618,9 +1617,9 @@ case "$answer_00" in
 			# name the files in ascending order depending on the number of existing mkv in directory
 			count=$( printf '%03d\n'  $(ls ${source1%/*}|grep "$2"| grep -c .mkv$))
 
-			echo ""
+			echo
 			echo "encoding ${source2%.*}.$2.$count.br${br_test##*=}.qc$qcomp.aq${aqmode##*=}:${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.mkv"
-			echo ""
+			echo
 
 			# start measuring encoding time
 			start1=$(date +%s)
@@ -1678,7 +1677,7 @@ case "$answer_00" in
 			stop=$(date +%s);
 			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 			echo "encoding ${source2%.*}.$2.$count.br${br_test##*=}.qc$qcomp.aq${aqmode##*=}:${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.mkv lasted $time"
-			echo ""
+			echo
 			echo "range qcomp $qcomplow → $qcomphigh; increment $qcompincrement"
 		done
 
@@ -1711,28 +1710,27 @@ case "$answer_00" in
 	}
 
 	function br_test {
-		echo ""
+		echo
 		echo "set bitrate for aq strength and psy-rd"
-		echo ""
+		echo
 		read -e -p "bitrate for "$2" > " br_test
 
 		# keep cfg informed
 		sed -i "/br_test$2/d" "$config"
 		echo "br_test$2=$br_test" >> "$config"
-		br_test="$br_test"
 	}
 
 	while true; do
-		echo ""
+		echo
 		echo "choose qcomp values for"
 		echo "your test encodings of "${source2%.*}" in $2"
-		echo ""
+		echo
 		echo "right now, qcomp is ${qcomp##*=}"
 
-		echo ""
+		echo
 		echo "hit return to continue"
 		echo "else e(x)it"
-		echo ""
+		echo
 		read -e -p "(RETURN|x) > " answer_qcomp
 			case $answer_qcomp in
 				x|X) # get out of the loop
@@ -1751,10 +1749,10 @@ case "$answer_00" in
 	done
 
 	until [[ $qcomp =~ ^0\.[0-9][0-9]$|^1\.0$ ]] ; do
-		echo ""
+		echo
 		echo "set qcomp parameter for $2 of "${source2%.*}""
 		echo "e.g. 0.71"
-		echo ""
+		echo
 		read -e -p "qcomp > " qcomp
 	done
 
@@ -1763,28 +1761,28 @@ case "$answer_00" in
 	echo "qcomp$2=$qcomp" >> "$config"
 
 	if [[ -n ${br_test##*=} ]]; then
-		echo ""
+		echo
 		echo "further testing in 2pass mode"
 		echo "given bitrate is ${br_test##*=}"
-		echo ""
+		echo
 		echo "hit return if ok"
 		echo "or (e)dit"
 		read -e -p "(RETURN|e) > " answer_br_test
 			case $answer_br_test in
 				e|E|edit|EDIT|Edit)
-					br_test
+					br_test $1 $2
 				;;
 
 				*)	# do nothing here
 				;;
 			esac
 	else
-		br_test
+		br_test $1 $2
 	fi
 
 	echo "from here, run the script with"
 	echo "option 5"
-	echo ""
+	echo
 	;;
 
 	5)  # 5 - variations in aq strength and psy-rd
@@ -1814,56 +1812,56 @@ case "$answer_00" in
 	function aqpsy {
 		# DIRTY! what range aq strength? all parameters 1-200
 		until [[ $aqhigh -ge $aqlow && $aqlow =~ ^[1-9]$|^[1-9][0-9]$|^1[0-9][0-9]$|^200$ && $aqhigh =~ ^[1-9]$|^[1-9][0-9]$|^1[0-9][0-9]$|^200$ && $aqincrement =~ ^[1-9]$|^[1-9][0-9]$|^1[0-9][0-9]$|^200$ ]]; do
-			echo ""
+			echo
 			echo "aq strength: default is 1.0"
 			echo "film ~1.0, animation ~0.6, grain ~0.5"
-			echo ""
+			echo
 			echo "set lowest value of aq strength, e.g. 50 for 0.5"
-			echo ""
+			echo
 			read -e -p "aq strength, lowest value > " aqlow
 
-			echo ""
+			echo
 			echo "set maximum value of aq strength, e.g. 100 for 1.0"
-			echo ""
+			echo
 			read -e -p "aq strength, maximum value > " aqhigh
 
-			echo ""
+			echo
 			echo "set increment steps, e.g. 5 for 0.05 or 10 for 0.10"
 			echo "≠0"
-			echo ""
+			echo
 			read -e -p "increments > " aqincrement
 		done
 
 		# DIRTY! what range for psy-rdo? all parameters 1-200
 		until [[ $psyrdhigh -ge $psyrdlow && $psyrdlow =~ ^[1-9]$|^[1-9][0-9]$|^1[0-9][0-9]$|^200$ && $psyrdhigh =~ ^[1-9]$|^[1-9][0-9]$|^1[0-9][0-9]$|^200$ && $psyrdincrement =~ ^[1-9]$|^[1-9][0-9]$|^1[0-9][0-9]$|^200$ ]]; do
-			echo ""
+			echo
 			echo "psy-rd: default is 1.0"
 			echo "test with values around 0.9 through 1.2"
-			echo ""
+			echo
 			echo "set lowest value of psy-rd, e.g. 90 for 0.9"
-			echo ""
+			echo
 			read -e -p "psy-rd, lowest value > " psyrdlow
 
-			echo ""
+			echo
 			echo "maximum value of psy-rd, e.g. 120 for 1.2"
-			echo ""
+			echo
 			read -e -p "psy-rd, maximum value > " psyrdhigh
 
-			echo ""
+			echo
 			echo "increment steps for psy-rd values"
 			echo "e.g. 5 for 0.05 or 10 for 0.1"
 			echo "≠0"
-			echo ""
+			echo
 			read -e -p "increments > " psyrdincrement
 		done
 
 		# number of test encodings
 		number_encodings=$(echo "(((($aqhigh-$aqlow)/$aqincrement)+1)*((($psyrdhigh-$psyrdlow)/$psyrdincrement)+1))"|bc)
 
-		echo ""
+		echo
 		echo "these settings will result"
 		echo "in $number_encodings encodings and will take some time…"
-		echo ""
+		echo
 		sleep 2
 
 		# start measuring overall encoding time
@@ -1878,15 +1876,15 @@ case "$answer_00" in
 				# name the files in ascending order depending on the number of existing mkv in directory
 				count=$( printf '%03d\n'  $(ls ${source1%/*}|grep "$2"| grep -c .mkv$))
 
-				echo ""
+				echo
 				echo "encoding ${source2%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psyrd.pt${psytr##*=}.mkv"
-				echo ""
+				echo
 
 				# start measuring encoding time
 				start1=$(date +%s)
 
 				#comparison screen
-				echo "=ffvideosource(\"${source1%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psyrd.pt${psytr##*=}.mkv\").subtitle(\"encode br${br_test##*=} qc${qcomp##*=} aq$aqmode:$aq psy$psyrd $2\", align=8)" >> "${source1%.*}".$2.aqpsy.avs
+				echo "=ffvideosource(\"${source1%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psyrd.pt${psytr##*=}.mkv\").subtitle(\"encode br${br_test##*=} qc${qcomp##*=} aq${aqmode##*=}:$aq psy$psyrd pt${psytr##*=} $2\", align=8)" >> "${source1%.*}".$2.aqpsy.avs
 
 				wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
 				| x264 --stdin y4m ${mbtree:+"--no-mbtree"} \
@@ -1940,7 +1938,7 @@ case "$answer_00" in
 				stop=$(date +%s);
 				time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 				echo "encoding ${source2%.*}.$2.$count.br${br_test##*=}.qc${qcomp##*=}.aq${aqmode##*=}:$aq.psy$psyrd.pt${psytr##*=}.mkv lasted $time"
-				echo ""
+				echo
 				echo "range aq strength $aqlow → $aqhigh; increment $aqincrement"
 				echo "range psy-rd	  $psyrdlow → $psyrdhigh; increment $psyrdincrement"
 			done
@@ -1965,7 +1963,7 @@ case "$answer_00" in
 
 		if [ -e /usr/bin/beep ]; then beep $beep; fi
 
-		echo ""
+		echo
 		echo "thoroughly look through all your test encodings"
 		echo "and decide, which aq strength and which psy-rd"
 		echo "parameters gave best results."
@@ -1976,9 +1974,9 @@ case "$answer_00" in
 	}
 
 	function br_test {
-		echo ""
+		echo
 		echo "set bitrate for aq strength and psy-rd"
-		echo ""
+		echo
 		read -e -p "bitrate for "$2" > " br_test
 
 		# keep cfg informed
@@ -1987,28 +1985,48 @@ case "$answer_00" in
 		br_test="$br_test"
 	}
 
+	if [[ -n ${br_test##*=} ]]; then
+		echo
+		echo "further testing in 2pass mode"
+		echo "given bitrate is ${br_test##*=}"
+		echo
+		echo "hit return if ok"
+		echo "or (e)dit"
+		read -e -p "(RETURN|e) > " answer_br_test
+			case $answer_br_test in
+				e|E|edit|EDIT|Edit)
+					br_test $1 $2
+				;;
+
+				*)	# do nothing here
+				;;
+			esac
+	else
+		br_test $1 $2
+	fi
+
 	while true; do
-		echo ""
+		echo
 		echo "choose the aq-mode for your"
 		echo "test encodings of "${source2%.*}" in $2"
-		echo ""
+		echo
 		echo "default here is 2"
 		echo "try 3 with bias to dark scenes"
 		echo "try 1, if results with 2 and 3 are unsatisfying"
 		echo "0 = do not use AQ at all - not recommended"
-		echo ""
+		echo
 		echo "right now, aq-mode is ${aqmode##*=}"
-		echo ""
+		echo
 		echo "(c)hange this"
 		echo "or return"
-		echo ""
+		echo
 		read -e -p "(RETURN|c) > " answer_aqmode
 			case $answer_aqmode in
 				c|C)
 					echo "choose aq-mode:"
 					# choose aqmode: 0, 1 or 2
 					until [[ $aqmode =~ ^[0-3]$ ]]; do
-						echo ""
+						echo
 						read -e -p "aq-mode > " aqmode
 					done
 
@@ -2025,17 +2043,17 @@ case "$answer_00" in
 	done
 
 	while true; do
-		echo ""
+		echo
 		echo "choose aq strength and psyrd values for"
 		echo "your test encodings of "${source2%.*}" in $2"
-		echo ""
+		echo
 		echo "right now, aq strength is ${aqs##*=}"
 		echo "and psyrd is ${psyrd##*=}"
-		echo ""
+		echo
 
 		echo "hit return to continue"
 		echo "else e(x)it"
-		echo ""
+		echo
 		read -e -p "(RETURN|x) > " answer_aqpsy
 			case $answer_aqpsy in
 				x|X) # just nothing
@@ -2055,17 +2073,17 @@ case "$answer_00" in
 	done
 
 	until [[ $aqs =~ ^[0-2]\.[0-9]+$ ]] ; do
-		echo ""
+		echo
 		echo "set aq strength for $2 of "${source2%.*}""
 		echo "e.g. 0.85"
-		echo ""
+		echo
 		read -e -p "aq strength > " aqs
 	done
 
 	until [[ $psyrd =~ ^[0-2]\.[0-9]+$ ]] ; do
 		echo "set psy-rd for $2 of "${source2%.*}""
 		echo "e.g. 0.9"
-		echo ""
+		echo
 		read -e -p "psy-rd > " psyrd
 	done
 
@@ -2075,36 +2093,16 @@ case "$answer_00" in
 	sed -i "/psyrd$2/d" "$config"
 	echo "psyrd$2=$psyrd" >> "$config"
 
-	if [[ -n ${br_test##*=} ]]; then
-		echo ""
-		echo "further testing in 2pass mode"
-		echo "given bitrate is ${br_test##*=}"
-		echo ""
-		echo "hit return if ok"
-		echo "or (e)dit"
-		read -e -p "(RETURN|e) > " answer_br_test
-			case $answer_br_test in
-				e|E|edit|EDIT|Edit)
-					br_test
-				;;
-
-				*)	# do nothing here
-				;;
-			esac
-	else
-		br_test
-	fi
-
 	case $(echo "$psyrd" - 0.99999 | bc) in
 
 		-*) # psy-rd <1 -> psytr unset
 			echo "as psy-rd is set to a value <1 (or not at all)"
 			echo "psy-trellis is 'unset' automatically"
-			echo ""
+			echo
 			echo "you might do further testing with"
 			echo "option 7 (some more less common tests) or"
 			echo "go on with option 8 (a last round for crf)"
-			echo ""
+			echo
 			# keep cfg informed
 			sed -i "/psytr$2/d" "$config"
 			echo "psytr$2=unset" >> "$config"
@@ -2116,7 +2114,7 @@ case "$answer_00" in
 			echo "do further testing with option 7"
 			echo "(some more less common tests) or"
 			echo "go on with option 8 (a last round for crf)"
-			echo ""
+			echo
 		;;
 	esac
 	;;
@@ -2147,11 +2145,11 @@ case "$answer_00" in
 
 	case $(echo "${psyrd##*=}" - 0.99999 | bc) in
 		-*) # psy-rd <1 -> psytr unset
-		echo ""
+		echo
 		echo "as psy-rd is set to a value < 1 (or "
 		echo "not at all) (${psyrd##*=})"
 		echo "psy-trellis is 'unset' automatically"
-		echo ""
+		echo
 
 		# keep cfg informed
 		sed -i "/psytr$2/d" "$config"
@@ -2159,21 +2157,21 @@ case "$answer_00" in
 		;;
 
 		*) # psyrd >= 1
-		echo ""
+		echo
 		echo "as psy-rd is set to ≥1 (${psyrd##*=})"
 		echo "you may test for psy-trellis"
 		echo "else, e(x)it"
-		echo ""
+		echo
 		read -e -p "(RETURN|x) > " answer_psytr
 			case $answer_psytr in
 				x|X) # unset psy-trellis
 					echo "psy trellis is 'unset'."
-					echo ""
+					echo
 
 					# keep cfg informed
 					sed -i "/psytr$2/d" "$config"
 					echo "psytr$2=unset" >> "$config"
-					echo ""
+					echo
 				;;
 
 				*) # test for psy-trellis
@@ -2182,25 +2180,25 @@ case "$answer_00" in
 						echo "psy-trellis: default is 0.0"
 						echo "test for values ~0.0 through 0.15"
 						echo "set lowest value for psy-trellis, e.g. 10 for 0.1"
-						echo ""
+						echo
 						read -e -p "psy-trellis, lowest value > " psy2low
 
 						echo "set maximum value for psy-trellis, e.g. 20 for 0.2"
-						echo ""
+						echo
 						read -e -p "psy-trellis, maximum value > " psy2high
 
 						echo "set increment steps, e.g. 5 for 0.05"
-						echo ""
+						echo
 						read -e -p "increments > " psy2increment
 					done
 
 					# number of test encodings
 					number_encodings=$(echo "((($psy2high-$psy2low)/$psy2increment)+1)"|bc)
 
-					echo ""
+					echo
 					echo "these settings will result"
 					echo "in $number_encodings encodings"
-					echo ""
+					echo
 					sleep 2
 
 					start0=$(date +%s)
@@ -2213,9 +2211,9 @@ case "$answer_00" in
 						# name the files in ascending order depending on the number of existing mkv in directory
 						count=$( printf '%03d\n'  $(ls ${source1%/*}|grep "$2"| grep -c .mkv$))
 
-						echo ""
+						echo
 						echo "encoding ${source2%.*}.$2.$count.crf${crf##*=}.qc${qcomp##*=}.aq${aqmode##*=}:${aqs##*=}.psy${psyrd##*=}.pt$psy2.mkv"
-						echo ""
+						echo
 
 						start1=$(date +%s)
 
@@ -2245,7 +2243,7 @@ case "$answer_00" in
 						stop=$(date +%s);
 						time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 						echo "encoding ${source2%.*}.$2.$count.crf${crf##*=}.qc${qcomp##*=}.aq${aqmode##*=}:${aqs##*=}.psy${psyrd##*=}.pt$psy2.mkv lasted $time"
-						echo ""
+						echo
 						echo "range psy-trellis $psy2low → $psy2high; increment $psy2increment"
 					done
 
@@ -2267,17 +2265,17 @@ case "$answer_00" in
 
 					if [ -e /usr/bin/beep ]; then beep $beep; fi
 
-					echo ""
+					echo
 					echo "thoroughly look through this last test encodings and"
 					echo "decide, which one is your best encode."
 					echo "then close AvsPmod."
 					sleep 2
 					wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".$2.psytr.avs
 
-					echo ""
+					echo
 					echo "set psy-trellis"
 					echo "e.g. 0.05"
-					echo ""
+					echo
 					until [[ $psytr =~ ^0$|^[0-1]\.[0-9]$|^[0-1]\.[0-9][0-9]$|^2\.00$  ]] ; do
 						read -e -p "psy-trellis > " psytr
 					done
@@ -2294,7 +2292,7 @@ case "$answer_00" in
 	echo "(option 7) or"
 	echo "try another (maybe last) round for optimal crf"
 	echo "(option 8)"
-	echo ""
+	echo
 	;;
 
 	7)  # 7 - some more testing with different parameters
@@ -2323,7 +2321,7 @@ case "$answer_00" in
 
 	until [[ $answer_various =~ [c,C,d,D,n,N,x,X] ]] ; do
 		echo "what do you want to test?"
-		echo ""
+		echo
 		echo "(c)hroma-qp-offset"
 		echo "(d)ebanding with f3kdbt"
 		echo "(n)o-mbtree"
@@ -2332,27 +2330,27 @@ case "$answer_00" in
 				c|C)	# chroma-qp-offset
 					# until cqpohigh -12 through 12 and cqpolow -12 through 12 and cqpohigh greater or equal cqpolow; do
 					until [[ $cqpohigh =~ ^-{0,1}[0-9]$|^-{0,1}1[0-2]$ && $cqpolow =~ ^-{0,1}[0-9]$|^-{0,1}1[0-2]$ && $cqpohigh -ge $cqpolow ]]; do
-						echo ""
+						echo
 						echo "test for chroma-qp-offset: default 0,"
 						echo "range -12 through 12; sensible ranges -3 through 3"
 						echo "set lowest value for chroma-qp-offset, e.g. -2"
 						echo "take care: -6 is lower than -4 :-)"
-						echo ""
+						echo
 						read -e -p "chroma-qp-offset, lowest value > " cqpolow
 
-						echo ""
+						echo
 						echo "set maximum value for chroma-qp-offset, e.g. 2"
-						echo ""
+						echo
 						read -e -p "chroma-qp-offset, maximum value > " cqpohigh
 					done
 
 					# number of test encodings
-					number_encodings=$(echo "(($cqpohigh-$cqpolow)+1)"|bc)
+					number_encodings=$(expr "$cqpohigh" - "$cqpolow" + 1)
 
-					echo ""
+					echo
 					echo "these settings will result"
 					echo "in $number_encodings encodings"
-					echo ""
+					echo
 					sleep 2
 
 					start0=$(date +%s)
@@ -2364,9 +2362,9 @@ case "$answer_00" in
 						# name the files in ascending order depending on the number of existing mkv in directory
 						count=$( printf '%03d\n'  $(ls ${source1%/*}|grep "$2"| grep -c .mkv$))
 
-						echo ""
+						echo
 						echo "encoding ${source2%.*}.$2.$count.crf${crf##*=}.qc${qcomp##*=}.aq${aqmode##*=}:${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.cqpo$cqpo.mkv"
-						echo ""
+						echo
 
 						start1=$(date +%s)
 
@@ -2396,7 +2394,7 @@ case "$answer_00" in
 						stop=$(date +%s);
 						time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 						echo "encoding ${source1%.*}.$2.$count.crf${crf##*=}.qc${qcomp##*=}.aq${aqmode##*=}:${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.cqpo$cqpo.mkv lasted $time"
-						echo ""
+						echo
 						echo "range chroma-qp-offset $cqpolow → $cqpohigh"
 					done
 
@@ -2417,17 +2415,17 @@ case "$answer_00" in
 
 					if [ -e /usr/bin/beep ]; then beep $beep; fi
 
-					echo ""
+					echo
 					echo "thoroughly look through this last test encodings and"
 					echo "decide, which one is your best encode."
 					echo "then close AvsPmod."
 					sleep 2
 					wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".$2.cqpo.avs
 
-					echo ""
+					echo
 					echo "set chroma-qp-offset"
 					echo "e.g. 1"
-					echo ""
+					echo
 					read -e -p "chroma-qp-offset > " cqpo
 
 					# keep cfg informed
@@ -2440,37 +2438,51 @@ case "$answer_00" in
 				;;
 
 				n|N)	# toggle no-mbtree
-					if [[ ${mbtree##*=} = 1 ]]; then
+					if [[ ${mbtree##*=} = 1 ]] || [[ -n ${mbtree##*=} ]]; then
 						mbt_mode=disabled
 					else
 						mbt_mode=enabled
 					fi
 
 					while true; do
-						echo ""
+						echo
 						echo "by default, macroblock tree ratecontrol"
 						echo "is enabled."
-						echo ""
-						echo "disable mbtree if encoding results are unsatisfying"
-						echo ""
+						echo
+						echo "disable mbtree if default results are not satisfying"
+						echo
 						echo "right now, mbtree is $mbt_mode"
-						echo ""
+						echo
 						echo "(c)hange this"
 						echo "or return"
-						echo ""
+						echo
 						read -e -p "(RETURN|c) > " answer_mbt
 							case $answer_mbt in
 								c|C)
-									echo "toggle mbtree on (0) or off (1)"
+									echo "toggle mbtree on (1) or off (0)"
 									until [[ $mbtree =~ ^[0-1]$ ]]; do
-									echo ""
+									echo
 									read -e -p "mbtree > " mbtree
 									done
 
-									# keep cfg informed
-									sed -i "/mbtree$2/d" "$config"
-									echo "mbtree$2=$mbtree" >> "$config"
-									break
+									case $mbtree in
+										1)
+											# keep cfg informed
+											sed -i "/mbtree$2/d" "$config"
+											echo "mbtree is enabled now"
+											echo
+											break
+										;;
+										
+										0)
+											# keep cfg informed
+											sed -i "/mbtree$2/d" "$config"
+											echo "mbtree$2=$mbtree" >> "$config"
+											echo "mbtree is disabled now"
+											echo
+											break
+										;;
+									esac
 								;;
 
 								*) # nothing
@@ -2484,7 +2496,7 @@ case "$answer_00" in
 				;;
 
 				*) # nothing
-					echo ""
+					echo
 					echo "if you don't want to test any of this"
 					echo "hit x"
 				;;
@@ -2492,7 +2504,7 @@ case "$answer_00" in
 	done
 	echo "go on with option 8 and test"
 	echo "for a good value in crf"
-	echo ""
+	echo
 
 	;;
 
@@ -2525,27 +2537,27 @@ case "$answer_00" in
 			echo "once again, try a range of crf increments"
 			echo "set lowest crf value as hundreds,"
 			echo "e.g. 168 for 16.8"
-			echo ""
+			echo
 			read -e -p "crf, lowest value > " crf2low
 
 			echo "set highst crf value as hundreds,"
 			echo "e.g. 172 for 17.2"
-			echo ""
+			echo
 			read -e -p "crf, maximum value > " crf2high
 
 			echo "set increment steps, e.g. 1 for 0.1"
 			echo "≠0"
-			echo ""
+			echo
 			read -e -p "increments > " crf2increment
 		done
 
 		# number of test encodings
 		number_encodings=$(echo "((($crf2high-$crf2low)/$crf2increment)+1)"|bc)
 
-		echo ""
+		echo
 		echo "these settings will result"
 		echo "in $number_encodings encodings"
-		echo ""
+		echo
 		sleep 2
 
 		start0=$(date +%s)
@@ -2558,9 +2570,9 @@ case "$answer_00" in
 			# name the files in ascending order depending on the number of existing mkv in directory
 			count=$( printf '%03d\n'  $(ls ${source1%/*}|grep "$2"| grep -c .mkv$))
 
-			echo ""
+			echo
 			echo "encoding ${source2%.*}.$2.$count.crf$crf2.qc${qcomp##*=}.aq${aqmode##*=}:${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.cqpo${cqpo##*=}.mkv"
-			echo ""
+			echo
 
 			# start measuring encoding time
 			start1=$(date +%s)
@@ -2598,7 +2610,7 @@ case "$answer_00" in
 			stop=$(date +%s);
 			time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
 			echo "encoding ${source2%.*}.$2.$count.crf$crf2.qc${qcomp##*=}.aq${aqmode##*=}:${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.cqpo${cqpo##*=}.mkv lasted $time"
-			echo ""
+			echo
 			echo "range crf $crf2low → $crf2high; increment $crf2increment"
 
 		done
@@ -2625,10 +2637,10 @@ case "$answer_00" in
 		if [[ -e "${source1%.*}".$2.crf2.log ]] ; then
 			echo "bit rates:"
 			column -t "${source1%.*}".$2.crf2.log
-			echo ""
+			echo
 		fi
 
-		echo ""
+		echo
 		echo "thoroughly look through all your test"
 		echo "encodings and decide, with which crf you"
 		echo "get best results at considerable bitrate."
@@ -2638,19 +2650,19 @@ case "$answer_00" in
 	}
 
 	while true; do
-		echo ""
+		echo
 		echo "after all that optimization, you may test for"
 		echo "a new, probably more bitsaving value of crf"
-		echo ""
+		echo
 		echo "so far you tested with a crf of ${crf##*=}"
-		echo ""
+		echo
 		echo "choose crf values for"
 		echo "your test encodings of "${source2%.*}" in $2"
 
-		echo ""
+		echo
 		echo "hit return to continue"
 		echo "else e(x)it"
-		echo ""
+		echo
 		read -e -p "(RETURN|x) > " answer_crf2
 			case $answer_crf2 in
 				x|X) # just nothing
@@ -2669,10 +2681,10 @@ case "$answer_00" in
 	# read crf from cfg, otherwise last tested = highest tested crf is presented
 	crf=$(cat "$config"|grep crf|grep $2)
 	until [[ $crf =~ ^[0-4][0-9]\.[0-9]|[5][0-2]\.[0-9]|53\.0$ ]] ; do
-		echo ""
+		echo
 		echo "set crf parameter"
 		echo "so far you tested with a crf of ${crf##*=}"
-		echo ""
+		echo
 		read -e -p "crf > " crf
 	done
 
@@ -2682,7 +2694,7 @@ case "$answer_00" in
 
 	echo "now you may encode the whole movie"
 	echo "run the script like this:"
-	echo ""
+	echo
 
 	if [[ -e "${source1%.*}".SD.final.avs ]] && [[ ! -e "${source1%.*}".720.final.avs ]] && [[ ! -e "${source1%.*}".1080.final.avs ]]; then
 		echo "./encode.sh ${source2%.*}"
@@ -2693,23 +2705,23 @@ case "$answer_00" in
 	else
 		echo "./encode.sh ${source2%.*} <resolution>"
 		if [[ -e "${source1%.*}".SD.final.avs ]] && [[ -e "${source1%.*}".720.final.avs ]] && [[ -e "${source1%.*}".1080.final.avs ]]; then
-			echo ""
+			echo
 			echo "where resolution might be SD, 720 or 1080"
 		elif [[ -e "${source1%.*}".SD.final.avs ]] && [[ -e "${source1%.*}".720.final.avs ]] && [[ ! -e "${source1%.*}".1080.final.avs ]]; then
-			echo ""
+			echo
 			echo "where resolution might be SD or 720"
 		elif [[ -e "${source1%.*}".SD.final.avs ]] && [[ ! -e "${source1%.*}".720.final.avs ]] && [[ -e "${source1%.*}".1080.final.avs ]]; then
-			echo ""
+			echo
 			echo "where resolution might be SD or 1080"
 		else [[ ! -e "${source1%.*}".SD.final.avs ]] && [[ -e "${source1%.*}".720.final.avs ]] && [[ -e "${source1%.*}".1080.final.avs ]]
-			echo ""
+			echo
 			echo "where resolution might be 720 or 1080"
 		fi
 	fi
 
-	echo ""
+	echo
 	echo "go on with option 9"
-	echo ""
+	echo
 	;;
 
 	9)  # 9 - encode the whole movie
@@ -2737,9 +2749,9 @@ case "$answer_00" in
 	height=$(cat "$config"|grep height|grep $2)
 
 	function br_test {
-		echo ""
+		echo
 		echo "set bitrate for final encoding"
-		echo ""
+		echo
 		read -e -p "bitrate for "$2" > " br_test
 
 		# keep cfg informed
@@ -2750,36 +2762,36 @@ case "$answer_00" in
 
 	function br_check {
 		if [[ -n ${br_test##*=} ]]; then
-		echo ""
+		echo
 		echo "final enciding in 2pass mode"
 		echo "given bitrate is ${br_test##*=}"
-		echo ""
+		echo
 		echo "hit return if ok"
 		echo "or (e)dit"
 		read -e -p "(RETURN|e) > " answer_br_test
 			case $answer_br_test in
 				e|E|edit|EDIT|Edit)
-					br_test
+					br_test $1 $2
 				;;
 
 				*)	# do nothing here
 				;;
 			esac
 	else
-		br_test
+		br_test $1 $2
 	fi
 	}
 
 	function encodeSD2pass {
-		echo ""
+		echo
 		echo "now encoding ${source2%.*}.$2.mkv"
 		echo "with a resolution of ${width##*=}×${height##*=} and a PAR of $par"
-		echo ""
+		echo
 
 		start=$(date +%s)
 
 		# create comparison screen avs
-		echo "a=import(\"${avs##*=}\").subtitle(\"source\", align=8)" > "${source1%.*}".comparison.$2.avs
+		echo "a=import(\"${finalavs##*=}\").subtitle(\"source\", align=8)" > "${source1%.*}".comparison.$2.avs
 		echo "b=ffvideosource(\"${source1%.*}.$2.mkv\").subtitle(\"encode $2 ${source2%.*}\", align=8)" >> "${source1%.*}".comparison.$2.avs
 		echo "interleave(a,b)" >> "${source1%.*}".comparison.$2.avs
 		echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".comparison.$2.avs
@@ -2839,15 +2851,15 @@ case "$answer_00" in
 	}
 
 	function encodeSDfromHD2pass {
-		echo ""
+		echo
 		echo "now encoding ${source2%.*}.$2.mkv"
 		echo "with a resolution of ${width##*=}×${height##*=}"
-		echo ""
+		echo
 
 		start=$(date +%s)
 
 		# create comparison screen avs
-		echo "a=import(\"${avs##*=}\").Spline36Resize("${width##*=}","${height##*=}").subtitle(\"source\", align=8)" > "${source1%.*}".comparison.$2.avs
+		echo "a=import(\"${finalavs##*=}\").Spline36Resize("${width##*=}","${height##*=}").subtitle(\"source\", align=8)" > "${source1%.*}".comparison.$2.avs
 		echo "b=ffvideosource(\"${source1%.*}.$2.mkv\").subtitle(\"encode $2\", align=8)" >> "${source1%.*}".comparison.$2.avs
 		echo "interleave(a,b)" >> "${source1%.*}".comparison.$2.avs
 		echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".comparison.$2.avs
@@ -2908,15 +2920,15 @@ case "$answer_00" in
 	}
 
 	function encodeHD2pass {
-		echo ""
+		echo
 		echo "now encoding ${source2%.*}.$2.mkv"
 		echo "with a resolution of ${width##*=}×${height##*=}"
-		echo ""
+		echo
 
 		start=$(date +%s)
 
 		# create comparison screen avs
-		echo "a=import(\"${avs##*=}\").Spline36Resize("${width##*=}","${height##*=}").subtitle(\"source\", align=8)" > "${source1%.*}".comparison.$2.avs
+		echo "a=import(\"${finalavs##*=}\").Spline36Resize("${width##*=}","${height##*=}").subtitle(\"source\", align=8)" > "${source1%.*}".comparison.$2.avs
 		echo "b=ffvideosource(\"${source1%.*}.$2.mkv\").subtitle(\"encode $2\", align=8)" >> "${source1%.*}".comparison.$2.avs
 		echo "interleave(a,b)" >> "${source1%.*}".comparison.$2.avs
 		echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".comparison.$2.avs
@@ -2976,15 +2988,15 @@ case "$answer_00" in
 	}
 
 	function encodeSD {
-		echo ""
+		echo
 		echo "now encoding ${source2%.*}.$2.mkv"
 		echo "with a resolution of ${width##*=}×${height##*=} and a PAR of $par…"
-		echo ""
+		echo
 
 		start=$(date +%s)
 
 		# create comparison screen avs
-		echo "a=import(\"${avs##*=}\").subtitle(\"source\", align=8)" > "${source1%.*}".comparison.$2.avs
+		echo "a=import(\"${finalavs##*=}\").subtitle(\"source\", align=8)" > "${source1%.*}".comparison.$2.avs
 		echo "b=ffvideosource(\"${source1%.*}.$2.mkv\").subtitle(\"encode $2 ${source2%.*}\", align=8)" >> "${source1%.*}".comparison.$2.avs
 		echo "interleave(a,b)" >> "${source1%.*}".comparison.$2.avs
 		echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".comparison.$2.avs
@@ -3018,15 +3030,15 @@ case "$answer_00" in
 	}
 
 	function encodeSDfromHD {
-		echo ""
+		echo
 		echo "now encoding ${source2%.*}.$2.mkv"
 		echo "with a resolution of ${width##*=}×${height##*=}…"
-		echo ""
+		echo
 
 		start=$(date +%s)
 
 		# create comparison screen avs
-		echo "a=import(\"${avs##*=}\").Spline36Resize("${width##*=}","${height##*=}").subtitle(\"source\", align=8)" > "${source1%.*}".comparison.$2.avs
+		echo "a=import(\"${finalavs##*=}\").Spline36Resize("${width##*=}","${height##*=}").subtitle(\"source\", align=8)" > "${source1%.*}".comparison.$2.avs
 		echo "b=ffvideosource(\"${source1%.*}.$2.mkv\").subtitle(\"encode $2 ${source2%.*}\", align=8)" >> "${source1%.*}".comparison.$2.avs
 		echo "interleave(a,b)" >> "${source1%.*}".comparison.$2.avs
 		echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".comparison.$2.avs
@@ -3062,15 +3074,15 @@ case "$answer_00" in
 	}
 
 	function encodeHD {
-		echo ""
+		echo
 		echo "now encoding ${source2%.*}.$2.mkv"
 		echo "with a resolution of ${width##*=}×${height##*=}…"
-		echo ""
+		echo
 
 		start=$(date +%s)
 
 		# create comparison screen avs
-		echo "a=import(\"${avs##*=}\").Spline36Resize("${width##*=}","${height##*=}").subtitle(\"source\", align=8)" > "${source1%.*}".comparison.$2.avs
+		echo "a=import(\"${finalavs##*=}\").Spline36Resize("${width##*=}","${height##*=}").subtitle(\"source\", align=8)" > "${source1%.*}".comparison.$2.avs
 		echo "b=ffvideosource(\"${source1%.*}.$2.mkv\").subtitle(\"encode $2 ${source2%.*}\", align=8)" >> "${source1%.*}".comparison.$2.avs
 		echo "interleave(a,b)" >> "${source1%.*}".comparison.$2.avs
 		echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".comparison.$2.avs
@@ -3141,7 +3153,7 @@ case "$answer_00" in
 	fi
 
 	if [[ -z $2 ]] ;then #|| [[ $2 != SD || $2 != 720 || $2 != 1080 ]]; then
-		echo ""
+		echo
 		echo "ambiguious. 576p, 720p or 1080p?"
 	fi
 	;;
