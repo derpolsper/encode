@@ -140,4 +140,4 @@ The script does NOT do:
 
 The maximum number of test encodings in one avs file is somewhat 154, which does not seem to set a concerning limit the number of combinations even in cross testing aq strength and psy-rd.
 
-Though some parameters can be set permanent, encoding needs a lot of trial and error to find the best possible result. There's lots of interaction. But hey, encoding is fun!
+Though some parameters can be set permanent, encoding needs a lot of trial and error to find the best possible result. There's lots of interaction. But hey, **encoding is fun!**
