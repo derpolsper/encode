@@ -6,7 +6,7 @@ This script provides test encodes with several parameters, and does some, gradua
 
 It uses native linux cli tools as far as available (which is not much right now), all the rest is done using windows tools via wine.
 
-It works for standard and high definition sources, getting along with Matroska containers, e.g. remuxes as well as m2ts streams.
+It works for standard and high definition sources, getting along with Matroska containers, e.g. remuxes as well as m2ts streams (also via mpls BluRay playlists).
 
 If you encode a HD file in a SD resolution, the appropriate colormatrix is chosen.
 
@@ -19,11 +19,12 @@ It offers several options, (mostly) one prerequesite to another, largely corresp
 3  - test for crf
 4  - test for mbtree vs --no-mbtree
 5  - test for qcomp
-6  - test for aq mode, aq strength and psy-rd
-7  - test for psy-trellis
-8  - do some more things: chroma-qp-offset
-9  - another round of crf
-10 - encoding the whole movie
+6  - test for aq strength in different aq modes
+7  - test for psy-rd
+8  - test for psy-trellis
+9  - do some more things: chroma-qp-offset
+10 - another round of crf
+11 - encoding the whole movie
 
 The script consists of two parts:  
 The bash script itself: encode.sh and a configuration file default.cfg in a directory named encode.
@@ -44,7 +45,7 @@ Start the script like this:
 You can check, if all neccessary programs are available and check the default settings for encoding.
 Start the script without parameters to begin the encoding process from an unencrypted remux file respectively m2ts file.
 While going through option 1 and 2, an individual config file will be generated which stores your settings for each movie. The config file will be placed in the same ./encode directory as the default.cfg file and given the name of your test encode.
-With this name as parameter, you go on from option 3 to option 9. Let's say, you encode "The Fabulous Baker Boys". Choose a short name for practical reasons! Name your encoding tfbb, for example. From there on, start the script with
+With this name as parameter, you go on from option 3 to option 11. Let's say, you encode "The Fabulous Baker Boys". Choose a short name for practical reasons! Name your encoding tfbb, for example. From there on, start the script with
     $ ./encode.sh tfbb <resolution>
 with <resolution> = SD if you encode from a DVD or
 with <resolution> = 480, 576, 720 or 1080 if you encode a HD file.  
@@ -59,7 +60,7 @@ Install the linux programs preferably from your distribution:
 
 If wine64 is installed, you should uninstall it to prevent windows applications from being installed there.
 
-Download eac3to, AvsPmod, avs2yuv, Avisynth, Avisynth Plugins, BalanceBorders, FillMargins, fixcolumnbrightness and ColorMatrix.
+Download eac3to, AvsPmod, avs2yuv, Avisynth, Avisynth Plugins, BalanceBorders, FillMargins, FixColumnbrightness and ColorMatrix.
 
 Install Avisynth:
 
@@ -99,16 +100,17 @@ Unzip ColorMatrixv25.zip to
 
     $ unzip /path/to/ColorMatrixv25.zip -d ~/.config/encode/.filters/ColorMatrix/
 
-This script does not need more programs to work. You can install all kind of avisynth filters. There is no guarantee for them to work, though. Generally, many avisynth filters should work, however, I did not do much in the way of verification here.__
-I tested for
+This script does not need more programs to work. You can use all kind of avisynth filters. There is no guarantee for them to work, though. Generally, most avisynth filters should work, however, I did not do much in the way of verification here.__
+I tested positive for
 + QTGMC().SelectEven()
 + TFM().TDecimate()
 + FillMargins
 + BalanceBorders
++ FixColumnbrightness
 
-As eac3to in wine does not mux streams into matroska containers, the script kind of walks around and demuxes the source into h264 or mpeg2 streams, which afterwards are muxed into a mkv file, just for traditional reason. Furthermore, eac3to using wine cannot work on mpls playlists, so you run into problems if the movie is allocated to more than one single m2ts file.__
+The script demuxes the source into h264, vc1 or mpeg2 streams, which afterwards are muxed into a mkv file.
 
-I learned that AvsPmod is not very stable while editing opened avs files. When using the resize calculator, do not click »apply«, do not let the calculator work on your .avs, but set these parameters when the script asks for them.
+When using the resize calculator in AvsPmod, do not click »apply«, do not let the calculator work on your .avs, but set these parameters when the script asks for them.
 
 ###Limitations
 
@@ -124,6 +126,6 @@ The maximum number of test encodings in one avs file is somewhat 154, which does
 
 Though some parameters can be set permanent, encoding needs a lot of trial and error to find the best possible result. There's lots of interaction. But hey, encoding is fun!__
 
-Some flaky things I did not know how to avoid are noted in the script, these comments start with #TODONOTE. I'd be especially thankful for them to be solved in a clean way.__
+I'd be especially thankful for some flaky things (commented with #TODONOTE) to be solved in a clean way.__
 
 Credits to uncountable contributors at stackoverflow.com and those awesome people at ptp.me!
