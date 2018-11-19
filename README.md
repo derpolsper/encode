@@ -6,7 +6,7 @@ This script provides test encodes with several parameters, and does some, gradua
 
 It uses native linux cli tools as far as available (which is not much right now), all the rest is done using windows tools via wine.
 
-It works for standard and high definition sources, getting along with Matroska containers, e.g. remuxes as well as m2ts streams (also via mpls BluRay playlists).
+It works for standard and high definition sources, getting along with Matroska containers, e.g. remuxes as well as m2ts streams (also mpls BluRay playlists).
 
 If you encode a HD file in a SD resolution, the appropriate colormatrix is chosen.
 
@@ -14,7 +14,7 @@ It offers several options, (mostly) one prerequesite to another, largely corresp
 
 + 00 - check, if all necessary programs are installed
 + 0  - display and edit default settings and current encoding parameters
-+ 1  - demux de-/ unencrypted m2ts|remux -> mpeg2|h264|vc1 -> mkv,
++ 1  - demux de-/ unencrypted m2ts|remux -> mpeg2|h264|vc1|m2v -> mkv,
 + 2  - create necessary avs files
 + 3  - test for crf
 + 4  - test for mbtree vs --no-mbtree
@@ -26,9 +26,11 @@ It offers several options, (mostly) one prerequesite to another, largely corresp
 + 10 - another round of crf
 + 11 - encoding the whole movie
 
-The script consists of two parts:  
+The script consists of two parts:
+
 The bash script itself: encode.sh and a configuration file default.cfg in a directory named encode.
-You may place the script somewhere in your $PATH.  
+You may place the script somewhere in your `$PATH`.
+
 The config file I suggest to place to
 `~/.config/encode/default.cfg`
 but any other place may be suitable. In the latter case, you have to edit the script:
@@ -38,28 +40,31 @@ Each movie gets its own config file derived from the default.cfg and stores all 
 If you want to change them manually, use your editor of choice or choose the edit-option in option 0.
 
 Maybe you prefer not to mix your encoding environment with other installations of wine. If you do not have any wine-installation yet, you may leave the newly installed wine directory in place. If you do have a wine installation already, you may rename it or install your encoding environment someplace else. Edit the script:
+
 `wine="${HOME}/.wine"`
 
 Start the script like this:
-```bash
-$ ./encode.sh
-```
+
+`$ ./encode.sh`
+
 You can check, if all neccessary programs are available and check the default settings for encoding.
 Start the script without parameters to begin the encoding process from an unencrypted remux file respectively m2ts file.
 While going through option 1 and 2, an individual config file will be generated which stores your settings for each movie. The config file will be placed in the same ./encode directory as the default.cfg file and given the name of your test encode.
-With this name as parameter, you go on from option 3 to option 11. Let's say, you encode "The Fabulous Baker Boys". Choose a short name for practical reasons! Name your encoding tfbb, for example. From there on, start the script with
-```bash
-$ ./encode.sh tfbb <resolution>
-```
-with <resolution> = SD if you encode from a DVD or
-with <resolution> = 480, 576, 720 or 1080 if you encode a HD file.
+
+With this name as parameter, you go on from option 3 to option 11.
+
+Let's say, you encode "The Fabulous Baker Boys". Choose a short name for practical reasons! Name your encoding tfbb, for example. From there on, start the script with
+`$ ./encode.sh tfbb <resolution>`
+
+with resolution = SD if you encode from a DVD or
+with resolution = 480, 576, 720 or 1080 if you encode a HD file.
 
 You want to work on another movie, before the baker boys are finished? No problem, that encoding also gets its individual config file, so your settings don't get confused.
 
 
 ### Requirements
 
-Install the linux programs preferably from your distribution:
+Install some programs preferably from your distribution:
 
     # apt-get install bash bc beep libimage-exiftool-perl mediainfo mkvtoolnix unrar wine x264
 
@@ -80,6 +85,7 @@ Unrar Avisynth Plugins and copy the content of the plugins directory:
     $ cp -rv /path/to/unrar'ed/AviSynth\ Plugins/plugins ~/.wine/drive_c/Program\ Files/AviSynth\ 2.5/
 
 Copying the desired filters out of Windows paths:
+
     $ cp -v ~/path/to/fixcolumnbrightness ~/.config/encode/.filters/
     $ cp -v ~/.wine/drive_c/Program\ Files/AviSynth\ 2.5/plugins/BalanceBorders.avs ~/.config/encode/.filters/
     $ cp -rv /path/to/unrar'ed/AviSynth\ Plugins/32-Bit\ DLLs/*.dll ~/.wine/drive_c/windows/system32/
@@ -96,7 +102,8 @@ and avs2yuv-0.24.zip:
 
     $ unzip /path/to/avs2yuv-0.24.zip -d ~/.wine/drive_c/Program\ Files/
 
-Filters do not need to be in the wine directory. If stored somewhere else, in case of wine updates often followed by malfunctions, filters do not have to be re-installed.__
+Filters do not need to be in the wine directory. If stored somewhere else, in case of wine updates often followed by malfunctions, filters do not have to be re-installed.
+
 Unzip FillMargins.zip into .filters-directory in your encode directory:
 
     $ unzip /path/to/FillMargins.zip -d ~/.config/encode/.filters/FillMargins
@@ -105,21 +112,25 @@ Unzip ColorMatrixv25.zip to
 
     $ unzip /path/to/ColorMatrixv25.zip -d ~/.config/encode/.filters/ColorMatrix/
 
-This script does not need more programs to work. You can use all kind of avisynth filters. There is no guarantee for them to work, though. Generally, most avisynth filters should work, however, I did not do much in the way of verification here.__
+This script does not need more programs to work. You can use all kind of avisynth filters. There is no guarantee for them to work, though. Generally, most avisynth filters should work, however, I did not do much in the way of verification here.
+
 I tested positive for
-+ QTGMC().SelectEven()
-+ TFM().TDecimate()
++ QTGMC()
++ SelectEven()
++ TFM()
++ TDecimate()
 + FillMargins
 + BalanceBorders
 + FixColumnbrightness
 
-The script demuxes the source into h264, vc1 or mpeg2 streams, which afterwards are muxed into a mkv file.
+The script demuxes the source into h264, vc1, mpeg2 or m2v streams, which afterwards are muxed into a mkv file.
 
 When using the resize calculator in AvsPmod, do not click »apply«, do not let the calculator work on your .avs, but set these parameters when the script asks for them.
 
 ### Limitations
 
-The script does NOT do:__
+The script does NOT do:
+
 + decrypt sources
 + handle DVDs or VOB containers
 + handle demuxed audio files
@@ -127,10 +138,6 @@ The script does NOT do:__
 + handle chapter files
 + mux anything together
 
-The maximum number of test encodings in one avs file is somewhat 154, which does not seem to set a concerning limit the number of combinations even in cross testing aq strength and psy-rd.__
+The maximum number of test encodings in one avs file is somewhat 154, which does not seem to set a concerning limit the number of combinations even in cross testing aq strength and psy-rd.
 
-Though some parameters can be set permanent, encoding needs a lot of trial and error to find the best possible result. There's lots of interaction. But hey, encoding is fun!__
-
-I'd be especially thankful for some flaky things (commented with #TODONOTE) to be solved in a clean way.__
-
-Credits to uncountable contributors at stackoverflow.com and those awesome people at ptp.me!
+Though some parameters can be set permanent, encoding needs a lot of trial and error to find the best possible result. There's lots of interaction. But hey, encoding is fun!
