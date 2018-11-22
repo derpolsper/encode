@@ -2340,13 +2340,11 @@ case "$answer_00" in
                     # keep cfg informed
                     sed -i "/aqmode$2/d" "$config"
                     echo "aqmode$2=$answer_aqmode" >> "$config"
-#                    aqmode=$answer_aqmode
+                    aqmode=$answer_aqmode
                     unset aqshigh
                     unset aqslow
                     unset aqsincrement
                     aqs $1 $2
-#                   unset aqs
-                    set_aqs $1 $2
                     unset br2
                     br_change $1 $2
                 ;;
@@ -2355,12 +2353,7 @@ case "$answer_00" in
                     unset aqshigh
                     unset aqslow
                     unset aqsincrement
-#                   unset aqmode
                     aqmode_aqs $1 $2
-#                   unset aqmode
-#                   unset aqs
-                    set_aqmode $1 $2
-                    set_aqs $1 $2
                     unset br2
                     br_change $1 $2
                 ;;
@@ -2370,6 +2363,12 @@ case "$answer_00" in
                 ;;
             esac
     done
+
+    set_aqmode $1 $2
+    set_aqs $1 $2
+
+    echo "from here, run the script with option 7"
+    echo -e "and test for psy-rd\n"
     ;;
 
     7)  # 7 - testing for psyrd
