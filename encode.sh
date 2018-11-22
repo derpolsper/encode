@@ -2774,7 +2774,7 @@ case "$answer_00" in
                     echo "=import(\"${avs##*=}\").subtitle(\"source\", align=8)" > "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
 
                     for ((cqpo0=$cqpolow; $cqpo0<=$cqpohigh; cqpo0=$cqpo0+1));do
-                        encodings_left=$(echo "((($cqpohigh-$cqpo0)/$cqpoincrement)+1)"|bc)
+                        encodings_left=$(expr "$cqpohigh" - "$cqpo0" + 1)
                         if [[ $cqpo0 = $cqpolow ]]; then
                             echo -e "\nrange chroma qp offset *$cqpolow* → $cqpohigh, increment $cqpoincrement; $number_encodings encodings; $encodings_left encodings left"
                         elif [[ $cqpo0 = $cqpohigh ]]; then
@@ -2786,7 +2786,7 @@ case "$answer_00" in
                         # name the files in ascending order depending on the number of existing mkv in directory
                         count=$( printf '%03d\n'  $(ls ${source1%/*}|grep "$2"| grep -c .mkv$))
 
-                        echo -e "encoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.mkv\n"
+                        echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.mkv\n"
 
                         start1=$(date +%s)
 
