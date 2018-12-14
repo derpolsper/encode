@@ -1516,6 +1516,7 @@ case "$answer_00" in
         echo "=import(\"${avs##*=}\").subtitle(\"source\", align=8)" > "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
 
         for (( crf1=$crf1low; $crf1<=$crf1high; crf1+=$crf1increment)); do
+            # number of left encodings
             encodings_left=$(echo "((($crf1high-$crf1)/$crf1increment)+1)"|bc)
             if [[ $crf1 = $crf1low ]]; then
                 echo -e "\nrange crf *$crf1low* → $crf1high, increment $crf1increment; $number_encodings encodings; $encodings_left encodings left"
@@ -1886,6 +1887,7 @@ case "$answer_00" in
         echo "=import(\"${avs##*=}\").subtitle(\"source\", align=8)" > "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
 
         for ((qcomp0=$qcomplow; $qcomp0<=$qcomphigh; qcomp0+=$qcompincrement)); do
+            # number of left encodings
             encodings_left=$(echo "((($qcomphigh-$qcomp0)/$qcompincrement)+1)"|bc)
             if [[ $qcomp0 = $qcomplow ]]; then
                 echo -e "\nrange qcomp *$qcomplow* → $qcomphigh, increment $qcompincrement; $number_encodings encodings; $encodings_left encodings left"
@@ -2060,12 +2062,14 @@ case "$answer_00" in
         echo "=import(\"${avs##*=}\").subtitle(\"source\", align=8)" > "${source1%.*}".$2.aqmode$aqmode.$aqslow-$aqshigh-$aqsincrement.avs
 
         for ((aqs0=$aqslow; $aqs0<=$aqshigh; aqs0+=$aqsincrement));do
+            # number of left encodings
+            encodings_left=$(echo "((($aqshigh-$aqs0)/$aqsincrement)+1)"|bc)
             if [[ $aqs0 = $aqslow ]]; then
-                echo -e "\nrange aq strength *$aqslow* → $aqshigh, increment $aqsincrement; $number_encodings encodings"
+                echo -e "\nrange aq strength *$aqslow* → $aqshigh, increment $aqsincrement; $number_encodings encodings, $encodings_left encodings left"
             elif [[ $aqs0 = $aqshigh ]]; then
-                echo -e "\nrange aq strength $aqslow → *$aqshigh*, increment $aqsincrement; $number_encodings encodings"
+                echo -e "\nrange aq strength $aqslow → *$aqshigh*, increment $aqsincrement; $number_encodings encodings, $encodings_left encodings left"
             else
-                echo -e "\nrange aq strength $aqslow → *$aqs0* → $aqshigh, increment $aqsincrement; $number_encodings encodings"
+                echo -e "\nrange aq strength $aqslow → *$aqs0* → $aqshigh, increment $aqsincrement; $number_encodings encodings, $encodings_left encodings left"
             fi
 
             # name the files in ascending order depending on the number of existing mkv in directory
@@ -2195,6 +2199,7 @@ case "$answer_00" in
 
         for aqmode0 in {1..3} ;do
             for ((aqs0=$aqslow; $aqs0<=$aqshigh; aqs0+=$aqsincrement));do
+                # number of left encodings
                 encodings_left=$(echo "(((3-$aqmode0)*((($aqshigh-$aqslow)/$aqsincrement)+1))+((($aqshigh-$aqs0)/$aqsincrement)+1))"|bc)
                 if [[ $aqs0 = $aqslow ]]; then
                     echo -e "\nrange aq strength *$aqslow* → $aqshigh, increment $aqsincrement; aq-mode $aqmode0; $number_encodings encodings; $encodings_left encodings left"
@@ -2404,6 +2409,7 @@ case "$answer_00" in
         echo "=import(\"${avs##*=}\").subtitle(\"source\", align=8)" > "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
 
         for ((psyrd0=$psyrdlow; $psyrd0<=$psyrdhigh; psyrd0+=$psyrdincrement));do
+            # number of left encodings
             encodings_left=$(echo "((($psyrdhigh-$psyrd0)/$psyrdincrement)+1)"|bc)
             if [[ $psyrd0 = $psyrdlow ]]; then
                 echo -e "\nrange psy-rdo *$psyrdlow* → $psyrdhigh, increment $psyrdincrement; $number_encodings encodings; $encodings_left encodings left"
@@ -2621,6 +2627,7 @@ case "$answer_00" in
                         echo "=import(\"${avs##*=}\").subtitle(\"source\", align=8)" > "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
 
                         for ((psy2=$psy2low; $psy2<=$psy2high; psy2+=$psy2increment));do
+                            # number of left encodings
                             encodings_left=$(echo "((($psy2high-$psy2)/$psy2increment)+1)"|bc)
                             if [[ $psy2 = $psy2low ]]; then
                                 echo -e "\nrange psy-trellis *$psy2low* → $psy2high, increment $psy2increment; $number_encodings encodings; $encodings_left encodings left"
@@ -2773,6 +2780,7 @@ case "$answer_00" in
                     echo "=import(\"${avs##*=}\").subtitle(\"source\", align=8)" > "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
 
                     for ((cqpo0=$cqpolow; $cqpo0<=$cqpohigh; cqpo0=$cqpo0+1));do
+                        # number of left encodings
                         encodings_left=$(expr "$cqpohigh" - "$cqpo0" + 1)
                         if [[ $cqpo0 = $cqpolow ]]; then
                             echo -e "\nrange chroma qp offset *$cqpolow* → $cqpohigh, increment $cqpoincrement; $number_encodings encodings; $encodings_left encodings left"
@@ -2930,6 +2938,7 @@ case "$answer_00" in
         echo "=import(\"${avs##*=}\").subtitle(\"source\", align=8)" > "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
 
         for ((crf2=$crf2low; $crf2<=$crf2high; crf2+=$crf2increment));do
+            # number of left encodings
             encodings_left=$(echo "((($crf2high-$crf2)/$crf2increment)+1)"|bc)
             if [[ $crf2 = $crf2low ]]; then
                 echo -e "\nrange crf *$crf2low* → $crf2high, increment $crf2increment; $number_encodings encodings; $encodings_left encodings left"
