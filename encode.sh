@@ -365,7 +365,7 @@ case "$answer_00" in
     done
 
     # check source1 for file extension == mkv
-    until [[ $source1 == @(*.mkv|*.mpls) ]] && [[ $source1 != $source0 ]]; do
+    until [[ $source1 == @(*.mkv) ]] && [[ $source1 != $source0 ]]; do
         echo -e "\nsave the demuxed file"
         echo "absolute path AND name WITH file extension:"
         echo -e "e.g. /home/<user>/encoding/moviename.mkv\n"
@@ -378,7 +378,7 @@ case "$answer_00" in
     # bash parameter expansion does not allow nesting, so do it in two steps
     source2=${source1##*/}
 
-    function source_nonraw {
+    function source_muxed {
         cd "${source0%/*}"
         wine "$winedir"/drive_c/Program\ Files/eac3to/eac3to.exe "${source0##*/}" | tee "${source1%.*}".log
 
@@ -410,12 +410,39 @@ case "$answer_00" in
         mkvmerge -v -o "$source1" "$source0" | tee -a "${source1%.*}".log
     }
 
-    if [[ $source0 == @(*.mpls|*.m2ts|*.mkv|*.vc1|*.m2v) ]] ; then
-        source_nonraw
+    function source_remux {
+        cd "${source0%/*}"
+        mkvmerge -i "${source0##*/}" | tee "${source1%.*}".log
+
+        until [[ $param1 == @(*.h264||*.sup*|*.flac*|*.ac3*|*.dts*|*.txt*|*.m2v*) ]]; do
+            echo -e "\nextract all wanted tracks following this name pattern:"
+            echo "[0-n]:moviename.extension, e.g. 0:moviename.h264"
+            echo "1:moviename.flac 2:moviename.ac3 3:moviename.sup etc"
+            echo -e "the video stream HAS TO be given h264, mpeg2 or vc1 as file extension\n"
+            read -e -p "> " param1
+        done
+
+        # keep $param1 without parenthesis, otherwise eac3to fails while parsing the parameter
+        #wine "$winedir"/drive_c/Program\ Files/eac3to/eac3to.exe "${source0##*/}" $param1 | tee -a "${source1%.*}".log
+        mkvextract tracks "$source0" $param1 | tee -a "${source1%.*}".log
+
+        mv *.h264 ${source2%.*}.h264
+        mv *.mpeg2 ${source2%.*}.mpeg2
+        mv *.vc1 ${source2%.*}.vc1
+        mv *.m2v ${source2%.*}.m2v
+# TODONOTE: dirty. problems when >1 h264|mpeg2|vc1|m2v file
+        mkvmerge -v -o "$source1" $(ls "${source0%/*}"|grep -iE "h264|mpeg2|vc1|m2v" ) | tee -a "${source1%.*}".log
+        mkvextract chapters "$source0" -s >> "${source2%.*}.chapters.txt" | tee -a "${source1%.*}".log
+    }
+
+    if [[ $source0 == @(*.mpls|*.m2ts|*.vc1|*.m2v) ]] ; then
+        source_muxed
         # delete the h264|mpeg2|vc1 file
         rm -v $(ls "${source0%/*}"|grep -iE "h264|mpeg2|vc1|m2v" ) | tee -a "${source1%.*}".log
     elif [[ $source0 == @(*.h264) ]] ; then
         source_raw
+    elif [[ $source0 == @(*.mkv) ]] ; then
+        source_remux
     else
         echo -e "something went wrong\n"
     fi
@@ -1519,11 +1546,11 @@ case "$answer_00" in
             # number of left encodings
             encodings_left=$(echo "((($crf1high-$crf1)/$crf1increment)+1)"|bc)
             if [[ $crf1 = $crf1low ]]; then
-                echo -e "\nrange crf *$crf1low* → $crf1high, increment $crf1increment; $number_encodings encodings; $encodings_left encodings left"
+                echo -e "\nrange crf *$crf1low* → $crf1high, increment $crf1increment; $encodings_left of $number_encodings encodings left"
             elif [[ $crf1 = $crf1high ]]; then
-                echo -e "\nrange crf $crf1low → *$crf1high*, increment $crf1increment; $number_encodings encodings; 1 encoding left"
+                echo -e "\nrange crf $crf1low → *$crf1high*, increment $crf1increment; $encodings_left of $number_encodings encodings left"
             else
-                echo -e "\nrange crf $crf1low → *$crf1* → $crf1high, increment $crf1increment; $number_encodings encodings; $encodings_left encodings left"
+                echo -e "\nrange crf $crf1low → *$crf1* → $crf1high, increment $crf1increment; $encodings_left of $number_encodings encodings left"
             fi
 
             #name the files in ascending order depending on the number of existing mkv in directory
@@ -1799,24 +1826,9 @@ case "$answer_00" in
         sleep 1.5
 
         wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".$2.mbt.avs
-
-        until [[ $mbt =~ ^[0-1]$ ]] ; do
-            echo "0: mb-tree enabled or"
-            echo -e "1: --no-mbtree\n"
-            read -e -p "(0|1) > " mbt
-            # keep cfg informed
-            sed -i "/nombtree$2/d" "$config"
-                case $mbt in
-                    1)
-                    echo "nombtree$2=no-" >> "$config"
-                    ;;
-                    0)
-                    #nothing to do
-                    ;;
-                esac
-        done
     }
 
+    while true; do
         if [[ -z ${nombtree##*=+x} ]]; then
             echo -e "\nmbtree is on, which is the default setting"
         else
@@ -1826,16 +1838,11 @@ case "$answer_00" in
         echo "test for mb-tree settings in "${source2%.*}" in $2"
         echo -e "with a bitrate of "${br##*=}"\n"
         echo "RETURN for test encodings with these values,"
-#        echo "(c)hange bitrate"
         echo -e "or e(x)it\n"
         read -e -p "(RETURN|x) > " answer_mbtree
             case $answer_mbtree in
-#                 c|C) # get out of the loop
-#                     br_change $1 $2
-#                 ;;
-
-                x|X)
-                    #break #nothing here
+                x|X) #nothing here
+                    break
                 ;;
 
                 *)
@@ -1846,11 +1853,28 @@ case "$answer_00" in
             esac
         # read nombtree from cfg
         #nombtree=$(cat "$config"|grep nombtree|grep $2)
-#    done
+    done
 
-        echo -e "\nfrom here, run the script with"
-        echo -e "option 5 - qcomp"
-        echo -e "or option 6 - aq modes and aq strength\n"
+    until [[ $mbt =~ ^[0-1]$ ]] ; do
+        echo "0: mb-tree enabled or"
+        echo -e "1: --no-mbtree\n"
+        read -e -p "(0|1) > " mbt
+        # keep cfg informed
+        sed -i "/nombtree$2/d" "$config"
+        case $mbt in
+            1)
+                echo "nombtree$2=no-" >> "$config"
+            ;;
+
+            0)
+                #nothing to do
+            ;;
+            esac
+    done
+
+    echo -e "\nfrom here, run the script with"
+    echo -e "option 5 - qcomp"
+    echo -e "or option 6 - aq modes and aq strength\n"
     ;;
 
     5)  # 5 - test variations in qcomp
@@ -1890,11 +1914,11 @@ case "$answer_00" in
             # number of left encodings
             encodings_left=$(echo "((($qcomphigh-$qcomp0)/$qcompincrement)+1)"|bc)
             if [[ $qcomp0 = $qcomplow ]]; then
-                echo -e "\nrange qcomp *$qcomplow* → $qcomphigh, increment $qcompincrement; $number_encodings encodings; $encodings_left encodings left"
+                echo -e "\nrange qcomp *$qcomplow* → $qcomphigh, increment $qcompincrement; $encodings_left of $number_encodings encodings left"
             elif [[ $qcomp0 = $qcomphigh ]]; then
-                echo -e "\nrange qcomp $qcomplow → *$qcomphigh*, increment $qcompincrement; $number_encodings encodings; 1 encoding left"
+                echo -e "\nrange qcomp $qcomplow → *$qcomphigh*, increment $qcompincrement; $encodings_left of $number_encodings encodings left"
             else
-                echo -e "\nrange qcomp $qcomplow → *$qcomp0* → $qcomphigh, increment $qcompincrement; $number_encodings encodings; $encodings_left encodings left"
+                echo -e "\nrange qcomp $qcomplow → *$qcomp0* → $qcomphigh, increment $qcompincrement; $encodings_left of $number_encodings encodings left"
             fi
 
             # name the files in ascending order depending on the number of existing mkv in directory
@@ -2065,11 +2089,11 @@ case "$answer_00" in
             # number of left encodings
             encodings_left=$(echo "((($aqshigh-$aqs0)/$aqsincrement)+1)"|bc)
             if [[ $aqs0 = $aqslow ]]; then
-                echo -e "\nrange aq strength *$aqslow* → $aqshigh, increment $aqsincrement; $number_encodings encodings, $encodings_left encodings left"
+                echo -e "\nrange aq strength *$aqslow* → $aqshigh, increment $aqsincrement; $encodings_left of $number_encodings encodings left"
             elif [[ $aqs0 = $aqshigh ]]; then
-                echo -e "\nrange aq strength $aqslow → *$aqshigh*, increment $aqsincrement; $number_encodings encodings, $encodings_left encodings left"
+                echo -e "\nrange aq strength $aqslow → *$aqshigh*, increment $aqsincrement; $encodings_left of $number_encodings encodings left"
             else
-                echo -e "\nrange aq strength $aqslow → *$aqs0* → $aqshigh, increment $aqsincrement; $number_encodings encodings, $encodings_left encodings left"
+                echo -e "\nrange aq strength $aqslow → *$aqs0* → $aqshigh, increment $aqsincrement; $encodings_left of $number_encodings encodings left"
             fi
 
             # name the files in ascending order depending on the number of existing mkv in directory
@@ -2202,13 +2226,15 @@ case "$answer_00" in
                 # number of left encodings
                 encodings_left=$(echo "(((3-$aqmode0)*((($aqshigh-$aqslow)/$aqsincrement)+1))+((($aqshigh-$aqs0)/$aqsincrement)+1))"|bc)
                 if [[ $aqs0 = $aqslow ]]; then
-                    echo -e "\nrange aq strength *$aqslow* → $aqshigh, increment $aqsincrement; aq-mode $aqmode0; $number_encodings encodings; $encodings_left encodings left"
-                elif [[ $aqs0 = $aqshigh && $aqmode = 3 ]]; then
-                    echo -e "\nrange aq strength $aqslow → *$aqshigh*, increment $aqsincrement; aq-mode $aqmode0; $number_encodings encodings; 1 encoding left"
-                elif [[ $aqs0 = $aqshigh && $aqmode != 3 ]]; then
-                    echo -e "\nrange aq strength $aqslow → *$aqshigh*, increment $aqsincrement; aq-mode $aqmode0; $number_encodings encodings; $encodings_left left"
+                    echo -e "\nrange aq strength *$aqslow* → $aqshigh, increment $aqsincrement; aq-mode $aqmode0; $encodings_left of $number_encodings encodings left"
+#                 elif [[ $aqs0 = $aqshigh && $aqmode = 3 ]]; then
+#                     echo -e "\nrange aq strength $aqslow → *$aqshigh*, increment $aqsincrement; aq-mode $aqmode0; $encodings_left of $number_encodings encodings left"
+#                 elif [[ $aqs0 = $aqshigh && $aqmode != 3 ]]; then
+#                     echo -e "\nrange aq strength $aqslow → *$aqshigh*, increment $aqsincrement; aq-mode $aqmode0; $encodings_left of $number_encodings encodings left"
+                elif [[ $aqs0 = $aqshigh ]]; then
+                    echo -e "\nrange aq strength $aqslow → *$aqshigh*, increment $aqsincrement; aq-mode $aqmode0; $encodings_left of $number_encodings encodings left"
                 else
-                    echo -e "\nrange aq strength $aqslow → *$aqs0* → $aqshigh, increment $aqsincrement; aq-mode $aqmode0; $number_encodings encodings; $encodings_left encodings left"
+                    echo -e "\nrange aq strength $aqslow → *$aqs0* → $aqshigh, increment $aqsincrement; aq-mode $aqmode0; $encodings_left of $number_encodings encodings left"
                 fi
 
                 # name the files in ascending order depending on the number of existing mkv in directory
@@ -2412,11 +2438,11 @@ case "$answer_00" in
             # number of left encodings
             encodings_left=$(echo "((($psyrdhigh-$psyrd0)/$psyrdincrement)+1)"|bc)
             if [[ $psyrd0 = $psyrdlow ]]; then
-                echo -e "\nrange psy-rdo *$psyrdlow* → $psyrdhigh, increment $psyrdincrement; $number_encodings encodings; $encodings_left encodings left"
+                echo -e "\nrange psy-rdo *$psyrdlow* → $psyrdhigh, increment $psyrdincrement; $encodings_left of $number_encodings encodings left"
             elif [[ $psyrd0 = $psyrdhigh ]]; then
-                echo -e "\nrange psy-rdo $psyrdlow → *$psyrdhigh*, increment $psyrdincrement; $number_encodings encodings; 1 encoding left"
+                echo -e "\nrange psy-rdo $psyrdlow → *$psyrdhigh*, increment $psyrdincrement; $encodings_left of $number_encodings encodings left"
             else
-                echo -e "\nrange psy-rdo $psyrdlow → *$psyrd0* → $psyrdhigh, increment $crf1increment; $number_encodings encodings; $encodings_left encodings left"
+                echo -e "\nrange psy-rdo $psyrdlow → *$psyrd0* → $psyrdhigh, increment $crf1increment; $encodings_left of $number_encodings encodings left"
             fi
 
             # name the files in ascending order depending on the number of existing mkv in directory
@@ -2570,37 +2596,7 @@ case "$answer_00" in
 
     8)  # 8 - variations in psy-trellis
 
-    if [[ $(echo "scale=0;${psyrd##*=}/1"|bc) -lt 1 ]]; then
-        # psy-rd <1 -> psytr unset
-        echo "as psy-rd is set to a value < 1 (${psyrd##*=}),"
-        echo "psy-trellis is 'unset' automatically"
-        # keep cfg informed
-        sed -i "/psytr$2/d" "$config"
-        echo "psytr$2=unset" >> "$config"
-    elif [[ $(echo "scale=0;${psyrd##*=}/1"|bc) -ge 1 ]]; then
-        while true; do
-            if [[ -z ${psytr##*=} ]]; then
-                echo -e "\npsy-trellis is 'unset'\n"
-            else
-                echo -e "\npsy-trellis is '${psytr##*=}'\n"
-            fi
-            echo -e "as psy-rd is set to ≥1 (${psyrd##*=})"
-            echo "you may test for psy-trellis"
-            echo -e "else, e(x)it\n"
-
-            read -e -p "(RETURN|x) > " answer_psytr
-                case $answer_psytr in
-                    x|X) # unset psy-trellis
-                        if [[ ${psytr##*=} =~ 0 || -z ${psytr##*=} ]] ; then
-                            echo "psy trellis is 'unset'."
-                            # keep cfg informed
-                            sed -i "/psytr$2/d" "$config"
-                            echo "psytr$2=unset" >> "$config"
-                        fi
-                        break
-                    ;;
-
-                    *) # test for psy-trellis
+    function psytrellis {
                         #until psy2low 1-99 and psy2high 1-199 and psy2increment 1-99; do
                         until [[  $psy2high -ge $psy2low && $psy2low =~ ^[0-9]$|^[1-9][0-9]$ && $psy2high =~ ^[0-9]$|^[1-9][0-9]$|^1[0-9][0-9]$ && $psy2increment =~ ^[1-9]$|^[1-9][0-9]$ ]]; do
                             echo -e "\npsy-trellis: default is 0.0"
@@ -2630,11 +2626,11 @@ case "$answer_00" in
                             # number of left encodings
                             encodings_left=$(echo "((($psy2high-$psy2)/$psy2increment)+1)"|bc)
                             if [[ $psy2 = $psy2low ]]; then
-                                echo -e "\nrange psy-trellis *$psy2low* → $psy2high, increment $psy2increment; $number_encodings encodings; $encodings_left encodings left"
+                                echo -e "\nrange psy-trellis *$psy2low* → $psy2high, increment $psy2increment; $encodings_left of $number_encodings encodings left"
                             elif [[ $psy2 = $psy2high ]]; then
-                                echo -e "\nrange psy-trellis $psy2low → *$psy2high*, increment $psy2increment; $number_encodings encodings; 1 encoding left"
+                                echo -e "\nrange psy-trellis $psy2low → *$psy2high*, increment $psy2increment; $encodings_left of $number_encodings encodings left"
                             else
-                                echo -e "\nrange psy-trellis $psy2low → *$psy2* → $psy2high, increment $psy2increment; $number_encodings encodings; $encodings_left encodings left"
+                                echo -e "\nrange psy-trellis $psy2low → *$psy2* → $psy2high, increment $psy2increment; $encodings_left of $number_encodings encodings left"
                             fi
 
                             # name the files in ascending order depending on the number of existing mkv in directory
@@ -2725,22 +2721,59 @@ case "$answer_00" in
                         echo "then close AvsPmod."
                         sleep 1.5
                         wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".$2.psytr.*.avs
+    }
 
-                        unset br2
-                        br_change $1 $2
+    if [[ $(echo "scale=0;${psyrd##*=}/1"|bc) -lt 1 ]]; then
+        # psy-rd <1 -> psytr unset
+        echo "as psy-rd is set to a value < 1 (${psyrd##*=}),"
+        echo "psy-trellis is 'unset' automatically"
+        # keep cfg informed
+        sed -i "/psytr$2/d" "$config"
+        echo "psytr$2=unset" >> "$config"
+    elif [[ $(echo "scale=0;${psyrd##*=}/1"|bc) -ge 1 ]]; then
+        while true; do
+            if [[ -z ${psytr##*=} ]]; then
+                echo -e "\npsy-trellis is 'unset'\n"
+            else
+                echo -e "\npsy-trellis is '${psytr##*=}'\n"
+            fi
+            echo -e "as psy-rd is set to ≥1 (${psyrd##*=})"
+            echo "you may test for psy-trellis"
+            echo -e "else, e(x)it\n"
 
-                        until [[ $psytr =~ ^0$|^[0-1]\.[0-9]$|^[0-1]\.[0-9][0-9]$|^2\.00$  ]] ; do
-                            echo "set psy-trellis"
-                            echo -e "e.g. 0.05\n"
-                            read -e -p "psy-trellis > " psytr
-                        done
-                        # keep cfg informed
-                        sed -i "/psytr$2/d" "$config"
-                        echo "psytr$2=$psytr" >> "$config"
+            read -e -p "(RETURN|x) > " answer_psytr
+                case $answer_psytr in
+                    x|X) # unset psy-trellis
+                        if [[ ${psytr##*=} =~ 0 || -z ${psytr##*=} ]] ; then
+                            echo "psy trellis is 'unset'."
+                            # keep cfg informed
+                            sed -i "/psytr$2/d" "$config"
+                            echo "psytr$2=unset" >> "$config"
+                        fi
+                        break
+                    ;;
+
+                    *) # test for psy-trellis
+                    unset psy2high
+                    unset psy2low
+                    unset psy2increment
+                    psytrellis $1 $2
+                    unset br2
+                    br_change $1 $2
                     ;;
                 esac
         done
+        
+        until [[ $psytr =~ ^0$|^[0-1]\.[0-9]$|^[0-1]\.[0-9][0-9]$|^2\.00$  ]] ; do
+            echo "set psy-trellis"
+            echo -e "e.g. 0.05\n"
+            read -e -p "psy-trellis > " psytr
+        done
+        # keep cfg informed
+        sed -i "/psytr$2/d" "$config"
+        echo "psytr$2=$psytr" >> "$config"
     fi
+
     echo -e "\ndo some testing for e.g. chroma-qp-offset"
     echo "(option 9) or"
     echo "try another (maybe last) round for optimal crf"
@@ -2756,132 +2789,149 @@ case "$answer_00" in
         read -e -p "(c) > " answer_various
             case $answer_various in
                 c|C)    # chroma-qp-offset
-                    # until cqpohigh -12 through 12 and cqpolow -12 through 12 and cqpohigh greater or equal cqpolow; do
-                    until [[ $cqpohigh =~ ^-{0,1}[0-9]$|^-{0,1}1[0-2]$ && $cqpolow =~ ^-{0,1}[0-9]$|^-{0,1}1[0-2]$ && $cqpohigh -ge $cqpolow ]]; do
-                        echo -e "\ntest for chroma-qp-offset: default 0,"
-                        echo "range -12 through 12; sensible ranges -3 through 3"
-                        echo "set lowest value for chroma-qp-offset, e.g. -2"
-                        echo -e "take care: -6 is lower than -4 :-)\n"
-                        read -e -p "chroma-qp-offset, lowest value > " cqpolow
+                    function cqpo-test {
+                        # until cqpohigh -12 through 12 and cqpolow -12 through 12 and cqpohigh greater or equal cqpolow; do
+                        until [[ $cqpohigh =~ ^-{0,1}[0-9]$|^-{0,1}1[0-2]$ && $cqpolow =~ ^-{0,1}[0-9]$|^-{0,1}1[0-2]$ && $cqpohigh -ge $cqpolow ]]; do
+                            echo -e "\ntest for chroma-qp-offset: default 0,"
+                            echo "range -12 through 12; sensible ranges -3 through 3"
+                            echo "set lowest value for chroma-qp-offset, e.g. -2"
+                            echo -e "take care: -6 is lower than -4 :-)\n"
+                            read -e -p "chroma-qp-offset, lowest value > " cqpolow
 
-                        echo -e "set maximum value for chroma-qp-offset, e.g. 2\n"
-                        read -e -p "chroma-qp-offset, maximum value > " cqpohigh
-                    done
+                            echo -e "set maximum value for chroma-qp-offset, e.g. 2\n"
+                            read -e -p "chroma-qp-offset, maximum value > " cqpohigh
+                        done
 
-                    # number of test encodings
-                    number_encodings=$(expr "$cqpohigh" - "$cqpolow" + 1)
+                        # number of test encodings
+                        number_encodings=$(expr "$cqpohigh" - "$cqpolow" + 1)
 
-                    echo -e "\nthese settings will result in $number_encodings encodings"
-                    sleep 1.5
+                        echo -e "\nthese settings will result in $number_encodings encodings"
+                        sleep 1.5
 
-                    start0=$(date +%s)
+                        start0=$(date +%s)
 
-                    # create comparison screen avs
-                    echo "=import(\"${avs##*=}\").subtitle(\"source\", align=8)" > "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
+                        # create comparison screen avs
+                        echo "=import(\"${avs##*=}\").subtitle(\"source\", align=8)" > "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
 
-                    for ((cqpo0=$cqpolow; $cqpo0<=$cqpohigh; cqpo0=$cqpo0+1));do
-                        # number of left encodings
-                        encodings_left=$(expr "$cqpohigh" - "$cqpo0" + 1)
-                        if [[ $cqpo0 = $cqpolow ]]; then
-                            echo -e "\nrange chroma qp offset *$cqpolow* → $cqpohigh, increment $cqpoincrement; $number_encodings encodings; $encodings_left encodings left"
-                        elif [[ $cqpo0 = $cqpohigh ]]; then
-                            echo -e "\nrange chroma qp offset $cqpolow → *$cqpohigh*, increment $cqpoincrement; $number_encodings encodings; 1 encoding left"
-                        else
-                            echo -e "\nrange chroma qp offset $cqpolow → *$cqpo0* → $cqpohigh, increment $cqpoincrement; $number_encodings encodings; $encodings_left encodings left"
-                        fi
+                        for ((cqpo0=$cqpolow; $cqpo0<=$cqpohigh; cqpo0=$cqpo0+1));do
+                            # number of left encodings
+                            encodings_left=$(expr "$cqpohigh" - "$cqpo0" + 1)
+                            if [[ $cqpo0 = $cqpolow ]]; then
+                                echo -e "\nrange chroma qp offset *$cqpolow* → $cqpohigh, increment $cqpoincrement; $encodings_left of $number_encodings encodings left"
+                            elif [[ $cqpo0 = $cqpohigh ]]; then
+                                echo -e "\nrange chroma qp offset $cqpolow → *$cqpohigh*, increment $cqpoincrement; $encodings_left of $number_encodings encodings left"
+                            else
+                                echo -e "\nrange chroma qp offset $cqpolow → *$cqpo0* → $cqpohigh, increment $cqpoincrement; $encodings_left of $number_encodings encodings left"
+                            fi
 
-                        # name the files in ascending order depending on the number of existing mkv in directory
-                        count=$( printf '%03d\n'  $(ls ${source1%/*}|grep "$2"| grep -c .mkv$))
+                            # name the files in ascending order depending on the number of existing mkv in directory
+                            count=$( printf '%03d\n'  $(ls ${source1%/*}|grep "$2"| grep -c .mkv$))
 
-                        echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.mkv\n"
+                            echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.mkv\n"
 
-                        start1=$(date +%s)
+                            start1=$(date +%s)
 
-                        #comparison screen
-                        echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.mkv\").subtitle(\"encode $2 cqpo$cqpo0\", align=8)" >> "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
+                            #comparison screen
+                            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.mkv\").subtitle(\"encode $2 cqpo$cqpo0\", align=8)" >> "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
 
-                        wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
-                        | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
-                        --bitrate "${br##*=}" \
-                        --pass 1 \
-                        --stats "${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.stats" \
-                        --qcomp "${qcomp##*=}" \
-                        --aq-mode "${aqmode##*=}" \
-                        --aq-strength "${aqs##*=}" \
-                        --chroma-qp-offset "${cqpo##*=}" \
-                        --preset "$preset" \
-                        --tune "$tune" \
-                        --profile "$profile" \
-                        --ref "${ref##*=}" \
-                        --sar "$par" \
-                        --rc-lookahead "$lookahead" \
-                        --me "$me" \
-                        --merange "$merange" \
-                        --subme "$subme" \
-                        --deblock "$deblock" \
-                        --psy-rd "${psyrd##*=}":"${psytr##*=}" \
-                        -o /dev/null - 2>&1|tee -a "${source1%.*}".$2.log;
+                            wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
+                            | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
+                            --bitrate "${br##*=}" \
+                            --pass 1 \
+                            --stats "${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.stats" \
+                            --qcomp "${qcomp##*=}" \
+                            --aq-mode "${aqmode##*=}" \
+                            --aq-strength "${aqs##*=}" \
+                            --chroma-qp-offset "${cqpo##*=}" \
+                            --preset "$preset" \
+                            --tune "$tune" \
+                            --profile "$profile" \
+                            --ref "${ref##*=}" \
+                            --sar "$par" \
+                            --rc-lookahead "$lookahead" \
+                            --me "$me" \
+                            --merange "$merange" \
+                            --subme "$subme" \
+                            --deblock "$deblock" \
+                            --psy-rd "${psyrd##*=}":"${psytr##*=}" \
+                            -o /dev/null - 2>&1|tee -a "${source1%.*}".$2.log;
 
-                        wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
-                        | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
-                        --bitrate "${br##*=}" \
-                        --pass 2 \
-                        --stats "${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.stats" \
-                        --qcomp "${qcomp##*=}" \
-                        --aq-mode "${aqmode##*=}" \
-                        --aq-strength "${aqs##*=}" \
-                        --chroma-qp-offset "${cqpo##*=}" \
-                        --preset "$preset" \
-                        --tune "$tune" \
-                        --profile "$profile" \
-                        --ref "${ref##*=}" \
-                        --sar "$par" \
-                        --rc-lookahead "$lookahead" \
-                        --me "$me" \
-                        --merange "$merange" \
-                        --subme "$subme" \
-                        --deblock "$deblock" \
-                        --psy-rd "${psyrd##*=}":"${psytr##*=}" \
-                        -o "${source1%.*}".$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.mkv - 2>&1|tee -a "${source1%.*}".$2.log;
+                            wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
+                            | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
+                            --bitrate "${br##*=}" \
+                            --pass 2 \
+                            --stats "${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.stats" \
+                            --qcomp "${qcomp##*=}" \
+                            --aq-mode "${aqmode##*=}" \
+                            --aq-strength "${aqs##*=}" \
+                            --chroma-qp-offset "${cqpo##*=}" \
+                            --preset "$preset" \
+                            --tune "$tune" \
+                            --profile "$profile" \
+                            --ref "${ref##*=}" \
+                            --sar "$par" \
+                            --rc-lookahead "$lookahead" \
+                            --me "$me" \
+                            --merange "$merange" \
+                            --subme "$subme" \
+                            --deblock "$deblock" \
+                            --psy-rd "${psyrd##*=}":"${psytr##*=}" \
+                            -o "${source1%.*}".$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.mkv - 2>&1|tee -a "${source1%.*}".$2.log;
 
-                        # remove stats file
-                        rm ${source1%.*}.$2.$count.*.stats
-                        if [[ -z ${nombtree##*=} ]]; then
-                            rm ${source1%.*}.$2.$count.*.stats.mbtree
-                        fi
+                            # remove stats file
+                            rm ${source1%.*}.$2.$count.*.stats
+                            if [[ -z ${nombtree##*=} ]]; then
+                                rm ${source1%.*}.$2.$count.*.stats.mbtree
+                            fi
+
+                            stop=$(date +%s);
+                            time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
+                            echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.mkv lasted $time"
+                        done
 
                         stop=$(date +%s);
-                        time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-                        echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.mkv lasted $time"
+                        days=$(( ($stop-$start0)/86400 ))
+                        time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
+                        echo -e "\ntest encodings for chroma-qp-offset in $2 lasted $days days and $time"
+
+                        #comparison screen
+                        prefixes=({a..z} {a..e}{a..z})
+                        i=0
+                        while IFS= read -r line; do
+                        printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}".$2.temp.cqpo.$cqpolow-$cqpohigh.avs
+                        done < "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
+                        avslines="$(wc -l < "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs)"
+                        echo "interleave($(printf %s, a,{b..z} a,{a..e}{a..z})a)" | cut -d ',' --complement -f "$(( ("$avslines" *2) -1 ))"-310 >> "${source1%.*}".$2.temp.cqpo.$cqpolow-$cqpohigh.avs
+                        echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.temp.cqpo.$cqpolow-$cqpohigh.avs
+                        echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".$2.temp.cqpo.$cqpolow-$cqpohigh.avs
+                        mv "${source1%.*}".$2.temp.cqpo.$cqpolow-$cqpohigh.avs "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
+
+                        if [ -e /usr/bin/beep ]; then beep $beep; fi
+
+                        echo "thoroughly look through this last test encodings"
+                        echo "and decide, which one is your best encode."
+                        echo "then close AvsPmod."
+                        sleep 1.5
+                        wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".$2.cqpo.*.avs
+                    }
+
+                    while true; do
+                        echo "set chroma-qp-offset value"
+                        echo "e.g. -2"
+                        echo -e "else, X for more testing"
+                            read -e -p "(RETURN|*) > " answer_cqpo
+                                case $answer_cqpo in
+                                    x|X)
+                                        unset cqpo0
+                                        cqpo0-test
+                                    ;;
+
+                                    *)
+                                        #break
+                                    ;;
+                                esac
                     done
 
-                    stop=$(date +%s);
-                    days=$(( ($stop-$start0)/86400 ))
-                    time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-                    echo -e "\ntest encodings for chroma-qp-offset in $2 lasted $days days and $time"
-
-                    #comparison screen
-                    prefixes=({a..z} {a..e}{a..z})
-                    i=0
-                    while IFS= read -r line; do
-                    printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}".$2.temp.cqpo.$cqpolow-$cqpohigh.avs
-                    done < "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
-                    avslines="$(wc -l < "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs)"
-                    echo "interleave($(printf %s, a,{b..z} a,{a..e}{a..z})a)" | cut -d ',' --complement -f "$(( ("$avslines" *2) -1 ))"-310 >> "${source1%.*}".$2.temp.cqpo.$cqpolow-$cqpohigh.avs
-                    echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.temp.cqpo.$cqpolow-$cqpohigh.avs
-                    echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".$2.temp.cqpo.$cqpolow-$cqpohigh.avs
-                    mv "${source1%.*}".$2.temp.cqpo.$cqpolow-$cqpohigh.avs "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
-
-                    if [ -e /usr/bin/beep ]; then beep $beep; fi
-
-                    echo "thoroughly look through this last test encodings"
-                    echo "and decide, which one is your best encode."
-                    echo "then close AvsPmod."
-                    sleep 1.5
-                    wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".$2.cqpo.*.avs
-
-                    echo "set chroma-qp-offset"
-                    echo -e "e.g. -2\n"
                     until [[ $cqpo =~ ^-?[0-9]$|^-?1[0-2]$ ]]; do
                         read -e -p "chroma-qp-offset > " cqpo
                     done
@@ -2941,11 +2991,11 @@ case "$answer_00" in
             # number of left encodings
             encodings_left=$(echo "((($crf2high-$crf2)/$crf2increment)+1)"|bc)
             if [[ $crf2 = $crf2low ]]; then
-                echo -e "\nrange crf *$crf2low* → $crf2high, increment $crf2increment; $number_encodings encodings; $encodings_left encodings left"
+                echo -e "\nrange crf *$crf2low* → $crf2high, increment $crf2increment; $encodings_left of $number_encodings encodings left"
             elif [[ $crf2 = $crf2high ]]; then
-                echo -e "\nrange crf $crf2low → *$crf2high*, increment $crf2increment; $number_encodings encodings; 1 encoding left"
+                echo -e "\nrange crf $crf2low → *$crf2high*, increment $crf2increment; $encodings_left of $number_encodings encodings left"
             else
-                echo -e "\nrange crf $crf2low → *$crf2* → $crf2high, increment $crf2increment; $number_encodings encodings; $encodings_left encodings left"
+                echo -e "\nrange crf $crf2low → *$crf2* → $crf2high, increment $crf2increment; $encodings_left of $number_encodings encodings left"
             fi
 
             # name the files in ascending order depending on the number of existing mkv in directory
