@@ -70,7 +70,7 @@ Install some programs preferably from your distribution:
 
 If wine64 is installed, you should uninstall it to prevent windows applications from being installed there.
 
-Download eac3to, AvsPmod, avs2yuv, Avisynth, Avisynth Plugins, BalanceBorders, FillMargins, FixColumnbrightness and ColorMatrix.
+Download eac3to, AvsPmod, avs2yuv, Avisynth, Avisynth Plugins, BalanceBorders, FillMargins, FixBrightnessProtect and ColorMatrix.
 
 Install Avisynth:
 
@@ -86,9 +86,11 @@ Unrar Avisynth Plugins and copy the content of the plugins directory:
 
 Copying the desired filters out of Windows paths:
 
-    $ cp -v ~/path/to/fixcolumnbrightness ~/.config/encode/.filters/
+    $ cp -v ~/path/to/FixBrightnessProtect ~/.config/encode/.filters/
     $ cp -v ~/.wine/drive_c/Program\ Files/AviSynth\ 2.5/plugins/BalanceBorders.avs ~/.config/encode/.filters/
     $ cp -rv /path/to/unrar'ed/AviSynth\ Plugins/32-Bit\ DLLs/*.dll ~/.wine/drive_c/windows/system32/
+
+…or take these filters from [here](https://github.com/derpolsper/encode/tree/master/filters) and put them to a custom place, but link to them in the encode.sh script.
 
 Unzip your eac3to.zip to "Program Files":
 
@@ -119,9 +121,10 @@ I tested positive for
 + SelectEven()
 + TFM()
 + TDecimate()
++ ColorMatrix
 + FillMargins
 + BalanceBorders
-+ FixColumnbrightness
++ FixBrightnessProtect
 
 The script demuxes the source into h264, vc1, mpeg2 or m2v streams, which afterwards are muxed into a mkv file.
 
