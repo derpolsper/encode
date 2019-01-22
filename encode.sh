@@ -358,7 +358,7 @@ case "$answer_00" in
     1)  # 1 - prepare sources: rip remux/ m2ts → mkv
 
     # check source0 for being raw h264, a m2ts stream, a matroska container or a m2v file
-    until [[  -e $source0 ]] && ( [[ $source0 == @(*.h264|*.m2ts|*.mpls|*.mkv|*.m2v) ]] ); do
+    until [[ -e $source0 ]] && ( [[ $source0 == @(*.h264|*.m2ts|*.mpls|*.mkv|*.m2v) ]] ); do
         echo -e "\nset path to source:"
         echo -e "raw h264, mkv, m2ts or mpls file respectively\n"
         read -e -p "> " source0
@@ -414,7 +414,7 @@ case "$answer_00" in
         cd "${source0%/*}"
         mkvmerge -i "${source0##*/}" | tee "${source1%.*}".log
 
-        until [[ $param1 == @(*.h264||*.sup*|*.flac*|*.ac3*|*.dts*|*.txt*|*.m2v*) ]]; do
+        until [[ $param1 == @(*.h264|*.sup*|*.flac*|*.ac3*|*.dts*|*.txt*|*.m2v*) ]]; do
             echo -e "\nextract all wanted tracks following this name pattern:"
             echo "[0-n]:moviename.extension, e.g. 0:moviename.h264"
             echo "1:moviename.flac 2:moviename.ac3 3:moviename.sup etc"
@@ -3155,7 +3155,7 @@ case "$answer_00" in
         echo -n "now encoding ${source2%.*}.$2.mkv"
         if [[ -n ${darwidth1##*=} && -n ${sarheight1##*=} ]]; then
             echo -n " with a resolution of ${darwidth1##*=}×${sarheight1##*=}"
-        elif [[ -n ${darheight1##*=} && -n  ${sarwidth1##*=} ]]; then
+        elif [[ -n ${darheight1##*=} && -n ${sarwidth1##*=} ]]; then
             echo -n " with a resolution of ${sarwidth1##*=}×${darheight1##*=}"
         else
             echo -n " with a resolution of ${width##*=}×${height##*=}"
@@ -3166,7 +3166,7 @@ case "$answer_00" in
         if [[ $ratectrl == 2 ]]; then
             echo -e " and ${br##*=} kb/s\n"
         elif [[ $ratectrl == c ]]; then
-            echo -e " and ratecontrol=${crf##*=}\n"
+            echo -e " and constant ratecontrol of ${crf##*=}\n"
         fi
     }
 
@@ -3312,7 +3312,7 @@ case "$answer_00" in
         if [[ $ratectrl == 2 ]]; then
             echo -n " and $br kb/s"
         elif [[ $ratectrl == c ]]; then
-            echo -n " and ratecontrol=${crf##*=}"
+            echo -n " and constant ratecontrol of ${crf##*=}"
         fi
         echo -e " lasted $days days and $time\n"
     }
@@ -3354,7 +3354,6 @@ case "$answer_00" in
 
     encoding_pre $1 $2
     if [[ $sarheight0 -le 576 ]] && [[ $sarwidth0 -le 720 ]]; then
-#       encoding_anamorphic1 $1 $2
         SDcomparison $1 $2
     elif [[ $sarheight0 -gt 576 ]] && [[ $sarwidth0 -gt 720 ]]; then
         HDcomparison $1 $2
@@ -3362,7 +3361,6 @@ case "$answer_00" in
     if [[ ${ratectrl##*=} == c ]]; then
         encodecrf $1 $2
     elif [[ ${ratectrl##*=} = 2 ]]; then
-#        br_change_final $1 $2
         encode2pass $1 $2
     fi
     encoding_post $1 $2
@@ -3373,5 +3371,4 @@ case "$answer_00" in
     *)  # neither any of the above
         exit 0
     ;;
-#done
     esac
