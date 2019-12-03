@@ -8,22 +8,29 @@ winedir="$HOME/.wine"
 
 # filters
 # store filters out of wine saves some escaping
+
+# general path to filters
+filters="$HOME/.config/encode/.filters"
+
 # path to fillmargins
 # if in wine directory, prevent bash from expanding backslashes
 # e.g. pathfillmargins=/home/user/.wine\/drive_c\/Program\\ Files\/FillMargins\/FillMargins.dll
-pathfm="$HOME/.config/encode/.filters/FillMargins/FillMargins.dll"
+pathfm="$filters/FillMargins/FillMargins.dll"
 
 # path to ColorMatrix.dll
 # if in wine directory, prevent bash from expanding backslashes
 # e.g. pathcolormatrix=/home/user\/.wine\/drive_c\/windows\/system32\/ColorMatrix\/ColorMatrix.dll
-pathcm="$HOME/.config/encode/.filters/ColorMatrix/ColorMatrix.dll"
+pathcm="$filters/ColorMatrix/ColorMatrix.dll"
 
 # path to BalanceBorders
 # if in wine directory, prevent bash from expanding backslashes
-pathbb="$HOME/.config/encode/.filters/BalanceBorders.avs"
+pathbb="$filters/BalanceBorders.avs"
+
+# path to FixBrightnessProtect
+# if in wine directory, prevent bash from expanding backslashes
+pathfixbr="$filters/FixBrightnessProtect.avsi"
 
 # zones
-
 if [[ -e $HOME/.config/encode/$1.$2.zones.txt ]]; then
     zones="$(cat $HOME/.config/encode/$1.$2.zones.txt)"
 fi
@@ -73,7 +80,7 @@ echo -e "6  - testing for aq strength in different aq modes\n"
 echo -e "7  - variations in psy-rd\n"
 echo -e "8  - variations in psy-trellis\n"
 echo -e "9  - more things: chroma-qp-offset\n"
-echo -e "10  - another round of crf\n"
+echo -e "10 - another round of crf\n"
 echo -e "11 - encode the whole movie\n"
 read -p "> " answer_00
 
@@ -104,21 +111,21 @@ if [[ $answer_00 -ge 3 ]]; then
 fi
 
 if [[ $answer_00 -ge 3 ]] || [[ -f ${config%/*}/$1.cfg && $2 = @(SD|480|576|720|1080) ]]; then
-    avs=$(cat "$config"|grep testavs|grep $2)
-    finalavs=$(cat "$config"|grep finalavs|grep $2)
-    ref=$(cat "$config"|grep ref|grep $2)
-    crf=$(cat "$config"|grep crf|grep $2)
-    qcomp=$(cat "$config"|grep qcomp|grep $2)
-    aqmode=$(cat "$config"|grep aqmode|grep $2)
-    aqs=$(cat "$config"|grep aqs|grep $2)
-    psyrd=$(cat "$config"|grep psyrd|grep $2)
-    psytr=$(cat "$config"|grep psytr|grep $2)
-    cqpo=$(cat "$config"|grep cqpo|grep $2)
-    nombtree=$(cat "$config"|grep nombtree|grep $2)
-    br=$(cat "$config"|grep br|grep $2)
-    width=$(cat "$config"|grep width|grep $2)
-    height=$(cat "$config"|grep height|grep $2)
-    ratectrl=$(cat "$config"|grep ratectrl|grep $2)
+    avs=$(cat "$config"|grep testavs|grep $2=)
+    finalavs=$(cat "$config"|grep finalavs|grep $2=)
+    ref=$(cat "$config"|grep ref|grep $2=)
+    crf=$(cat "$config"|grep crf|grep $2=)
+    qcomp=$(cat "$config"|grep qcomp|grep $2=)
+    aqmode=$(cat "$config"|grep aqmode|grep $2=)
+    aqs=$(cat "$config"|grep aqs|grep $2=)
+    psyrd=$(cat "$config"|grep psyrd|grep $2=)
+    psytr=$(cat "$config"|grep psytr|grep $2=)
+    cqpo=$(cat "$config"|grep cqpo|grep $2=)
+    nombtree=$(cat "$config"|grep nombtree|grep $2=)
+    br=$(cat "$config"|grep br|grep $2=)
+    width=$(cat "$config"|grep width|grep $2=)
+    height=$(cat "$config"|grep height|grep $2=)
+    ratectrl=$(cat "$config"|grep ratectrl|grep $2=)
 
     function bitrate {
         until [[ $br2 =~ ^[1-9][0-9]+*$ ]]; do
@@ -250,6 +257,12 @@ case "$answer_00" in
         echo -e "***\n*** BalanceBorders NOT found ***\n***\n";
     fi
 
+    if [ -e "$pathfixbr" ]; then
+        echo -e "FixBrightnessProtect found\n"
+    else
+        echo -e "***\n*** FixBrightnessProtect NOT found ***\n***\n";
+    fi
+
     echo -e "you might go on with option 1\n"
     ;;
 
@@ -302,9 +315,9 @@ case "$answer_00" in
             echo -e "***     SETTINGS FOR ENCODE      ***\n"
 
                  if [[ -n ${darwidth1##*=} && -n ${sarheight1##*=} ]]; then
-                     echo -e "DISPLAY ASPECT:\t\t ""$darwidth1##*=}"×"${sarheight1##*=}\n"
+                     echo -e "DISPLAY ASPECT:\t\t ""${darwidth1##*=}"×"${sarheight1##*=}\n"
                  elif [[ -n ${darheight1##*=} && -n  ${sarwidth1##*=} ]]; then
-                     echo -e "DISPLAY ASPECT:\t\t ""$sarwidth1##*=}"×"${darheight1##*=}\n"
+                     echo -e "DISPLAY ASPECT:\t\t ""${sarwidth1##*=}"×"${darheight1##*=}\n"
                  else
                     echo -e "TARGET RESOLUTION:\t ""${width##*=}"×"${height##*=}\n"
                  fi
@@ -733,6 +746,7 @@ case "$answer_00" in
                     echo -e "of balanceborders (0-4 pixels)\n"
                     echo "when checked, note values and"
                     echo "close AvsPmod window with ALT+F4"
+                    sleep 1.5
                     wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".avs
 
                     unset left_bb
@@ -937,7 +951,9 @@ case "$answer_00" in
     }
 
     function setresolution480 {
-        until [[ $width480 =~ ^[[:digit:]]+$ ]] ; do
+        max480width="854"
+        unset width480
+        until (( $width480 <= $max480width )) 2> /dev/null && [[ $width480 =~ ^[[:digit:]]+$ ]]; do
             echo -e "\nset final width for 480p\n"
             read -e -p "width > " width480
 
@@ -945,7 +961,9 @@ case "$answer_00" in
             echo "width480=$width480" >> "${config%/*}/${source2%.*}.cfg"
         done
 
-        until [[ $height480 =~ ^[[:digit:]]+$ ]] ; do
+        max480height="480"
+        unset height480
+        until (( $height480 <= $max480height )) 2> /dev/null && [[ $height480 =~ ^[[:digit:]]+$ ]] ; do
             echo -e "\nset final height for 480p\n"
             read -e -p "height > " height480
 
@@ -979,7 +997,9 @@ case "$answer_00" in
     }
 
     function setresolution576 {
-        until [[ $width576 =~ ^[[:digit:]]+$ ]] ; do
+        max576width="1024"
+        unset width576
+        until (( $width576 <= $max576width )) 2> /dev/null && [[ $width576 =~ ^[[:digit:]]+$ ]] ; do
             echo -e "\nset final width for 576p\n"
             read -e -p "width > " width576
 
@@ -987,7 +1007,9 @@ case "$answer_00" in
             echo "width576=$width576" >> "${config%/*}/${source2%.*}.cfg"
         done
 
-        until [[ $height576 =~ ^[[:digit:]]+$ ]] ; do
+        max576height="576"
+        unset height576
+        until (( $height576 <= $max576height )) 2> /dev/null && [[ $height576 =~ ^[[:digit:]]+$ ]] ; do
             echo -e "\nset final height for 576p\n"
             read -e -p "height > " height576
 
@@ -1021,7 +1043,9 @@ case "$answer_00" in
     }
 
     function setresolution720 {
-        until [[ $width720 =~ ^[[:digit:]]+$ ]] ; do
+        max720width="1280"
+        unset width720
+        until (( $width720 <= $max720width )) 2> /dev/null && [[ $width720 =~ ^[[:digit:]]+$ ]] ; do
             echo -e "\nset final width for 720p\n"
             read -e -p "width > " width720
 
@@ -1029,7 +1053,9 @@ case "$answer_00" in
             echo "width720=$width720" >> "${config%/*}/${source2%.*}.cfg"
         done
 
-        until [[ $height720 =~ ^[[:digit:]]+$ ]] ; do
+        max720height="720"
+        unset height720
+        until (( $height720 <= $max720height )) 2> /dev/null && [[ $height720 =~ ^[[:digit:]]+$ ]] ; do
             echo -e "set final height for 720p\n"
             read -e -p "height > " height720
 
@@ -2099,19 +2125,19 @@ case "$answer_00" in
             # name the files in ascending order depending on the number of existing mkv in directory
             count=$( printf '%03d\n'  $(ls ${source1%/*}|grep "$2"| grep -c .mkv$))
 
-            echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode.$aqs0.psy${psyrd0##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\n"
+            echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\n"
 
             # start measuring encoding time
             start1=$(date +%s)
 
             #comparison screen
-            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode.$aqs0.psy${psyrd0##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"encode $2 br${br##*=} aq$aqmode.$aqs0 psy${psyrd0##*=} pt${psytr##*=}\", align=8)" >> "${source1%.*}".$2.aqmode$aqmode.$aqslow-$aqshigh-$aqsincrement.avs
+            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"encode $2 br${br##*=} aq$aqmode.$aqs0 psy${psyrd##*=} pt${psytr##*=}\", align=8)" >> "${source1%.*}".$2.aqmode$aqmode.$aqslow-$aqshigh-$aqsincrement.avs
 
             wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
             --bitrate "${br##*=}" \
             --pass 1 \
-            --stats "${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode.$aqs0.psy${psyrd0##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.stats" \
+            --stats "${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.stats" \
             --qcomp "${qcomp##*=}" \
             --preset "$preset" \
             --tune "$tune" \
@@ -2126,14 +2152,14 @@ case "$answer_00" in
             --deblock "$deblock" \
             --chroma-qp-offset "${cqpo##*=}" \
             --aq-strength $(echo "scale=2;$aqs0/100"|bc) \
-            --psy-rd "${psyrd0##*=}" \
+            --psy-rd "${psyrd##*=}" \
             -o /dev/null - 2>&1|tee -a "${source1%.*}".$2.log;
 
             wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
             --bitrate "${br##*=}" \
             --pass 2 \
-            --stats "${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode.$aqs0.psy${psyrd0##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.stats" \
+            --stats "${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.stats" \
             --qcomp "${qcomp##*=}" \
             --preset "$preset" \
             --tune "$tune" \
@@ -2149,12 +2175,12 @@ case "$answer_00" in
             --deblock "$deblock" \
             --aq-strength $(echo "scale=2;$aqs0/100"|bc) \
             --psy-rd "${psyrd##*=}" \
-            -o "${source1%.*}".$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode.$aqs0.psy${psyrd0##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv - 2>&1|tee -a "${source1%.*}".$2.log;
+            -o "${source1%.*}".$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv - 2>&1|tee -a "${source1%.*}".$2.log;
 
             # stop measuring encoding time
             stop=$(date +%s);
             time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-            echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode.$aqs0.psy${psyrd0##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv lasted $time"
+            echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv lasted $time"
 
             # remove stats file
             rm ${source1%.*}.$2.$count.*.stats
@@ -2240,19 +2266,19 @@ case "$answer_00" in
                 # name the files in ascending order depending on the number of existing mkv in directory
                 count=$( printf '%03d\n'  $(ls ${source1%/*}|grep "$2"| grep -c .mkv$))
 
-                echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd0##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\n"
+                echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\n"
 
                 # start measuring encoding time
                 start1=$(date +%s)
 
                 #comparison screen
-                echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd0##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"encode $2 br${br##*=} aq$aqmode0.$aqs0 psy$psyrd0 pt${psytr##*=}\", align=8)" >> "${source1%.*}".$2.aqmodes-$aqslow-$aqshigh-$aqsincrement.avs
+                echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"encode $2 br${br##*=} aq$aqmode0.$aqs0 psy${psyrd##*=} pt${psytr##*=}\", align=8)" >> "${source1%.*}".$2.aqmodes-$aqslow-$aqshigh-$aqsincrement.avs
 
                 wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
                 | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
                 --bitrate "${br##*=}" \
                 --pass 1 \
-                --stats "${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd0##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.stats" \
+                --stats "${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.stats" \
                 --qcomp "${qcomp##*=}" \
                 --preset "$preset" \
                 --tune "$tune" \
@@ -2267,14 +2293,14 @@ case "$answer_00" in
                 --deblock "$deblock" \
                 --chroma-qp-offset "${cqpo##*=}" \
                 --aq-strength $(echo "scale=2;$aqs0/100"|bc) \
-                --psy-rd "${psyrd0##*=}" \
+                --psy-rd "${psyrd##*=}" \
                 -o /dev/null - 2>&1|tee -a "${source1%.*}".$2.log;
 
                 wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
                 | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
                 --bitrate "${br##*=}" \
                 --pass 2 \
-                --stats "${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd0##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.stats" \
+                --stats "${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.stats" \
                 --qcomp "${qcomp##*=}" \
                 --preset "$preset" \
                 --tune "$tune" \
@@ -2289,13 +2315,13 @@ case "$answer_00" in
                 --chroma-qp-offset "${cqpo##*=}" \
                 --deblock "$deblock" \
                 --aq-strength $(echo "scale=2;$aqs0/100"|bc) \
-                --psy-rd "${psyrd0##*=}" \
-                -o "${source1%.*}".$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd0##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv - 2>&1|tee -a "${source1%.*}".$2.log;
+                --psy-rd "${psyrd##*=}" \
+                -o "${source1%.*}".$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv - 2>&1|tee -a "${source1%.*}".$2.log;
 
                 # stop measuring encoding time
                 stop=$(date +%s);
                 time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-                echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd0##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv lasted $time"
+                echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv lasted $time"
 
                 # remove stats file
                 rm ${source1%.*}.$2.$count.*.stats
@@ -2361,7 +2387,8 @@ case "$answer_00" in
         echo "maybe several aq-modes"
         echo "default is 3"
         echo "try 1 and 2 if results with 3 are unsatisfying"
-        echo -e "right now, aq-mode is ${aqmode##*=}\n"
+        echo "right now, aq-mode is ${aqmode##*=}"
+        echo -e "and aq strength is ${aqs##*=}\n"
         echo "choose (1), (2) or (3);"
         echo "(a) to test for ALL"
         echo -e "or RETURN to end testing\n"
@@ -3109,6 +3136,11 @@ case "$answer_00" in
     # keep cfg informed
     sed -i "/crf$2/d" "$config"
     echo "crf$2=$crf_2" >> "$config"
+    # corresponding bit rate
+    br=$(cat "${source1%.*}".$2.crf2.log|grep "crf $crf_2"|cut -d':' -f2|cut -d' ' -f2|cut -d'.' -f1|sort -u)
+    # keep cfg informed
+    sed -i "/br$2/d" "$config"
+    echo "br$2=$br" >> "$config"
 
     echo -e "\nnow you may encode the whole movie"
     echo -e "run the script like this:\n"
@@ -3371,4 +3403,4 @@ case "$answer_00" in
     *)  # neither any of the above
         exit 0
     ;;
-    esac
+esac
