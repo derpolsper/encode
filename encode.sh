@@ -371,9 +371,9 @@ case "$answer_00" in
     1)  # 1 - prepare sources: rip remux/ m2ts → mkv
 
     # check source0 for being raw h264, a m2ts stream, a matroska container or a m2v file
-    until [[ -e $source0 ]] && ( [[ $source0 == @(*.h264|*.m2ts|*.mpls|*.mkv|*.m2v) ]] ); do
+    until [[ -e $source0 ]] && ( [[ $source0 == @(*.h264|*.m2ts|*.m2v|*.mkv|*.mpls) ]] ); do
         echo -e "\nset path to source:"
-        echo -e "raw h264, mkv, m2ts or mpls file respectively\n"
+        echo -e "raw h264, m2v, mkv, m2ts or mpls file respectively\n"
         read -e -p "> " source0
     done
 
@@ -391,15 +391,15 @@ case "$answer_00" in
     # bash parameter expansion does not allow nesting, so do it in two steps
     source2=${source1##*/}
 
-    function source_muxed {
+    function source_dvd_bd {
         cd "${source0%/*}"
         wine "$winedir"/drive_c/Program\ Files/eac3to/eac3to.exe "${source0##*/}" | tee "${source1%.*}".log
 
-        until [[ $param1 == @(*\-demux*|*.h264|*.mpeg2*|*.vc1*|*.sup*|*.flac*|*.ac3*|*.dts*|*.txt*|*.m2v*) ]]; do
+        until [[ $param1 == @(*\-demux*|*.ac3*|*.dts*|*.flac*|*.h264*|*.m2v*|*.mpeg2*|*.sup*|*.txt*|*.vc1*) ]]; do
             echo -e "\nextract all wanted tracks following this name pattern:"
             echo "[1-n]:moviename.extension, e.g. 2:moviename.h264"
             echo "3:moviename.flac 4:moviename.ac3 5:moviename.sup etc"
-            echo -e "the video stream HAS TO be given h264, mpeg2 or vc1 as file extension\n"
+            echo -e "the video stream HAS TO be given h264, mpeg2, m2v or vc1 as file extension\n"
             echo -e "or just type -demux\n"
             read -e -p "> " param1
         done
@@ -413,6 +413,8 @@ case "$answer_00" in
             mv *.m2v ${source2%.*}.m2v
 # TODONOTE: dirty. problems when >1 h264|mpeg2|vc1|m2v file
         mkvmerge -v -o "$source1" $(ls "${source0%/*}"|grep -iE "h264|mpeg2|vc1|m2v" ) | tee -a "${source1%.*}".log
+        # delete the h264|mpeg2|vc1 file
+        rm "$(ls "${source0%/*}"|grep -iE "h264|mpeg2|vc1|m2v")" | tee -a "${source1%.*}".log
     }
 
     function source_raw {
@@ -440,16 +442,14 @@ case "$answer_00" in
         mkvextract tracks "$source0" $param1 | tee -a "${source1%.*}".log
 
         # TODONOTE: dirty. problems when >1 h264|mpeg2|vc1|m2v file
-        mkvmerge -v -o "$source1" $(ls "${source0%/*}"|grep -iE "h264|mpeg2|vc1|m2v" ) | tee -a "${source1%.*}".log
+        mkvmerge -v -o "$source1" $(ls "${source0%/*}"|grep -iE "h264|mpeg2|vc1|m2v") | tee -a "${source1%.*}".log
         mkvextract chapters "$source0" -s >> "${source2%.*}.chapters.txt" | tee -a "${source1%.*}".log
-        for i in ./*.h264 ./*.mpeg2 ./*.vc1 ./*.m2v ; do rm $i; done
+        rm "$(ls "${source0%/*}"|grep -iE "h264|mpeg2|vc1|m2v")"
     }
 
-    if [[ $source0 == @(*.mpls|*.m2ts|*.vc1|*.m2v) ]] ; then
-        source_muxed
-        # delete the h264|mpeg2|vc1 file
-        rm -v $(ls "${source0%/*}"|grep -iE "h264|mpeg2|vc1|m2v" ) | tee -a "${source1%.*}".log
-    elif [[ $source0 == @(*.h264) ]] ; then
+    if [[ $source0 == @(*.mpls|*.m2ts) ]] ; then
+        source_dvd_bd
+    elif [[ $source0 == @(*.h264|*.vc1|*.m2v) ]] ; then
         source_raw
     elif [[ $source0 == @(*.mkv) ]] ; then
         source_remux
@@ -2127,11 +2127,7 @@ case "$answer_00" in
             start1=$(date +%s)
 
             #comparison screen
-<<<<<<< HEAD
             echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 br${br##*=} aq$aqmode.$aqs0 psy${psyrd##*=} pt${psytr##*=}\", align=8)" >> "${source1%.*}".$2.aqmode$aqmode.$aqslow-$aqshigh-$aqsincrement.avs
-=======
-            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"encode $2 br${br##*=} aq$aqmode.$aqs0 psy${psyrd##*=} pt${psytr##*=}\", align=8)" >> "${source1%.*}".$2.aqmode$aqmode.$aqslow-$aqshigh-$aqsincrement.avs
->>>>>>> 60aa14b71449c3784477a7a82928553eb20b46f7
 
             wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
@@ -2272,11 +2268,7 @@ case "$answer_00" in
                 start1=$(date +%s)
 
                 #comparison screen
-<<<<<<< HEAD
                 echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 br${br##*=} aq$aqmode0.$aqs0 psy${psyrd##*=} pt${psytr##*=}\", align=8)" >> "${source1%.*}".$2.aqmodes-$aqslow-$aqshigh-$aqsincrement.avs
-=======
-                echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"encode $2 br${br##*=} aq$aqmode0.$aqs0 psy${psyrd##*=} pt${psytr##*=}\", align=8)" >> "${source1%.*}".$2.aqmodes-$aqslow-$aqshigh-$aqsincrement.avs
->>>>>>> 60aa14b71449c3784477a7a82928553eb20b46f7
 
                 wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
                 | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
@@ -2794,7 +2786,7 @@ case "$answer_00" in
                     ;;
                 esac
         done
-        
+
         until [[ $psytr =~ ^0$|^[0-1]\.[0-9]$|^[0-1]\.[0-9][0-9]$|^2\.00$  ]] ; do
             echo "set psy-trellis"
             echo -e "e.g. 0.05\n"
