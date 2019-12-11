@@ -20,7 +20,7 @@ pathfm="$filters/FillMargins/FillMargins.dll"
 # path to ColorMatrix.dll
 # if in wine directory, prevent bash from expanding backslashes
 # e.g. pathcolormatrix=/home/user\/.wine\/drive_c\/windows\/system32\/ColorMatrix\/ColorMatrix.dll
-pathcm="$filters/ColorMatrix/ColorMatrix.dll"
+#pathcm="$filters/ColorMatrix/ColorMatrix.dll"
 
 # path to BalanceBorders
 # if in wine directory, prevent bash from expanding backslashes
@@ -126,6 +126,8 @@ if [[ $answer_00 -ge 3 ]] || [[ -f ${config%/*}/$1.cfg && $2 = @(SD|480|576|720|
     width=$(cat "$config"|grep width|grep $2=)
     height=$(cat "$config"|grep height|grep $2=)
     ratectrl=$(cat "$config"|grep ratectrl|grep $2=)
+    colormatrix=$(cat "$config"|grep colormatrix|grep $2=)
+    colorprim=$(cat "$config"|grep colorprim|grep $2=)
 
     function bitrate {
         until [[ $br2 =~ ^[1-9][0-9]+*$ ]]; do
@@ -602,6 +604,33 @@ case "$answer_00" in
                     echo "par=$par" >> "${config%/*}/${source2%.*}.cfg"
                 ;;
             esac
+    }
+
+    function colormatrices {
+        if [[ $sarwidth0 -lt 1920 && $sarheight0 -lt 1080 && $darwidth0 -lt 1920 && $darheight0 -lt 1080 ]] ; then
+            echo "As your source's dimentions are less than FullHD,"
+            echo -e "that may be a DVD\n"
+            echo -e "Please choose between (P)AL and (N)TSC\n"
+
+            until [[ $colormatrix0 =~ [n,N,p,P] ]]; do
+                read -e -p "> " colormatrix0
+                    case "$colormatrix0" in
+                        n|N)
+                            # keep cfg informed
+                            sed -i "/colormatrixSD/d" "${config%/*}/${source2%.*}.cfg"
+                            echo "colormatrixSD=smpte170m" >> "${config%/*}/${source2%.*}.cfg"
+                            sed -i "/colorprimSD/d" "${config%/*}/${source2%.*}.cfg"
+                            echo "colorprimSD=smpte170m" >> "${config%/*}/${source2%.*}.cfg"
+                        ;;
+                        p|P)
+                            sed -i "/colormatrixSD/d" "${config%/*}/${source2%.*}.cfg"
+                            echo "colormatrixSD=bt470bg" >> "${config%/*}/${source2%.*}.cfg"
+                            sed -i "/colorprimSD/d" "${config%/*}/${source2%.*}.cfg"
+                            echo "colorprimSD=bt470bg" >> "${config%/*}/${source2%.*}.cfg"
+                        ;;
+                    esac
+            done
+        fi
     }
 
     function cropping {
@@ -1129,8 +1158,8 @@ case "$answer_00" in
         echo "#fillmargins1" >> "${source1%.*}".480.final.avs
         echo "#balanceborders0" >> "${source1%.*}".480.final.avs
         echo "#balanceborders1" >> "${source1%.*}".480.final.avs
-        echo "LoadPlugin(\"$pathcm\")" >> "${source1%.*}".480.final.avs
-        echo "ColorMatrix(mode=\"Rec.709->Rec.601\", clamp=0)" >> "${source1%.*}".480.final.avs
+        #echo "LoadPlugin(\"$pathcm\")" >> "${source1%.*}".480.final.avs
+        #echo "ColorMatrix(mode=\"Rec.709->Rec.601\", clamp=0)" >> "${source1%.*}".480.final.avs
         echo "Spline36Resize($width480, $height480)" >> "${source1%.*}".480.final.avs
     }
 
@@ -1148,8 +1177,8 @@ case "$answer_00" in
         echo "#fillmargins1" >> "${source1%.*}".576.final.avs
         echo "#balanceborders0" >> "${source1%.*}".576.final.avs
         echo "#balanceborders1" >> "${source1%.*}".576.final.avs
-        echo "LoadPlugin(\"$pathcm\")" >> "${source1%.*}".576.final.avs
-        echo "ColorMatrix(mode=\"Rec.709->Rec.601\", clamp=0)" >> "${source1%.*}".576.final.avs
+        #echo "LoadPlugin(\"$pathcm\")" >> "${source1%.*}".576.final.avs
+        #echo "ColorMatrix(mode=\"Rec.709->Rec.601\", clamp=0)" >> "${source1%.*}".576.final.avs
         echo "Spline36Resize($width576, $height576)" >> "${source1%.*}".576.final.avs
     }
 
@@ -1249,6 +1278,8 @@ case "$answer_00" in
     # for anamorphic sources SAR -> DAR calculation needed
     par_divider=$(echo $par|cut -d: -f1)
     par_denominator=$(echo $par|cut -d: -f2)
+
+    colormatrices
 
     if [[ ( -n $left_crop && -n $right_crop && -n $top_crop && -n $bottom_crop ) ]]; then
         echo -e "\ncropping values for "$source2":"
@@ -3201,7 +3232,7 @@ case "$answer_00" in
     function SDcomparison {
         # create comparison screen avs
         echo "a=import(\"${finalavs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)" > "${source1%.*}".comparison.$2.avs
-        echo "b=FFVideoSource(\"${source1%.*}.$2.mkv\").subtitle(\"${source2%.*} encode $2 ${source2%.*}\", align=8)" >> "${source1%.*}".comparison.$2.avs
+        echo "b=FFVideoSource(\"${source1%.*}.$2.mkv\").subtitle(\"${source2%.*} encode $2\", align=8)" >> "${source1%.*}".comparison.$2.avs
         echo "interleave(a,b)" >> "${source1%.*}".comparison.$2.avs
         echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".comparison.$2.avs
         echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.$2.avs
@@ -3246,6 +3277,7 @@ case "$answer_00" in
         --aq-mode "${aqmode##*=}" \
         --deblock "$deblock" \
         --chroma-qp-offset "${cqpo##*=}" \
+        --colormatrix "${colormatrix##*=}" --colorprim "${colorprim##*=}" \
         -o /dev/null - 2>&1|tee -a "${source1%.*}".$2.log|tee "${source1%.*}".$2.final.log;
 
         # 2. pass
@@ -3269,6 +3301,7 @@ case "$answer_00" in
         --aq-mode "${aqmode##*=}" \
         --deblock "$deblock" \
         --chroma-qp-offset "${cqpo##*=}" \
+        --colormatrix "${colormatrix##*=}" --colorprim "${colorprim##*=}" \
         -o "${source1%.*}".$2.mkv - 2>&1|tee -a "${source1%.*}".$2.log|tee "${source1%.*}".$2.final.log;
 
         stop=$(date +%s);
@@ -3298,6 +3331,7 @@ case "$answer_00" in
             --aq-mode "${aqmode##*=}" \
             --deblock "$deblock" \
             --chroma-qp-offset "${cqpo##*=}" \
+            --colormatrix "${colormatrix##*=}" --colorprim "${colorprim##*=}" \
             -o "${source1%.*}".$2.mkv - 2>&1|tee -a "${source1%.*}".$2.log|tee "${source1%.*}".$2.final.log;
         else
             wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${finalavs##*=}" - \
@@ -3318,6 +3352,7 @@ case "$answer_00" in
             --aq-mode "${aqmode##*=}" \
             --deblock "$deblock" \
             --chroma-qp-offset "${cqpo##*=}" \
+            --colormatrix "${colormatrix##*=}" --colorprim "${colorprim##*=}" \
             -o "${source1%.*}".$2.mkv - 2>&1|tee -a "${source1%.*}".$2.log|tee "${source1%.*}".$2.final.log;
         fi
         stop=$(date +%s);
