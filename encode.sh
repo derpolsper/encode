@@ -3136,6 +3136,14 @@ case "$answer_00" in
         echo -e "\nafter all that optimization, you may test for"
         echo "a new, probably more bitsaving value of crf"
 
+        echo "as a reminder, here are your crf/ bitrate values"
+        echo -e "from your first round testing for crf:\n"
+        # show bitrate from logfile
+        if [[ -e "${source1%.*}".$2.crf1.log ]] ; then
+            column -t "${source1%.*}".$2.crf1.log|sort -u
+            echo
+        fi
+
         echo -e "\nso far you tested with a crf of ${crf##*=}\n"
         echo "choose crf values for test encodings of"
         echo -e ""${source2%.*}" in $2\n"
