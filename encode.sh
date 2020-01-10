@@ -122,6 +122,7 @@ if [[ $answer_00 -ge 3 ]] || [[ -f ${config%/*}/$1.cfg && $2 = @(SD|480|576|720|
     psytr=$(cat "$config"|grep psytr|grep $2=)
     cqpo=$(cat "$config"|grep cqpo|grep $2=)
     nombtree=$(cat "$config"|grep nombtree|grep $2=)
+    lookahead=$(cat "$config"|grep lookahead|grep $2=)
     br=$(cat "$config"|grep br|grep $2=)
     width=$(cat "$config"|grep width|grep $2=)
     height=$(cat "$config"|grep height|grep $2=)
@@ -280,7 +281,7 @@ case "$answer_00" in
     echo -e "MERANGE:\t\t ""$merange"
     echo -e "SUBME:\t\t\t ""$subme"
     echo -e "DEBLOCK:\t\t ""$deblock"
-    echo -e "LOOKAHEAD:\t\t ""$lookahead"
+    echo -e "LOOKAHEAD:\t\t ""${lookahead##*=}"
 
     echo -e "\n***       SelectRangeEvery       ***\n"
 
@@ -884,7 +885,7 @@ case "$answer_00" in
                         --tune "$tune" \
                         --profile "$profile" \
                         --sar "$par" \
-                        --rc-lookahead "$lookahead" \
+                        --rc-lookahead "${lookahead##*=}" \
                         --me "$me" \
                         --merange "$merange" \
                         --subme "$subme" \
@@ -900,7 +901,7 @@ case "$answer_00" in
                         --tune "$tune" \
                         --profile "$profile" \
                         --sar "$par" \
-                        --rc-lookahead "$lookahead" \
+                        --rc-lookahead "${lookahead##*=}" \
                         --me "$me" \
                         --merange "$merange" \
                         --subme "$subme" \
@@ -1628,7 +1629,7 @@ case "$answer_00" in
             --profile "$profile" \
             --ref "${ref##*=}" \
             --sar "$par" \
-            --rc-lookahead "$lookahead" \
+            --rc-lookahead "${lookahead##*=}" \
             --me "$me" \
             --merange "$merange" \
             --subme "$subme" \
@@ -1756,7 +1757,7 @@ case "$answer_00" in
             --profile "$profile" \
             --ref "${ref##*=}" \
             --sar "$par" \
-            --rc-lookahead "$lookahead" \
+            --rc-lookahead "$lookaheadno" \
             --me "$me" \
             --merange "$merange" \
             --subme "$subme" \
@@ -1778,7 +1779,7 @@ case "$answer_00" in
             --profile "$profile" \
             --ref "${ref##*=}" \
             --sar "$par" \
-            --rc-lookahead "$lookahead" \
+            --rc-lookahead "$lookaheadno" \
             --me "$me" \
             --merange "$merange" \
             --subme "$subme" \
@@ -1812,7 +1813,7 @@ case "$answer_00" in
             --profile "$profile" \
             --ref "${ref##*=}" \
             --sar "$par" \
-            --rc-lookahead "$lookahead" \
+            --rc-lookahead "$lookaheadmb" \
             --me "$me" \
             --merange "$merange" \
             --subme "$subme" \
@@ -1834,7 +1835,7 @@ case "$answer_00" in
             --profile "$profile" \
             --ref "${ref##*=}" \
             --sar "$par" \
-            --rc-lookahead "$lookahead" \
+            --rc-lookahead "$lookaheadmb" \
             --me "$me" \
             --merange "$merange" \
             --subme "$subme" \
@@ -1914,13 +1915,15 @@ case "$answer_00" in
         read -e -p "(0|1) > " mbt
         # keep cfg informed
         sed -i "/nombtree$2/d" "$config"
+        sed -i "/lookahead$2/d" "$config"
         case $mbt in
             0)
                 echo "nombtree$2=no-" >> "$config"
+                echo "lookahead$2=100" >> "$config"
             ;;
 
             1)
-                #nothing to do
+                echo "lookahead$2=240" >> "$config"
             ;;
             esac
     done
@@ -1995,7 +1998,7 @@ case "$answer_00" in
             --profile "$profile" \
             --ref "${ref##*=}" \
             --sar "$par" \
-            --rc-lookahead "$lookahead" \
+            --rc-lookahead "${lookahead##*=}" \
             --me "$me" \
             --merange "$merange" \
             --subme "$subme" \
@@ -2017,7 +2020,7 @@ case "$answer_00" in
             --profile "$profile" \
             --ref "${ref##*=}" \
             --sar "$par" \
-            --rc-lookahead "$lookahead" \
+            --rc-lookahead "${lookahead##*=}" \
             --me "$me" \
             --merange "$merange" \
             --subme "$subme" \
@@ -2171,7 +2174,7 @@ case "$answer_00" in
             --profile "$profile" \
             --ref "${ref##*=}" \
             --sar "$par" \
-            --rc-lookahead "$lookahead" \
+            --rc-lookahead "${lookahead##*=}" \
             --me "$me" \
             --merange "$merange" \
             --subme "$subme" \
@@ -2193,7 +2196,7 @@ case "$answer_00" in
             --profile "$profile" \
             --ref "${ref##*=}" \
             --sar "$par" \
-            --rc-lookahead "$lookahead" \
+            --rc-lookahead "${lookahead##*=}" \
             --me "$me" \
             --merange "$merange" \
             --subme "$subme" \
@@ -2312,7 +2315,7 @@ case "$answer_00" in
                 --profile "$profile" \
                 --ref "${ref##*=}" \
                 --sar "$par" \
-                --rc-lookahead "$lookahead" \
+                --rc-lookahead "${lookahead##*=}" \
                 --me "$me" \
                 --merange "$merange" \
                 --subme "$subme" \
@@ -2334,7 +2337,7 @@ case "$answer_00" in
                 --profile "$profile" \
                 --ref "${ref##*=}" \
                 --sar "$par" \
-                --rc-lookahead "$lookahead" \
+                --rc-lookahead "${lookahead##*=}" \
                 --me "$me" \
                 --merange "$merange" \
                 --subme "$subme" \
@@ -2520,7 +2523,7 @@ case "$answer_00" in
             --profile "$profile" \
             --ref "${ref##*=}" \
             --sar "$par" \
-            --rc-lookahead "$lookahead" \
+            --rc-lookahead "${lookahead##*=}" \
             --me "$me" \
             --merange "$merange" \
             --subme "$subme" \
@@ -2542,7 +2545,7 @@ case "$answer_00" in
             --profile "$profile" \
             --ref "${ref##*=}" \
             --sar "$par" \
-            --rc-lookahead "$lookahead" \
+            --rc-lookahead "${lookahead##*=}" \
             --me "$me" \
             --merange "$merange" \
             --subme "$subme" \
@@ -2710,7 +2713,7 @@ case "$answer_00" in
                             --profile "$profile" \
                             --ref "${ref##*=}" \
                             --sar "$par" \
-                            --rc-lookahead "$lookahead" \
+                            --rc-lookahead "${lookahead##*=}" \
                             --me "$me" \
                             --merange "$merange" \
                             --subme "$subme" \
@@ -2732,7 +2735,7 @@ case "$answer_00" in
                             --profile "$profile" \
                             --ref "${ref##*=}" \
                             --sar "$par" \
-                            --rc-lookahead "$lookahead" \
+                            --rc-lookahead "${lookahead##*=}" \
                             --me "$me" \
                             --merange "$merange" \
                             --subme "$subme" \
@@ -2902,7 +2905,7 @@ case "$answer_00" in
                             --profile "$profile" \
                             --ref "${ref##*=}" \
                             --sar "$par" \
-                            --rc-lookahead "$lookahead" \
+                            --rc-lookahead "${lookahead##*=}" \
                             --me "$me" \
                             --merange "$merange" \
                             --subme "$subme" \
@@ -2924,7 +2927,7 @@ case "$answer_00" in
                             --profile "$profile" \
                             --ref "${ref##*=}" \
                             --sar "$par" \
-                            --rc-lookahead "$lookahead" \
+                            --rc-lookahead "${lookahead##*=}" \
                             --me "$me" \
                             --merange "$merange" \
                             --subme "$subme" \
@@ -3077,7 +3080,7 @@ case "$answer_00" in
             --profile "$profile" \
             --sar "$par" \
             --ref "${ref##*=}" \
-            --rc-lookahead "$lookahead" \
+            --rc-lookahead "${lookahead##*=}" \
             --me "$me" \
             --merange "$merange" \
             --subme "$subme" \
@@ -3270,7 +3273,7 @@ case "$answer_00" in
         --preset "$preset" \
         --tune "$tune" \
         --profile "$profile" \
-        --rc-lookahead "$lookahead" \
+        --rc-lookahead "${lookahead##*=}" \
         --me "$me" \
         --merange "$merange" \
         --subme "$subme" \
@@ -3294,7 +3297,7 @@ case "$answer_00" in
         --preset "$preset" \
         --tune "$tune" \
         --profile "$profile" \
-        --rc-lookahead "$lookahead" \
+        --rc-lookahead "${lookahead##*=}" \
         --me "$me" \
         --merange "$merange" \
         --subme "$subme" \
@@ -3324,7 +3327,7 @@ case "$answer_00" in
             --preset "$preset" \
             --tune "$tune" \
             --profile "$profile" \
-            --rc-lookahead "$lookahead" \
+            --rc-lookahead "${lookahead##*=}" \
             --me "$me" \
             --merange "$merange" \
             --subme "$subme" \
@@ -3345,7 +3348,7 @@ case "$answer_00" in
             --preset "$preset" \
             --tune "$tune" \
             --profile "$profile" \
-            --rc-lookahead "$lookahead" \
+            --rc-lookahead "${lookahead##*=}" \
             --me "$me" \
             --merange "$merange" \
             --subme "$subme" \
