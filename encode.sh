@@ -863,7 +863,7 @@ case "$answer_00" in
                     fi
                     echo "SelectRangeEvery(1000, 1, 1000)" >> "${source1%.*}".bb_thresh.avs
 
-                    echo "=import(\"${source1%.*}.bb_thresh.avs\").subtitle(\"${source2%.*} source $2\", align=8)" > "${source1%.*}".bb_thresh.avs
+                    echo "=import(\"${source1%.*}.bb_thresh.avs\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".bb_thresh.avs
                     for bb_thresh in 001 002 004 008 016 032 064 128 ; do
                         sleep 1.5
 
@@ -873,7 +873,7 @@ case "$answer_00" in
                         start1=$(date +%s)
 
                         #comparison screen
-                        echo "=import(\"${source1%.*}.bb$bb_thresh.avs\").subtitle(\"${source2%.*} bb thresh $bb_thresh\", align=8)" >> "${source1%.*}".bb_thresh.avs
+                        echo "=import(\"${source1%.*}.bb$bb_thresh.avs\").subtitle(\"${source2%.*} bb thresh $bb_thresh\", align=8)#.trim(0,framecount)" >> "${source1%.*}".bb_thresh.avs
 
                         # sensible bitrate hardcoded, all other variable parameters rest default
                         wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${source1%.*}".bb$bb_thresh.avs - \
@@ -1594,7 +1594,7 @@ case "$answer_00" in
         start0=$(date +%s)
 
         # create comparison screen avs
-        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)" > "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
+        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
 
         for (( crf1=$crf1low; $crf1<=$crf1high; crf1+=$crf1increment)); do
             # number of left encodings
@@ -1616,7 +1616,7 @@ case "$answer_00" in
             start1=$(date +%s)
 
             # write list of encodings into avs file
-            echo "=FFVideoSource(\"${source1%.*}.$2.$count.crf$crf1.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 crf$crf1\", align=8)" >> "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
+            echo "=FFVideoSource(\"${source1%.*}.$2.$count.crf$crf1.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 crf$crf1\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
 
             # write information to log files, no newline at the end of line
             echo -n "crf $(echo "scale=1;$crf1/10"|bc) : " | tee -a "${source1%.*}".$2.crf1.log >/dev/null
@@ -1742,10 +1742,10 @@ case "$answer_00" in
         echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.mbt.cqpo${cqpo##*=}.mkv\n"
 
         # create comparison screen avs
-        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)" > "${source1%.*}".$2.mbt.avs
+        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".$2.mbt.avs
 
         # write list of encodings into comparison screen avs file
-        echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 mbtree\", align=8)" >> "${source1%.*}".$2.mbt.avs
+        echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 mbtree\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.mbt.avs
 
         wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
             | x264 --stdin y4m \
@@ -1801,7 +1801,7 @@ case "$answer_00" in
         echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.no-mbt.cqpo${cqpo##*=}.mkv\n"
 
         # write list of encodings into comparison screen avs file
-        echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.no-mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 no-mbtree\", align=8)" >> "${source1%.*}".$2.mbt.avs
+        echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.no-mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 no-mbtree\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.mbt.avs
 
         wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
             | x264 --stdin y4m --no-mbtree \
@@ -1964,7 +1964,7 @@ case "$answer_00" in
         start0=$(date +%s)
 
         # create comparison screen avs
-        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)" > "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
+        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
 
         for ((qcomp0=$qcomplow; $qcomp0<=$qcomphigh; qcomp0+=$qcompincrement)); do
             # number of left encodings
@@ -1986,7 +1986,7 @@ case "$answer_00" in
             start1=$(date +%s)
 
             # create comparison screen avs
-            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc$qcomp0.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 br${br##*=} qc$qcomp0\", align=8)" >> "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
+            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc$qcomp0.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 br${br##*=} qc$qcomp0\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
 
             wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
@@ -2139,7 +2139,7 @@ case "$answer_00" in
         start0=$(date +%s)
 
         # create comparison screen avs
-        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)" > "${source1%.*}".$2.aqmode$aqmode.$aqslow-$aqshigh-$aqsincrement.avs
+        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".$2.aqmode$aqmode.$aqslow-$aqshigh-$aqsincrement.avs
 
         for ((aqs0=$aqslow; $aqs0<=$aqshigh; aqs0+=$aqsincrement));do
             # number of left encodings
@@ -2161,7 +2161,7 @@ case "$answer_00" in
             start1=$(date +%s)
 
             #comparison screen
-            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 br${br##*=} aq$aqmode.$aqs0 psy${psyrd##*=} pt${psytr##*=}\", align=8)" >> "${source1%.*}".$2.aqmode$aqmode.$aqslow-$aqshigh-$aqsincrement.avs
+            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 br${br##*=} aq$aqmode.$aqs0 psy${psyrd##*=} pt${psytr##*=}\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.aqmode$aqmode.$aqslow-$aqshigh-$aqsincrement.avs
 
             wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
@@ -2275,7 +2275,7 @@ case "$answer_00" in
         start0=$(date +%s)
 
         # create comparison screen avs
-        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)" > "${source1%.*}".$2.aqmodes-$aqslow-$aqshigh-$aqsincrement.avs
+        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".$2.aqmodes-$aqslow-$aqshigh-$aqsincrement.avs
 
         for aqmode0 in {1..3} ;do
             for ((aqs0=$aqslow; $aqs0<=$aqshigh; aqs0+=$aqsincrement));do
@@ -2302,7 +2302,7 @@ case "$answer_00" in
                 start1=$(date +%s)
 
                 #comparison screen
-                echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 br${br##*=} aq$aqmode0.$aqs0 psy${psyrd##*=} pt${psytr##*=}\", align=8)" >> "${source1%.*}".$2.aqmodes-$aqslow-$aqshigh-$aqsincrement.avs
+                echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 br${br##*=} aq$aqmode0.$aqs0 psy${psyrd##*=} pt${psytr##*=}\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.aqmodes-$aqslow-$aqshigh-$aqsincrement.avs
 
                 wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
                 | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
@@ -2489,7 +2489,7 @@ case "$answer_00" in
         start0=$(date +%s)
 
         # create comparison screen avs
-        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)" > "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
+        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
 
         for ((psyrd0=$psyrdlow; $psyrd0<=$psyrdhigh; psyrd0+=$psyrdincrement));do
             # number of left encodings
@@ -2510,7 +2510,7 @@ case "$answer_00" in
             # start measuring encoding time
             start1=$(date +%s)
             #comparison screen
-            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy$psyrd0.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 br${br##*=} aq${aqmode##*=}.${aqs##*=} psy$psyrd0 pt${psytr##*=}\", align=8)" >> "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
+            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy$psyrd0.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 br${br##*=} aq${aqmode##*=}.${aqs##*=} psy$psyrd0 pt${psytr##*=}\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
 
             wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
@@ -2677,7 +2677,7 @@ case "$answer_00" in
                         start0=$(date +%s)
 
                         # create comparison screen avs
-                        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)" > "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
+                        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
 
                         for ((psy2=$psy2low; $psy2<=$psy2high; psy2+=$psy2increment));do
                             # number of left encodings
@@ -2697,7 +2697,7 @@ case "$answer_00" in
                             start1=$(date +%s)
 
                             #comparison screen
-                            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt$psy2.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 aq${aqmode##*=}.${aqs##*=} psy${psyrd##*=} pt$psy2\", align=8)" >> "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
+                            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt$psy2.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 aq${aqmode##*=}.${aqs##*=} psy${psyrd##*=} pt$psy2\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
 
                             wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
                             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
@@ -2868,7 +2868,7 @@ case "$answer_00" in
                         start0=$(date +%s)
 
                         # create comparison screen avs
-                        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)" > "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
+                        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
 
                         for ((cqpo0=$cqpolow; $cqpo0<=$cqpohigh; cqpo0=$cqpo0+1));do
                             # number of left encodings
@@ -2889,7 +2889,7 @@ case "$answer_00" in
                             start1=$(date +%s)
 
                             #comparison screen
-                            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.mkv\").subtitle(\"${source2%.*} encode $2 cqpo$cqpo0\", align=8)" >> "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
+                            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.mkv\").subtitle(\"${source2%.*} encode $2 cqpo$cqpo0\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
 
                             wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
                             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
@@ -3042,7 +3042,7 @@ case "$answer_00" in
         start0=$(date +%s)
 
         # create comparison screen avs
-        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)" > "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
+        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
 
         for ((crf2=$crf2low; $crf2<=$crf2high; crf2+=$crf2increment));do
             # number of left encodings
@@ -3064,7 +3064,7 @@ case "$answer_00" in
             start1=$(date +%s)
 
             #comparison screen
-            echo "=FFVideoSource(\"${source1%.*}.$2.$count.crf$crf2.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 crf$crf2\", align=8)" >> "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
+            echo "=FFVideoSource(\"${source1%.*}.$2.$count.crf$crf2.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 crf$crf2\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
 
             # write information to log files, no newline at the end of line
             echo -n "crf $(echo "scale=1;$crf2/10"|bc) : " | tee -a "${source1%.*}".$2.crf2.log >/dev/null
@@ -3242,8 +3242,8 @@ case "$answer_00" in
 
     function SDcomparison {
         # create comparison screen avs
-        echo "a=import(\"${finalavs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)" > "${source1%.*}".comparison.$2.avs
-        echo "b=FFVideoSource(\"${source1%.*}.$2.mkv\").subtitle(\"${source2%.*} encode $2\", align=8)" >> "${source1%.*}".comparison.$2.avs
+        echo "a=import(\"${finalavs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".comparison.$2.avs
+        echo "b=FFVideoSource(\"${source1%.*}.$2.mkv\").subtitle(\"${source2%.*} encode $2\", align=8)#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
         echo "interleave(a,b)" >> "${source1%.*}".comparison.$2.avs
         echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".comparison.$2.avs
         echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.$2.avs
@@ -3252,13 +3252,13 @@ case "$answer_00" in
     function HDcomparison {
         # create comparison screen avs
         if [[ -n ${darwidth1##*=} && -n ${sarheight1##*=} ]]; then
-            echo "a=import(\"${finalavs##*=}\").Spline36Resize("${darwidth1##*=}","${sarheight1##*=}").subtitle(\"${source2%.*} source $2\", align=8)" > "${source1%.*}".comparison.$2.avs
+            echo "a=import(\"${finalavs##*=}\").Spline36Resize("${darwidth1##*=}","${sarheight1##*=}").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".comparison.$2.avs
         elif [[ -n ${darheight1##*=} && -n  ${sarwidth1##*=} ]]; then
-            echo "a=import(\"${finalavs##*=}\").Spline36Resize("${sarwidth1##*=}","${darheight1##*=}").subtitle(\"${source2%.*} source $2\", align=8)" > "${source1%.*}".comparison.$2.avs
+            echo "a=import(\"${finalavs##*=}\").Spline36Resize("${sarwidth1##*=}","${darheight1##*=}").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".comparison.$2.avs
         else
-            echo "a=import(\"${finalavs##*=}\").Spline36Resize("${width##*=}","${height##*=}").subtitle(\"${source2%.*} source $2\", align=8)" > "${source1%.*}".comparison.$2.avs
+            echo "a=import(\"${finalavs##*=}\").Spline36Resize("${width##*=}","${height##*=}").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".comparison.$2.avs
         fi
-        echo "b=FFVideoSource(\"${source1%.*}.$2.mkv\").subtitle(\"${source2%.*} encode $2\", align=8)" >> "${source1%.*}".comparison.$2.avs
+        echo "b=FFVideoSource(\"${source1%.*}.$2.mkv\").subtitle(\"${source2%.*} encode $2\", align=8)#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
         echo "interleave(a,b)" >> "${source1%.*}".comparison.$2.avs
         echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".comparison.$2.avs
         echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.$2.avs
