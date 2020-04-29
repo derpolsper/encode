@@ -923,7 +923,7 @@ case "$answer_00" in
                     stop=$(date +%s);
                     days=$(( ($stop-$start0)/86400 ))
                     time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-                    echo -e "\ntest encodings for balanceborders' thresh lasted $days days and $time"
+                    echo -e "\n$1 $2: test encodings for balanceborders' thresh lasted $days days and $time"
                     #comparison screen
                     prefixes=({a..z} {a..e}{a..z})
                     i=0
@@ -1653,7 +1653,7 @@ case "$answer_00" in
         # stop measuring overall encoding time
         stop=$(date +%s);
         time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-        echo -e "\ntest encodings for crf integers in $2 lasted $time"
+        echo -e "\n$1 $2: test encodings for crf integers lasted $time"
 
         #comparison screen
         prefixes=({a..z} {a..e}{a..z})
@@ -1850,7 +1850,7 @@ case "$answer_00" in
         # stop measuring overall encoding time
         stop=$(date +%s);
         time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-        echo -e "\ntest encodings for mbtree in $2 lasted $time\n"
+        echo -e "\n$1 $2: test encodings for mbtree lasted $time\n"
 
         # remove stats file
         rm ${source1%.*}.$2.$count.*.stats
@@ -2048,7 +2048,7 @@ case "$answer_00" in
         stop=$(date +%s);
         days=$(( ($stop-$start0)/86400 ))
         time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-        echo -e "\ntest encodings for qcomp in $2 lasted $days days and $time"
+        echo -e "\n$1 $2: test encodings for qcomp lasted $days days and $time"
 
         #comparison screen
         prefixes=({a..z} {a..e}{a..z})
@@ -2226,7 +2226,7 @@ case "$answer_00" in
         stop=$(date +%s);
         days=$(( ($stop-$start0)/86400 ))
         time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-        echo -e "\ntest encodings for aq modes and aq strength in $2 lasted $days days and $time"
+        echo -e "\n$1 $2: test encodings for aq modes and aq strength lasted $days days and $time"
 
         #comparison screen
         prefixes=({a..z} {a..e}{a..z})
@@ -2424,7 +2424,7 @@ case "$answer_00" in
         stop=$(date +%s);
         days=$(( ($stop-$start0)/86400 ))
         time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-        echo -e "\ntest encodings for psy-rd in $2 lasted $days days and $time"
+        echo -e "\n$1 $2: test encodings for psy-rd lasted $days days and $time"
 
         #comparison screen
         prefixes=({a..z} {a..e}{a..z})
@@ -2609,7 +2609,7 @@ case "$answer_00" in
                         stop=$(date +%s);
                         days=$(( ($stop-$start0)/86400 ))
                         time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-                        echo -e "\ntest encodings for psy-trellis in $2 lasted $days days and $time"
+                        echo -e "\n$1 $2: test encodings for psy-trellis lasted $days days and $time"
 
                         #comparison screen
                         prefixes=({a..z} {a..e}{a..z})
@@ -2801,7 +2801,7 @@ case "$answer_00" in
                         stop=$(date +%s);
                         days=$(( ($stop-$start0)/86400 ))
                         time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-                        echo -e "\ntest encodings for chroma-qp-offset in $2 lasted $days days and $time"
+                        echo -e "\n$1 $2: test encodings for chroma-qp-offset lasted $days days and $time"
 
                         #comparison screen
                         prefixes=({a..z} {a..e}{a..z})
@@ -2954,7 +2954,7 @@ case "$answer_00" in
         stop=$(date +%s);
         days=$(( ($stop-$start0)/86400 ))
         time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-        echo -e "\ntest encodings for a second round of crf in $2 lasted $days days and $time"
+        echo -e "\n$1 $2: test encodings for a second round of crf lasted $days days and $time"
 
         #comparison screen
         prefixes=({a..z} {a..e}{a..z})
