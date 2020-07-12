@@ -3091,7 +3091,11 @@ case "$answer_00" in
     }
 
     function encoding_pre {
-        echo -n "now encoding ${source2%.*}.$2.mkv"
+        if [[ ${ratectrl##*=} == c ]]; then
+            echo -n "now encoding ${source2%.*}.$2.crf"${crf##*=}".mkv"
+        elif [[ ${ratectrl##*=} == 2 ]]; then
+            echo -n "now encoding ${source2%.*}.$2.br"${br##*=}".mkv"
+        fi
         if [[ -n ${darwidth1##*=} && -n ${sarheight1##*=} ]]; then
             echo -n " with a resolution of ${darwidth1##*=}×${sarheight1##*=}"
         elif [[ -n ${darheight1##*=} && -n ${sarwidth1##*=} ]]; then
@@ -3112,7 +3116,11 @@ case "$answer_00" in
     function SDcomparison {
         # create comparison screen avs
         echo "a=import(\"${finalavs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".comparison.$2.avs
-        echo "b=FFVideoSource(\"${source1%.*}.$2.mkv\").subtitle(\"${source2%.*} encode $2\", align=8)#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
+        if [[ ${ratectrl##*=} == c ]]; then
+        echo "b=FFVideoSource(\"${source1%.*}.$2.crf"${crf##*=}".mkv\").subtitle(\"${source2%.*} encode $2\", align=8)#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
+        elif [[ ${ratectrl##*=} == 2 ]]; then
+        echo "b=FFVideoSource(\"${source1%.*}.$2.br"${br##*=}".mkv\").subtitle(\"${source2%.*} encode $2\", align=8)#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
+        fi
         echo "interleave(a,b)" >> "${source1%.*}".comparison.$2.avs
         echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".comparison.$2.avs
         echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.$2.avs
@@ -3127,7 +3135,11 @@ case "$answer_00" in
         else
             echo "a=import(\"${finalavs##*=}\").Spline36Resize("${width##*=}","${height##*=}").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".comparison.$2.avs
         fi
-        echo "b=FFVideoSource(\"${source1%.*}.$2.mkv\").subtitle(\"${source2%.*} encode $2\", align=8)#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
+        if [[ ${ratectrl##*=} == c ]]; then
+        echo "b=FFVideoSource(\"${source1%.*}.$2.crf"${crf##*=}".mkv\").subtitle(\"${source2%.*} encode $2\", align=8)#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
+        elif [[ ${ratectrl##*=} == 2 ]]; then
+        echo "b=FFVideoSource(\"${source1%.*}.$2.br"${br##*=}".mkv\").subtitle(\"${source2%.*} encode $2\", align=8)#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
+        fi
         echo "interleave(a,b)" >> "${source1%.*}".comparison.$2.avs
         echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".comparison.$2.avs
         echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.$2.avs
@@ -3158,7 +3170,7 @@ case "$answer_00" in
         --deblock "$deblock" \
         --chroma-qp-offset "${cqpo##*=}" \
         --colormatrix "${colormatrix##*=}" --colorprim "${colorprim##*=}" \
-        -o /dev/null - 2>&1|tee -a "${source1%.*}".$2.log|tee "${source1%.*}".$2.final.log;
+        -o /dev/null - 2>&1|tee -a "${source1%.*}".$2.log|tee "${source1%.*}".$2.br"${br##*=}".final.log;
 
         # 2. pass
         wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${finalavs##*=}" - \
@@ -3182,7 +3194,7 @@ case "$answer_00" in
         --deblock "$deblock" \
         --chroma-qp-offset "${cqpo##*=}" \
         --colormatrix "${colormatrix##*=}" --colorprim "${colorprim##*=}" \
-        -o "${source1%.*}".$2.mkv - 2>&1|tee -a "${source1%.*}".$2.log|tee "${source1%.*}".$2.final.log;
+        -o "${source1%.*}".$2.br"${br##*=}".mkv - 2>&1|tee -a "${source1%.*}".$2.log|tee "${source1%.*}".$2.br"${br##*=}".final.log;
 
         stop=$(date +%s);
         days=$(( ($stop-$start)/86400 ))
@@ -3212,7 +3224,7 @@ case "$answer_00" in
             --deblock "$deblock" \
             --chroma-qp-offset "${cqpo##*=}" \
             --colormatrix "${colormatrix##*=}" --colorprim "${colorprim##*=}" \
-            -o "${source1%.*}".$2.mkv - 2>&1|tee -a "${source1%.*}".$2.log|tee "${source1%.*}".$2.final.log;
+            -o "${source1%.*}".$2.crf"${crf##*=}".mkv - 2>&1|tee -a "${source1%.*}".$2.log|tee "${source1%.*}".$2.crf"${crf##*=}".final.log;
         else
             wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${finalavs##*=}" - \
             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
@@ -3233,7 +3245,7 @@ case "$answer_00" in
             --deblock "$deblock" \
             --chroma-qp-offset "${cqpo##*=}" \
             --colormatrix "${colormatrix##*=}" --colorprim "${colorprim##*=}" \
-            -o "${source1%.*}".$2.mkv - 2>&1|tee -a "${source1%.*}".$2.log|tee "${source1%.*}".$2.final.log;
+            -o "${source1%.*}".$2.crf"${crf##*=}".mkv - 2>&1|tee -a "${source1%.*}".$2.log|tee "${source1%.*}".$2.crf"${crf##*=}".final.log;
         fi
         stop=$(date +%s);
         days=$(( ($stop-$start)/86400 ))
@@ -3241,7 +3253,11 @@ case "$answer_00" in
     }
 
     function encoding_post {
-        echo -n "encoding ${source2%.*}.$2.mkv"
+        if [[ $ratectrl == 2 ]]; then
+        echo -n "encoding ${source2%.*}.$2.br"${br##*=}".mkv"
+        elif [[ $ratectrl == c ]]; then
+        echo -n "encoding ${source2%.*}.$2.crf"${crf##*=}".mkv"
+        fi
         if [[ -n ${darwidth1##*=} && -n ${sarheight1##*=} ]]; then
             echo -n " with a resolution of ${darwidth1##*=}×${sarheight1##*=}"
         elif [[ -n ${darheight1##*=} && -n  ${sarwidth1##*=} ]]; then
