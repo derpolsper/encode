@@ -31,8 +31,8 @@ pathbb="$filters/BalanceBorders.avs"
 pathfixbr="$filters/FixBrightnessProtect.avsi"
 
 # zones
-if [[ -e $HOME/.config/encode/$1.$2.zones.txt ]]; then
-    zones="$(cat $HOME/.config/encode/$1.$2.zones.txt)"
+if [[ -e ${config%/*}/$1.$2.zones.txt ]]; then
+    zones="$(cat ${config%/*}/$1.$2.zones.txt)"
 fi
 
 # beeps
@@ -84,28 +84,38 @@ echo -e "10 - another round of crf\n"
 echo -e "11 - encode the whole movie\n"
 read -p "> " answer_00
 
-if [[ $answer_00 -ge 2 ]] && [[ -z $1 ]]; then
-    echo -e "\nyou forgot to choose a config file\n"
-    echo -e "start the script like this:\n"
-    echo -e "./encode.sh ${source2%.*}\n"
+if [[ $answer_00 -ge 0 &&  -e $2 && ! $2 = @(SD|480|576|720|1080) ]]; then
+    echo -e "\n$2 is a weird resolution. choose another one.\n"
     exit
 fi
 
-if [[ $answer_00 -ge 2 ]] && [[ -z ${source2%.*} ]]; then
-    echo -e "\nfirst, make the data known"
-    echo -e "and start the script with option 1\n"
+if [[ $answer_00 -ge 2 && -z $1 ]]; then
+    echo -e "\nchoose a config file\n"
+    echo -e "start the script like this:\n"
+    echo -e "./encode.sh <config>\n"
+    echo -e "or begin with option 1:\n"
+    echo -e "./encode.sh\n"
+    exit
+fi
+
+if [[ $answer_00 -ge 2 && -z ${source2%.*} ]]; then
+    echo -e "\nchoose another config file and"
+    echo -e "start the script like this:\n"
+    echo -e "./encode.sh <config>\n"
+    echo -e "or begin with option 1:\n"
+    echo -e "./encode.sh\n"
     exit
 fi
 
 if [[ $answer_00 -ge 3 ]]; then
     if [[ -z $2 ]]; then
-        echo -e "\nyou forgot to choose a resolution"
+        echo -e "\nchoose a resolution"
         echo "start the script like this:"
         echo -e "\n./encode.sh ${source2%.*} <resolution>\n"
         echo -e "where resolution might be SD, 480, 576, 720 or 1080\n"
         exit
     elif [[ ! $2 = @(SD|480|576|720|1080) ]]; then
-        echo -e "\n$2 is a weird resolution. think about it.\n"
+        echo -e "\n$2 is a weird resolution. choose another one.\n"
         exit
     fi
 fi
@@ -289,14 +299,13 @@ case "$answer_00" in
     echo -e "LENGTH:\t\t\t" "$length"
     echo -e "OFFSET:\t\t\t" "$offset\n"
 
-        if [[ -n $1 ]] ; then
+        if [[ -n $1 ]]; then
             echo -e "***      SETTINGS ON SOURCE      ***\n"
-
-            if [[ -n $left_crop && -n $top_crop && -n $right_crop && -n $bottom_crop ]]; then
+            if [[ -e $left_crop || -e $top_crop || -e $right_crop || -e $bottom_crop ]]; then
                 echo -e "CROPPING [ltrb]:\t ""$left_crop","$top_crop","$right_crop","$bottom_crop\n"
             fi
 
-            if [[ -n $left_fm || -n $top_fm|| -n $right_fm|| -n $bottom_fm ]]; then
+            if [[ -n $left_fm || -n $top_fm || -n $right_fm || -n $bottom_fm ]]; then
                 echo -e "FILLMARGINS [ltrb]:\t ""$left_fm","$top_fm","$right_fm","$bottom_fm\n"
             fi
 
@@ -360,8 +369,16 @@ case "$answer_00" in
 
     read -e -p "(RETURN|e) > " answer_defaultsettings
         case "$answer_defaultsettings" in
-            e|E|edit) # edit the encode/default.cfg
-                "${EDITOR:-vi}" "$config"
+            e|E|edit) # edit either default of the encode/$1.cfg
+                if [[ -f ${config%/*}/$1.cfg ]]; then
+                    echo -e "\n\nhere you can edit the config for "$1"\n\n"
+                    sleep 2
+                    "${EDITOR:-vi}" "${config%/*}/$1.cfg"
+                else
+                    echo -e "\n\nhere you can edit the **default config**\n\n"
+                    sleep 2
+                    "${EDITOR:-vi}" "$config"
+                fi
             ;;
 
             *) # no editing
@@ -3174,7 +3191,7 @@ case "$answer_00" in
 
     function encodecrf {
         start=$(date +%s)
-        if [[ -e $HOME/.config/encode/$1.$2.zones.txt ]]; then
+        if [[ -e ${config%/*}/$1.$2.zones.txt ]]; then
             wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${finalavs##*=}" - \
             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
             --zones "${zones}" \
