@@ -606,10 +606,6 @@ case "$answer_00" in
                     echo "set par as fraction, use a colon!"
                     echo -e "e.g. 16:15\n"
                     read -e -p "> " par
-#                         if [[ ! $par =~ ^[[:digit:]]+:[[:digit:]]+$ ]]; then
-#                             echo "exactly: set as fraction, use a colon!"
-#                             echo "e.g. 16:15"
-#                         fi
                     done
                     # keep cfg informed
                     sed -i "/par/d" "${config%/*}/${source2%.*}.cfg"
@@ -716,6 +712,11 @@ case "$answer_00" in
     }
 
     function fillmargins {
+        unset left_fm
+        unset top_fm
+        unset right_fm
+        unset bottom_fm
+        
         echo -e "\nif cropping left one or more line(s) of black or dirty"
         echo -e "pixels elsewhere, you can use fillmargins\n"
         echo -e "choose as few pixels as possible"
@@ -996,7 +997,7 @@ case "$answer_00" in
     function setresolution480 {
         max480width="854"
         unset width480
-        until (( $width480 <= $max480width )) 2> /dev/null && [[ $width480 =~ ^[[:digit:]]+$ ]]; do
+        until (( $width480 <= $max480width )) 2> /dev/null && [[ $width480 =~ ^[[:digit:]]+$ && $width480 -gt 0  ]]; do
             echo -e "\nset final width for 480p\n"
             read -e -p "width > " width480
 
@@ -1006,7 +1007,7 @@ case "$answer_00" in
 
         max480height="480"
         unset height480
-        until (( $height480 <= $max480height )) 2> /dev/null && [[ $height480 =~ ^[[:digit:]]+$ ]] ; do
+        until (( $height480 <= $max480height )) 2> /dev/null && [[ $height480 =~ ^[[:digit:]]+$ && $height480 -gt  0 ]] ; do
             echo -e "\nset final height for 480p\n"
             read -e -p "height > " height480
 
@@ -1042,7 +1043,7 @@ case "$answer_00" in
     function setresolution576 {
         max576width="1024"
         unset width576
-        until (( $width576 <= $max576width )) 2> /dev/null && [[ $width576 =~ ^[[:digit:]]+$ ]] ; do
+        until (( $width576 <= $max576width )) 2> /dev/null && [[ $width576 =~ ^[[:digit:]]+$ && $width576 -gt  0 ]] ; do
             echo -e "\nset final width for 576p\n"
             read -e -p "width > " width576
 
@@ -1052,7 +1053,7 @@ case "$answer_00" in
 
         max576height="576"
         unset height576
-        until (( $height576 <= $max576height )) 2> /dev/null && [[ $height576 =~ ^[[:digit:]]+$ ]] ; do
+        until (( $height576 <= $max576height )) 2> /dev/null && [[ $height576 =~ ^[[:digit:]]+$ && $height576 -gt  0 ]] ; do
             echo -e "\nset final height for 576p\n"
             read -e -p "height > " height576
 
@@ -1088,7 +1089,7 @@ case "$answer_00" in
     function setresolution720 {
         max720width="1280"
         unset width720
-        until (( $width720 <= $max720width )) 2> /dev/null && [[ $width720 =~ ^[[:digit:]]+$ ]] ; do
+        until (( $width720 <= $max720width )) 2> /dev/null && [[ $width720 =~ ^[[:digit:]]+$ && $width720 -gt  0 ]] ; do
             echo -e "\nset final width for 720p\n"
             read -e -p "width > " width720
 
@@ -1098,7 +1099,7 @@ case "$answer_00" in
 
         max720height="720"
         unset height720
-        until (( $height720 <= $max720height )) 2> /dev/null && [[ $height720 =~ ^[[:digit:]]+$ ]] ; do
+        until (( $height720 <= $max720height )) 2> /dev/null && [[ $height720 =~ ^[[:digit:]]+$ && $height720 -gt  0 ]] ; do
             echo -e "set final height for 720p\n"
             read -e -p "height > " height720
 
@@ -1330,7 +1331,7 @@ case "$answer_00" in
 
     # fillmargins in case of 1 line of black or dirty pixels
     # note: editing the avs files will happen at the very end of option 2
-    if [[ -n $left_fm && -n $right_fm && -n $top_fm && -n $bottom_fm ]]; then
+    if [[ ( -n $left_fm && -n $right_fm && -n $top_fm && -n $bottom_fm ) ]]; then
         echo -e "\nfillmargin values for "$source2":"
         echo -e "left:\t $left_fm"
         echo -e "top:\t $top_fm"
