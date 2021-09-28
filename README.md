@@ -41,7 +41,7 @@ If you want to change them manually, use your editor of choice or choose the edi
 
 Maybe you prefer not to mix your encoding environment with other installations of wine. If you do not have any wine-installation yet, you may leave the newly installed wine directory in place. If you do have a wine installation already, you may rename it or install your encoding environment someplace else. Edit the script:
 
-`wine="${HOME}/.wine"`
+`wine="${HOME}/.wine.encode"`
 
 Start the script like this:
 
@@ -66,53 +66,25 @@ You want to work on another movie, before the baker boys are finished? No proble
 
 Install some programs preferably from your distribution:
 
-    # apt-get install bash bc beep libimage-exiftool-perl mediainfo mkvtoolnix unrar wine x264
+    # apt-get install bash bc beep libimage-exiftool-perl mediainfo mkvtoolnix sed unrar wine x264
 
 If wine64 is installed, you should uninstall it to prevent windows applications from being installed there.
 
-Download eac3to, AvsPmod, avs2yuv, Avisynth, Avisynth Plugins, BalanceBorders, FillMargins, FixBrightnessProtect and ColorMatrix.
+Download eac3to, AvsPmod, Avsresize, avs2yuv, Avisynth and the filters you want to use, like: FillBorders, BalanceBorders, FixBrightnessProtect3, etc.
+You can find them linked [here](https://github.com/derpolsper/encode/tree/master/filtersetc.md) and put them to a custom place, but link to them in the encode.sh script.
+Copying the desired filters to a place independent from the wine directories, e.g.:
 
-Install Avisynth:
-
-    $ wine path/to/Avisynth_258.exe
-
-and follow the instructions.
-
-Unrar Avisynth Plugins and copy the content of the plugins directory:
-
-    $ unrar x -r /path/to/AviSynth\ Plugins.rar
-
-    $ cp -rv /path/to/unrar'ed/AviSynth\ Plugins/plugins ~/.wine/drive_c/Program\ Files/AviSynth\ 2.5/
-
-Copying the desired filters out of Windows paths:
-
-    $ cp -v ~/path/to/FixBrightnessProtect ~/.config/encode/.filters/
-    $ cp -v ~/.wine/drive_c/Program\ Files/AviSynth\ 2.5/plugins/BalanceBorders.avs ~/.config/encode/.filters/
-    $ cp -rv /path/to/unrar'ed/AviSynth\ Plugins/32-Bit\ DLLs/*.dll ~/.wine/drive_c/windows/system32/
-
-…or take these filters from [here](https://github.com/derpolsper/encode/tree/master/filters) and put them to a custom place, but link to them in the encode.sh script.
+    ~/.config/encode/.filters/
 
 Unzip your eac3to.zip to "Program Files":
 
     $ unzip /path/to/eac3to.zip -d ~/.wine/drive_c/Program\ Files/eac3to
 
-similar, with AvsPmod:
+similar, with avs2yuv-0.24bm6.zip:
 
-    $ unzip /path/to/AvsPmod_v2.5.1.zip -d ~/.wine/drive_c/Program\ Files/
+    $ unzip /path/to/avs2yuv-0.24bm6.zip -d ~/.wine/drive_c/Program\ Files/
 
-and avs2yuv-0.24.zip:
-
-    $ unzip /path/to/avs2yuv-0.24.zip -d ~/.wine/drive_c/Program\ Files/
-
-Filters do not need to be in the wine directory. If stored somewhere else, in case of wine updates often followed by malfunctions, filters do not have to be re-installed.
-
-Unzip FillMargins.zip into .filters-directory in your encode directory:
-
-    $ unzip /path/to/FillMargins.zip -d ~/.config/encode/.filters/FillMargins
-
-Unzip ColorMatrixv25.zip to 
-
-    $ unzip /path/to/ColorMatrixv25.zip -d ~/.config/encode/.filters/ColorMatrix/
+Filters do not need to be in the wine directory. If stored somewhere else, they even survive reinstalls.
 
 This script does not need more programs to work. You can use all kind of avisynth filters. There is no guarantee for them to work, though. Generally, most avisynth filters should work, however, I did not do much in the way of verification here.
 
@@ -122,9 +94,9 @@ I tested positive for
 + TFM()
 + TDecimate()
 + ColorMatrix
-+ FillMargins
++ FillBorders
 + BalanceBorders
-+ FixBrightnessProtect
++ FixBrightnessProtect3
 
 The script demuxes the source into h264, vc1, mpeg2 or m2v streams, which afterwards are muxed into a mkv file.
 

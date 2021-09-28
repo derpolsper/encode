@@ -4,31 +4,56 @@
 config="$HOME/.config/encode/default.cfg"
 
 # path to wine directory
-winedir="$HOME/.wine"
+winedir="$HOME/.wine.encode"
 
-# filters
+# path to eac3to
+eac3to="$winedir/drive_c/Program Files/eac3to/eac3to.exe"
+
+# path to avisynth.dll
+avisynth="$winedir/drive_c/windows/system32/AviSynth.dll"
+#avisynth="$winedir/drive_c/windows/syswow64/AviSynth.dll"
+
+# path to AvsPmod
+avspmod="$winedir/drive_c/Program Files/AvsPmod/AvsPmod.exe"
+
 # store filters out of wine saves some escaping
-
 # general path to filters
 filters="$HOME/.config/encode/.filters"
 
-# path to fillmargins
-# if in wine directory, prevent bash from expanding backslashes
-# e.g. pathfillmargins=/home/user/.wine\/drive_c\/Program\\ Files\/FillMargins\/FillMargins.dll
-pathfm="$filters/FillMargins/FillMargins.dll"
+# path to dgindex
+dgindex="$filters/dgmpgdec158/DGIndex.exe"
 
-# path to ColorMatrix.dll
+# path to D2VSource
+d2vsource="$filters/D2VSource-1.2.2/x64/Release/D2VSource.dll"
+
+# path to avs2yuv
+avs2yuv="$filters/avs2yuv/avs2yuv64.exe"
+
+# path to LSMASHSource
+lsmashsource="$filters/LSMASHSource.dll"
+lwlinfo="$filters/LWLInfo.avsi"
+
+# path to z_resize
+z_resize="$filters/avsresize.dll"
+resize="z_Spline36Resize"
+
+# path to fillborders/ fillmargins
 # if in wine directory, prevent bash from expanding backslashes
-# e.g. pathcolormatrix=/home/user\/.wine\/drive_c\/windows\/system32\/ColorMatrix\/ColorMatrix.dll
-#pathcm="$filters/ColorMatrix/ColorMatrix.dll"
+# e.g. pathfillborders=/home/user/.wine\/drive_c\/Program\\ Files\/FillBorders\/FillBorders.dll
+pathfb="$filters/FillBorders.dll"
 
 # path to BalanceBorders
 # if in wine directory, prevent bash from expanding backslashes
-pathbb="$filters/BalanceBorders.avs"
+#pathbb="$filters/BalanceBorders.avsi"
+pathbb="$filters/balanceborders.avsi"
 
 # path to FixBrightnessProtect
 # if in wine directory, prevent bash from expanding backslashes
-pathfixbr="$filters/FixBrightnessProtect.avsi"
+pathfixbr="$filters/FixBrightnessProtect3.avsi"
+
+# wine settings
+export WINEPREFIX="$winedir"
+export WINEARCH=win64
 
 # zones
 if [[ -e ${config%/*}/$1.$2.zones.txt ]]; then
@@ -172,11 +197,18 @@ if [[ $answer_00 -ge 3 ]] || [[ -f ${config%/*}/$1.cfg && $2 = @(SD|480|576|720|
     }
 fi
 
+# for comparisons place info on resolution resolutiondepending
+if [[ $answer_00 -ge 3 ]] && [[ $2 = @(SD|480) ]]; then
+align_position="align=9"
+elif [[ $answer_00 -ge 3 ]] && [[ $2 = @(576|720|1080) ]]; then
+align_position="align=8"
+fi
+
 case "$answer_00" in
     00) # 00 - installed programs - default settings
 
     # bash, bc, beep, exiftool, mediainfo, mkvmerge, wine, x264
-    # eac3to, AviSynth, AvsPmod, avs2yuv, fillmargins, ColorMatrix
+    # eac3to, AviSynth, AvsPmod, avs2yuv, fillborders, ColorMatrix
     # Balanceborders
 
     echo -e "\n*** check for available programs ***\n"
@@ -227,41 +259,41 @@ case "$answer_00" in
         echo -e "***\n*** x264 NOT installed ***\n***\n";
     fi
 
-    if [ -e "$winedir"/drive_c/Program\ Files/eac3to/eac3to.exe ]; then
-        wine "$winedir"/drive_c/Program\ Files/eac3to/eac3to.exe 2>/dev/null| grep 'eac3to v';
+    if [ -e "$eac3to" ]; then
+        wine "$eac3to" 2>/dev/null| grep 'eac3to v';
         echo
     else
         echo -e "***\n*** eac3to NOT found ***\n***\n";
     fi
 
-    if [ -e "$winedir"/drive_c/windows/system32/avisynth.dll ]; then
+    if [ -e "$avisynth" ]; then
         echo -e "avisynth found\n"
     else
         echo -e "***\n*** avisynth NOT found ***\n***\n";
     fi
 
-    if [ -e "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe ]; then
+    if [ -e "$avspmod" ]; then
         echo -e "AvsPmod found\n"
     else
         echo -e "***\n*** AvsPmod NOT found ***\n***\n";
     fi
 
-    if [ -e "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe ]; then
+    if [ -e "$avs2yuv" ]; then
         echo -e "avs2yuv found\n"
     else
         echo -e "***\n*** avs2yuv NOT found ***\n***\n";
     fi
 
-    if [ -e "$pathfm" ]; then
-        echo -e "FillMargins found\n"
+    if [ -e "$dgindex" ]; then
+        echo -e "DGIndex found\n"
     else
-        echo -e "***\n*** FillMargins NOT found ***\n***\n";
+        echo -e "***\n*** DGIndex NOT found ***\n***\n";
     fi
 
-    if [ -e "$pathcm" ]; then
-        echo -e "ColorMatrix found\n"
+    if [ -e "$pathfb" ]; then
+        echo -e "FillBorders found\n"
     else
-        echo -e "***\n*** ColorMatrix NOT found ***\n***\n";
+        echo -e "***\n*** FillBorders NOT found ***\n***\n";
     fi
 
     if [ -e "$pathbb" ]; then
@@ -271,9 +303,9 @@ case "$answer_00" in
     fi
 
     if [ -e "$pathfixbr" ]; then
-        echo -e "FixBrightnessProtect found\n"
+        echo -e "FixBrightnessProtect3 found\n"
     else
-        echo -e "***\n*** FixBrightnessProtect NOT found ***\n***\n";
+        echo -e "***\n*** FixBrightnessProtect3 NOT found ***\n***\n";
     fi
 
     echo -e "you might go on with option 1\n"
@@ -301,12 +333,12 @@ case "$answer_00" in
 
         if [[ -n $1 ]]; then
             echo -e "***      SETTINGS ON SOURCE      ***\n"
-            if [[ -e $left_crop || -e $top_crop || -e $right_crop || -e $bottom_crop ]]; then
+            if [[ -n $left_crop || -n $top_crop || -n $right_crop || -n $bottom_crop ]]; then
                 echo -e "CROPPING [ltrb]:\t ""$left_crop","$top_crop","$right_crop","$bottom_crop\n"
             fi
 
-            if [[ -n $left_fm || -n $top_fm || -n $right_fm || -n $bottom_fm ]]; then
-                echo -e "FILLMARGINS [ltrb]:\t ""$left_fm","$top_fm","$right_fm","$bottom_fm\n"
+            if [[ -n $left_fb || -n $top_fb || -n $right_fb || -n $bottom_fb ]]; then
+                echo -e "FILLBORDERS [ltrb]:\t ""$left_fb","$top_fb","$right_fb","$bottom_fb\n"
             fi
 
             if [[ -n $left_bb || -n $top_bb || -n $right_bb || -n $bottom_bb ]]; then
@@ -356,8 +388,9 @@ case "$answer_00" in
             elif [[ ${ratectrl##*=} = 2 ]]; then
                 echo -e "RATE CONTROL:\t\t 2PASS"
             fi
-
-            echo -e "Bit rate:\t\t ""${br##*=}"
+            if [[ -n ${br##*=} ]]; then
+                echo -e "Bit rate:\t\t ""${br##*=}"
+            fi
         fi
 
     echo -e "\nyou may adjust them to your needs, e.g."
@@ -388,12 +421,12 @@ case "$answer_00" in
     echo -e "you may go on processing encodings\n"
     ;;
 
-    1)  # 1 - prepare sources: rip remux/ m2ts → mkv
+    1)  # 1 - prepare sources: rip/ remux/ m2ts → mkv
 
-    # check source0 for being raw h264, a m2ts stream, a matroska container or a m2v file
-    until [[ -e $source0 ]] && ( [[ $source0 == @(*.h264|*.m2ts|*.m2v|*.mkv|*.mpls) ]] ); do
+    # check source0 for being raw h264, a m2ts stream, a matroska container, a VOB or a m2v file
+    until [[ -e $source0 ]] && ( [[ $source0 == @(*.h264|*.m2ts|*.m2v|*.mkv|*.mpls|*.VOB) ]] ); do
         echo -e "\nset path to source:"
-        echo -e "raw h264, m2v, mkv, m2ts or mpls file respectively\n"
+        echo -e "raw h264, m2v, mkv, m2ts, mpls or any VOB file respectively\n"
         read -e -p "> " source0
     done
 
@@ -411,11 +444,11 @@ case "$answer_00" in
     # bash parameter expansion does not allow nesting, so do it in two steps
     source2=${source1##*/}
 
-    function source_dvd_bd {
+    function source_bd {
         cd "${source0%/*}"
-        wine "$winedir"/drive_c/Program\ Files/eac3to/eac3to.exe "${source0##*/}" | tee "${source1%.*}".log
+        wine "$eac3to" "${source0##*/}" | tee "${source1%.*}".log
 
-        until [[ $param1 == @(*\-demux*|*.ac3*|*.dts*|*.flac*|*.h264*|*.m2v*|*.mpeg2*|*.sup*|*.txt*|*.vc1*) ]]; do
+        until [[ $param1 == @(*\-demux*|*.ac3*|*.dts*|*.flac*|*.thd+ac3*|*.h264*|*.mpeg2*|*.sup*|*.txt*|*.vc1*|*.m2v*) ]]; do
             echo -e "\nextract all wanted tracks following this name pattern:"
             echo "[1-n]:moviename.extension, e.g. 2:moviename.h264"
             echo "3:moviename.flac 4:moviename.ac3 5:moviename.sup etc"
@@ -425,7 +458,7 @@ case "$answer_00" in
         done
 
         # keep $param1 without parenthesis, otherwise eac3to fails while parsing the parameter
-        wine "$winedir"/drive_c/Program\ Files/eac3to/eac3to.exe "${source0##*/}" $param1 | tee -a "${source1%.*}".log
+        wine "$eac3to" "${source0##*/}" $param1 | tee -a "${source1%.*}".log
 
             mv *.h264 ${source2%.*}.h264
             mv *.mpeg2 ${source2%.*}.mpeg2
@@ -439,7 +472,7 @@ case "$answer_00" in
 
     function source_raw {
         cd "${source0%/*}"
-        wine "$winedir"/drive_c/Program\ Files/eac3to/eac3to.exe "${source0##*/}" | tee "${source1%.*}".log
+        wine "$eac3to" "${source0##*/}" | tee "${source1%.*}".log
 
 # TODONOTE: dirty. problems when >1 h264 file
         mkvmerge -v -o "$source1" "$source0" | tee -a "${source1%.*}".log
@@ -449,7 +482,7 @@ case "$answer_00" in
         cd "${source0%/*}"
         mkvmerge -i "${source0##*/}" | tee "${source1%.*}".log
 
-        until [[ $param1 == @(*.ac3*|*.dts*|*.flac*|*.h264|*.m2v*|*.mpeg2|*.sup*|*.txt*) ]]; do
+        until [[ $param1 == @(*.ac3*|*.dts*|*.flac*|*.thd+ac3*|*.h264*|*.mpeg2*|*.sup*|*.txt*) ]]; do
             echo -e "\nextract all wanted tracks following this name pattern:"
             echo "[0-n]:moviename.extension, e.g. 0:moviename.h264"
             echo "1:moviename.flac 2:moviename.ac3 3:moviename.sup etc"
@@ -458,29 +491,47 @@ case "$answer_00" in
         done
 
         # keep $param1 without parenthesis, otherwise eac3to fails while parsing the parameter
-        #wine "$winedir"/drive_c/Program\ Files/eac3to/eac3to.exe "${source0##*/}" $param1 | tee -a "${source1%.*}".log
+        #wine $eac3to "${source0##*/}" $param1 | tee -a "${source1%.*}".log
         mkvextract tracks "$source0" $param1 | tee -a "${source1%.*}".log
 
         # TODONOTE: dirty. problems when >1 h264|mpeg2|vc1|m2v file
-        mkvmerge -v -o "$source1" $(ls "${source0%/*}"|grep -iE "h264|mpeg2|vc1|m2v") | tee -a "${source1%.*}".log
+        mkvmerge -v -o "$source1" $(ls "${source0%/*}"|grep -iE "h264|mpeg2|vc1") | tee -a "${source1%.*}".log
         mkvextract chapters "$source0" -s >> "${source2%.*}.chapters.txt" | tee -a "${source1%.*}".log
-        rm "$(ls "${source0%/*}"|grep -iE "h264|mpeg2|vc1|m2v")"
+        rm "$(ls|grep -iE "h264|mpeg2|vc1|m2v")"
+    }
+
+    function source_dvd {
+        cd "${source0%/*}"
+        echo -e "\nHere the available VOBs:\n\n$(ls *.VOB|grep -v 0.VOB|grep -v VIDEO)"
+        until [[ $vob0 =~ ^[[:digit:]]+[[:digit:]]$ ]] ; do
+        echo -e "\nchoose the VOB group you want to be remuxed"
+        echo -e "e.g. 01 or 02 or else"
+        read -e -p "> " vob0
+        done
+        vob1="$(ls *.VOB | grep VTS_ | grep -v 0.VOB | grep $vob0 | tr "\n" " ")"
+        wine "$dgindex" -i $vob1 -om 2 -od ${source2%.*} -exit
+        mkvmerge -v -o "$source1" $(ls "${source0%/*}"|grep -iE ".m2v") | tee -a "${source1%.*}".log
+        # rename audio tracks
+        ls -v | grep .ac3 | cat -n | while read n f; do mv -n "$f" "${source2%.*}"."$n".ac3; done
     }
 
     if [[ $source0 == @(*.mpls|*.m2ts) ]] ; then
-        source_dvd_bd
+        source_bd
     elif [[ $source0 == @(*.h264|*.vc1|*.m2v) ]] ; then
         source_raw
     elif [[ $source0 == @(*.mkv) ]] ; then
         source_remux
+    elif [[ $source0 == @(*.VOB) ]] ; then
+        source_dvd
     else
         echo -e "something went wrong\n"
     fi
 
     # remove spaces out of eac3to's log file name
-    for file in ./*.aac ./*.ac3 ./*.dts* ./*.flac ./*.h264 ./*.idx ./*.m2v ./*.mpeg* ./*.pcm ./*.srt ./*.sub ./*.sup ./*.txt ./*.vc1 ./*.w64 ./*.wav ; do mv "$file" $(echo $i | sed 's/ /./g') 2>/dev/null | tee -a "${source1%.*}".log; done
-# TODONOTE move ALL eac3to associated files to directory for demuxed files. does it?
-    for file in ./*.aac ./*.ac3 ./*.dts* ./*.flac ./*.h264 ./*.idx ./*.m2v ./*.mpeg* ./*.pcm ./*.srt ./*.sub ./*.sup ./*.txt ./*.vc1 ./*.w64 ./*.wav ; do mv "$file" "${source1%/*}"/ 2>/dev/null | tee -a "${source1%.*}".log; done
+    for file in ./*.aac ./*.ac3 ./*.dts* ./*.flac ./*.thd+ac3 ./*.h264 ./*.idx ./*.pcm ./*.srt ./*.sub ./*.sup ./*.txt ./*.vc1 ./*.w64 ./*.wav ./*d2v ./*.d2v.bad ./*.m2v ./*log ; do mv "$file" $(echo $i | sed 's/ /./g') 2>/dev/null | tee -a "${source1%.*}".log; done
+# TODONOTE move ALL eac3to/ D2V associated files to directory for demuxed files. does it?
+    for file in ./*.aac ./*.ac3 ./*.dts* ./*.flac ./*.thd+ac3 ./*.h264 ./*.idx ./*.pcm ./*.srt ./*.sub ./*.sup ./*.txt ./*.vc1 ./*.w64 ./*.wav ./*d2v ./*.d2v.bad ./*.m2v ./*log ; do mv "$file" "${source1%/*}"/ 2>/dev/null | tee -a "${source1%.*}".log; done
+    rm ./*.d2v && rm ./*.log && rm ./*.m2v && rm ./.mpeg*
 
     echo -e "\nyou find the demuxed files in"
     echo -e "${source1%/*}/\n"
@@ -621,29 +672,18 @@ case "$answer_00" in
     }
 
     function colormatrices {
-        if [[ $sarwidth0 -lt 1920 && $sarheight0 -lt 1080 && $darwidth0 -lt 1920 && $darheight0 -lt 1080 ]] ; then
-            echo "As your source's dimentions are less than FullHD,"
-            echo -e "that may be a DVD\n"
-            echo -e "Please choose between (P)AL and (N)TSC\n"
+        if [[ $sarwidth0 == 720 && $sarheight0 == 480 && $darwidth0 == 704 && $darheight0 == 480 ]] || [[ $sarwidth0 == 720 && $sarheight0 == 480 && $darwidth0 == 853 && $darheight0 == 480 ]] || [[ $sarwidth0 == 720 && $sarheight0 == 480 && $darwidth0 == 640 && $darheight0 == 480 ]] || [[ $sarwidth0 == 720 && $sarheight0 == 480 && $darwidth0 == 654 && $darheight0 == 480 ]] ; then
+            # keep cfg informed
+            sed -i "/colormatrixSD/d" "${config%/*}/${source2%.*}.cfg"
+            echo "colormatrixSD=smpte170m" >> "${config%/*}/${source2%.*}.cfg"
+            sed -i "/colorprimSD/d" "${config%/*}/${source2%.*}.cfg"
+            echo "colorprimSD=smpte170m" >> "${config%/*}/${source2%.*}.cfg"
 
-            until [[ $colormatrix0 =~ [n,N,p,P] ]]; do
-                read -e -p "> " colormatrix0
-                    case "$colormatrix0" in
-                        n|N)
-                            # keep cfg informed
-                            sed -i "/colormatrixSD/d" "${config%/*}/${source2%.*}.cfg"
-                            echo "colormatrixSD=smpte170m" >> "${config%/*}/${source2%.*}.cfg"
-                            sed -i "/colorprimSD/d" "${config%/*}/${source2%.*}.cfg"
-                            echo "colorprimSD=smpte170m" >> "${config%/*}/${source2%.*}.cfg"
-                        ;;
-                        p|P)
-                            sed -i "/colormatrixSD/d" "${config%/*}/${source2%.*}.cfg"
-                            echo "colormatrixSD=bt470bg" >> "${config%/*}/${source2%.*}.cfg"
-                            sed -i "/colorprimSD/d" "${config%/*}/${source2%.*}.cfg"
-                            echo "colorprimSD=bt470bg" >> "${config%/*}/${source2%.*}.cfg"
-                        ;;
-                    esac
-            done
+        elif [[ $sarwidth0 == 720 && $sarheight0 == 576 && $darwidth0 == 1024 && $darheight0 == 576 ]] || [[ $sarwidth0 == 720 && $sarheight0 == 576 && $darwidth0 == 1048 && $darheight0 == 576 ]] || [[ $sarwidth0 == 720 && $sarheight0 == 576 && $darwidth0 == 768 && $darheight0 == 576 ]] || [[ $sarwidth0 == 720 && $sarheight0 == 576 && $darwidth0 == 786 && $darheight0 == 576 ]] ; then
+            sed -i "/colormatrixSD/d" "${config%/*}/${source2%.*}.cfg"
+            echo "colormatrixSD=bt470bg" >> "${config%/*}/${source2%.*}.cfg"
+            sed -i "/colorprimSD/d" "${config%/*}/${source2%.*}.cfg"
+            echo "colorprimSD=bt470bg" >> "${config%/*}/${source2%.*}.cfg"
         fi
     }
 
@@ -661,8 +701,11 @@ case "$answer_00" in
                 ;;
 
                 *)
-                    echo "FFVideosource(\"$source1\")" > "${source1%.*}".avs
-                    wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".avs
+                    echo "LoadPlugin(\""$lsmashsource"\")" > "${source1%.*}".avs
+                    echo "LWLibavVideoSource(\"$source1\")" >> "${source1%.*}".avs
+                    echo "Import(\""$lwlinfo"\")" >> "${source1%.*}".avs
+                    echo "LWLInfo()" >> "${source1%.*}".avs
+                    wine "$avspmod" "${source1%.*}".avs
                 ;;
             esac
 
@@ -711,66 +754,64 @@ case "$answer_00" in
                     done
     }
 
-    function fillmargins {
-        unset left_fm
-        unset top_fm
-        unset right_fm
-        unset bottom_fm
-        
+    function fillborders {
+        unset left_fb
+        unset top_fb
+        unset right_fb
+        unset bottom_fb
+
         echo -e "\nif cropping left one or more line(s) of black or dirty"
-        echo -e "pixels elsewhere, you can use fillmargins\n"
-        echo -e "choose as few pixels as possible"
-        echo -e "and avoid more than two\n"
-        echo "do you want to use (f)illmargins?"
+        echo -e "pixels elsewhere, you can use fillborders\n"
+        echo -e "choose not more than ONE pixel at each border!\n"
+        echo "do you want to use (f)illborders?"
         echo -e "else, return\n"
-        read -e -p "(RETURN|f) > " answer_fillmargins
-            case $answer_fillmargins in
-                f|F|fillmargins|FillMargins)
-                        # who needs more than 2 pixels for fillmargins?
-                    until [[ $left_fm =~ ^[0-2]$ ]] ; do
+        read -e -p "(RETURN|f) > " answer_fillborders
+            case $answer_fillborders in
+                f|F|fillborders|FillBorders)
+                        # who needs more than 2 pixels for fillborders?
+                    until [[ $left_fb =~ ^[0-2]$ ]] ; do
                         echo "number of pixels on the"
-                        read -e -p "left > " left_fm
+                        read -e -p "left > " left_fb
 
                         # keep cfg informed
-                        sed -i "/left_fm/d" "${config%/*}/${source2%.*}.cfg"
-                        echo "$left_fm"
-                        echo "left_fm=$left_fm" >> "${config%/*}/${source2%.*}.cfg"
+                        sed -i "/left_fb/d" "${config%/*}/${source2%.*}.cfg"
+                        echo "left_fb=$left_fb" >> "${config%/*}/${source2%.*}.cfg"
                     done
 
-                    until [[ $top_fm =~ ^[0-2]$ ]] ; do
+                    until [[ $top_fb =~ ^[0-2]$ ]] ; do
                         echo "number of pixels on the"
-                        read -e -p "top > " top_fm
+                        read -e -p "top > " top_fb
 
                         # keep cfg informed
-                        sed -i "/top_fm/d" "${config%/*}/${source2%.*}.cfg"
-                        echo "top_fm=$top_fm" >> "${config%/*}/${source2%.*}.cfg"
+                        sed -i "/top_fb/d" "${config%/*}/${source2%.*}.cfg"
+                        echo "top_fb=$top_fb" >> "${config%/*}/${source2%.*}.cfg"
                     done
 
-                    until [[ $right_fm =~ ^[0-2]$ ]] ; do
+                    until [[ $right_fb =~ ^[0-2]$ ]] ; do
                         echo "number of pixels on the"
-                        read -e -p "right > " right_fm
+                        read -e -p "right > " right_fb
 
                         # keep cfg informed
-                        sed -i "/right_fm/d" "${config%/*}/${source2%.*}.cfg"
-                        echo "right_fm=$right_fm" >> "${config%/*}/${source2%.*}.cfg"
+                        sed -i "/right_fb/d" "${config%/*}/${source2%.*}.cfg"
+                        echo "right_fb=$right_fb" >> "${config%/*}/${source2%.*}.cfg"
                     done
 
-                    until [[ $bottom_fm =~ ^[0-2]$ ]] ; do
+                    until [[ $bottom_fb =~ ^[0-2]$ ]] ; do
                         echo "number of pixels on the"
-                        read -e -p "bottom > " bottom_fm
+                        read -e -p "bottom > " bottom_fb
 
                         # keep cfg informed
-                        sed -i "/bottom_fm/d" "${config%/*}/${source2%.*}.cfg"
-                        echo "bottom_fm=$bottom_fm" >> "${config%/*}/${source2%.*}.cfg"
+                        sed -i "/bottom_fb/d" "${config%/*}/${source2%.*}.cfg"
+                        echo "bottom_fb=$bottom_fb" >> "${config%/*}/${source2%.*}.cfg"
                     done
                 ;;
 
                 *)
                     # keep cfg informed
-                    sed -i "/left_fm/d" "${config%/*}/${source2%.*}.cfg"
-                    sed -i "/top_fm/d" "${config%/*}/${source2%.*}.cfg"
-                    sed -i "/right_fm/d" "${config%/*}/${source2%.*}.cfg"
-                    sed -i "/bottom_fm/d" "${config%/*}/${source2%.*}.cfg"
+                    sed -i "/left_fb/d" "${config%/*}/${source2%.*}.cfg"
+                    sed -i "/top_fb/d" "${config%/*}/${source2%.*}.cfg"
+                    sed -i "/right_fb/d" "${config%/*}/${source2%.*}.cfg"
+                    sed -i "/bottom_fb/d" "${config%/*}/${source2%.*}.cfg"
                 ;;
             esac
     }
@@ -781,17 +822,17 @@ case "$answer_00" in
         read -e -p "(RETURN|b) > " answer_balanceborders
             case $answer_balanceborders in
                 b|B|bb|BB|Balanceborders|balanceborders)
-                    if  [[ -n $left_fm || -n $top_fm|| -n $right_fm|| -n $bottom_fm ]]; then
+                    if  [[ -n $left_fb || -n $top_fb|| -n $right_fb|| -n $bottom_fb ]]; then
                         echo -e "\ncheck for dirty lines with balanceborders"
                         echo "(bear in mind your choice on"
-                        echo "fillmargins ($left_fm,$top_fm,$right_fm,$bottom_fm) [ltrb] and"
+                        echo "fillborders ($left_fb,$top_fb,$right_fb,$bottom_fb) [ltrb] and"
                     fi
                     echo "choose values for pixel ranges"
                     echo -e "of balanceborders (0-4 pixels)\n"
                     echo "when checked, note values and"
                     echo "close AvsPmod window with ALT+F4"
                     sleep 1.5
-                    wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".avs
+                    wine "$avspmod" "${source1%.*}".avs
 
                     unset left_bb
                     unset top_bb
@@ -861,11 +902,12 @@ case "$answer_00" in
 
                     # generate a new avs file for each bb_thresh value tested
                     for bb_thresh in 001 002 004 008 016 032 064 128 ; do
-                        echo "FFVideosource(\"$source1\")" > "${source1%.*}".bb$bb_thresh.avs
+                        echo "LoadPlugin(\""$lsmashsource"\")" > "${source1%.*}".bb$bb_thresh.avs
+                        echo "LWLibavVideoSource(\"$source1\")" >> "${source1%.*}".bb$bb_thresh.avs
                         echo "Crop($left_crop, $top_crop, -$right_crop, -$bottom_crop)" >> "${source1%.*}".bb$bb_thresh.avs
-                        if [[ $left_fm -ne 0 || $top_fm -ne 0 || $right_fm -ne 0 || $bottom_fm -ne 0 ]]; then
-                            echo "LoadPlugin(\"$pathfm\")" >> "${source1%.*}".bb$bb_thresh.avs
-                            echo "FillMargins($left_fm,$top_fm,$right_fm,$bottom_fm)" >> "${source1%.*}".bb$bb_thresh.avs
+                        if [[ $left_fb -ne 0 || $top_fb -ne 0 || $right_fb -ne 0 || $bottom_fb -ne 0 ]]; then
+                            echo "LoadPlugin(\"$pathfb\")" >> "${source1%.*}".bb$bb_thresh.avs
+                            echo "FillBorders($left_fb,$top_fb,$right_fb,$bottom_fb)" >> "${source1%.*}".bb$bb_thresh.avs
                         fi
                         echo "Import(\"$pathbb\")" >> "${source1%.*}".bb$bb_thresh.avs
                         echo "Balanceborders($top_bb,$bottom_bb,$left_bb,$right_bb,$bb_thresh,$bb_blur)" >> "${source1%.*}".bb$bb_thresh.avs
@@ -873,15 +915,16 @@ case "$answer_00" in
                     done
 
                     # a test avs
-                    echo "FFVideosource(\"$source1\")" > "${source1%.*}".bb_thresh.avs
+                    echo "LoadPlugin(\""$lsmashsource"\")" > "${source1%.*}".bb_thresh.avs
+                    echo "LWLibavVideoSource(\"$source1\")" >> "${source1%.*}".bb_thresh.avs
                     echo "Crop($left_crop, $top_crop, -$right_crop, -$bottom_crop)" >> "${source1%.*}".bb_thresh.avs
-                    if [[ $left_fm -ne 0 || $top_fm -ne 0 || $right_fm -ne 0 || $bottom_fm -ne 0 ]]; then
-                        echo "LoadPlugin(\"$pathfm\")" >> "${source1%.*}".bb_thresh.avs
-                        echo "FillMargins($left_fm,$top_fm,$right_fm,$bottom_fm)" >> "${source1%.*}".bb_thresh.avs
+                    if [[ $left_fb -ne 0 || $top_fb -ne 0 || $right_fb -ne 0 || $bottom_fb -ne 0 ]]; then
+                        echo "LoadPlugin(\"$pathfb\")" >> "${source1%.*}".bb_thresh.avs
+                        echo "FillBorders($left_fb,$top_fb,$right_fb,$bottom_fb)" >> "${source1%.*}".bb_thresh.avs
                     fi
                     echo "SelectRangeEvery(1000, 1, 1000)" >> "${source1%.*}".bb_thresh.avs
 
-                    echo "=import(\"${source1%.*}.bb_thresh.avs\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".bb_thresh.avs
+                    echo "=import(\"${source1%.*}.bb_thresh.avs\").subtitle(\"${source2%.*} source $2\", "$align_position")#.trim(0,framecount)" > "${source1%.*}".bb_thresh.avs
                     for bb_thresh in 001 002 004 008 016 032 064 128 ; do
                         sleep 1.5
 
@@ -891,10 +934,10 @@ case "$answer_00" in
                         start1=$(date +%s)
 
                         #comparison screen
-                        echo "=import(\"${source1%.*}.bb$bb_thresh.avs\").subtitle(\"${source2%.*} bb thresh $bb_thresh\", align=8)#.trim(0,framecount)" >> "${source1%.*}".bb_thresh.avs
+                        echo "=import(\"${source1%.*}.bb$bb_thresh.avs\").subtitle(\"${source2%.*} bb thresh $bb_thresh\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".bb_thresh.avs
 
                         # sensible bitrate hardcoded, all other variable parameters rest default
-                        wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${source1%.*}".bb$bb_thresh.avs - \
+                        wine "$avs2yuv" "${source1%.*}".bb$bb_thresh.avs - \
                         | x264 --stdin y4m \
                         --bitrate 12500 \
                         --pass 1 \
@@ -910,7 +953,7 @@ case "$answer_00" in
                         --deblock "$deblock" \
                         -o /dev/null - 2>&1|tee -a "${source1%.*}".bb.log;
 
-                        wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${source1%.*}".bb$bb_thresh.avs - \
+                        wine "$avs2yuv" "${source1%.*}".bb$bb_thresh.avs - \
                         | x264 --stdin y4m \
                         --bitrate 12500 \
                         --pass 2 \
@@ -951,8 +994,7 @@ case "$answer_00" in
 
                     avslines="$(wc -l < "${source1%.*}".bb_thresh.avs)"
                     echo "interleave($(printf %s, a,{b..z} a,{a..e}{a..z})a)" | cut -d ',' --complement -f "$(( ("$avslines" *2) -1 ))"-310 >> "${source1%.*}".2.bb_thresh.avs
-                    echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".2.bb_thresh.avs
-                    echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".2.bb_thresh.avs
+                    echo "LWLInfo()" >> "${source1%.*}".2.bb_thresh.avs
                     mv "${source1%.*}".2.bb_thresh.avs "${source1%.*}".bb_thresh.avs
 
                     if [ -e /usr/bin/beep ]; then beep $beep; fi
@@ -962,7 +1004,7 @@ case "$answer_00" in
                     echo "then close AvsPmod."
                     sleep 1.5
 
-                    wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".bb_thresh.avs
+                    wine "$avspmod" "${source1%.*}".bb_thresh.avs
                     unset bb_thresh
                     until [[ $bb_thresh =~ ^[1-9]$|^[1-9][0-9]$|^[1][0-1][0-9]$|[1][2][0-8]$ ]]; do
                         echo "maximum color shift, 0-128"
@@ -981,17 +1023,17 @@ case "$answer_00" in
 
     function getresolutionSD {
         # if resolution is SD has to be checked before function is used
-            widthSD=$(echo "$sarwidth0-$left_crop-$right_crop"|bc)
-            heightSD=$(echo "$sarheight0-$top_crop-$bottom_crop"|bc)
+#           widthSD=$(echo "$sarwidth0-$left_crop-$right_crop"|bc)
+#           heightSD=$(echo "$sarheight0-$top_crop-$bottom_crop"|bc)
 
             refSD=$(echo "scale=0;32768/((("$sarwidth1"/16)+0.5)/1 * (("$sarheight1"/16)+0.5)/1)"|bc)
             # keep cfg informed
             sed -i "/refSD/d" "${config%/*}/${source2%.*}.cfg"
             echo "refSD=$refSD" >> "${config%/*}/${source2%.*}.cfg"
-            sed -i "/widthSD/d" "${config%/*}/${source2%.*}.cfg"
-            echo "widthSD=$widthSD" >> "${config%/*}/${source2%.*}.cfg"
-            sed -i "/heightSD/d" "${config%/*}/${source2%.*}.cfg"
-            echo "heightSD=$heightSD" >> "${config%/*}/${source2%.*}.cfg"
+#            sed -i "/widthSD/d" "${config%/*}/${source2%.*}.cfg"
+#            echo "widthSD=$widthSD" >> "${config%/*}/${source2%.*}.cfg"
+#            sed -i "/heightSD/d" "${config%/*}/${source2%.*}.cfg"
+#            echo "heightSD=$heightSD" >> "${config%/*}/${source2%.*}.cfg"
     }
 
     function setresolution480 {
@@ -1152,13 +1194,18 @@ case "$answer_00" in
         # keep cfg informed
         sed -i "/finalavsSD/d" "${config%/*}/${source2%.*}.cfg"
         echo "finalavsSD=${source1%.*}.SD.final.avs" >> "${config%/*}/${source2%.*}.cfg"
-        echo "FFVideosource(\"$source1\")" > "${source1%.*}".SD.final.avs
+        echo "LoadPlugin(\""$lsmashsource"\")" > "${source1%.*}".SD.final.avs
+        echo "LWLibavVideoSource(\"$source1\")" >> "${source1%.*}".SD.final.avs
+        #echo "LoadPlugin(\""$d2vsource"\")" > "${source1%.*}".SD.final.avs
+        #echo "D2VSource(\"$source1\")" >> "${source1%.*}".SD.final.avs
+        #echo "Import(\""$lwlinfo"\")" >> "${source1%.*}".SD.final.avs
+        #echo "LWLInfo()" >> "${source1%.*}".SD.final.avs
         echo "#greyscale" >> "${source1%.*}".SD.final.avs
         echo "#interlaced" >> "${source1%.*}".SD.final.avs
         echo "#telecined" >> "${source1%.*}".SD.final.avs
         echo "Crop($left_crop, $top_crop, -$right_crop, -$bottom_crop)" >> "${source1%.*}".SD.final.avs
-        echo "#fillmargins0" >> "${source1%.*}".SD.final.avs
-        echo "#fillmargins1" >> "${source1%.*}".SD.final.avs
+        echo "#fillborders0" >> "${source1%.*}".SD.final.avs
+        echo "#fillborders1" >> "${source1%.*}".SD.final.avs
         echo "#balanceborders0" >> "${source1%.*}".SD.final.avs
         echo "#balanceborders1" >> "${source1%.*}".SD.final.avs
     }
@@ -1168,18 +1215,22 @@ case "$answer_00" in
         # keep cfg informed
         sed -i "/finalavs480/d" "${config%/*}/${source2%.*}.cfg"
         echo "finalavs480=${source1%.*}.480.final.avs" >> "${config%/*}/${source2%.*}.cfg"
-        echo "FFVideosource(\"$source1\")" > "${source1%.*}".480.final.avs
+        echo "LoadPlugin(\""$lsmashsource"\")" > "${source1%.*}".480.final.avs
+        echo "LWLibavVideoSource(\"$source1\")" >> "${source1%.*}".480.final.avs
         echo "#greyscale" >> "${source1%.*}".480.final.avs
         echo "#interlaced" >> "${source1%.*}".480.final.avs
         echo "#telecined" >> "${source1%.*}".480.final.avs
         echo "Crop($left_crop, $top_crop, -$right_crop, -$bottom_crop)" >> "${source1%.*}".480.final.avs
-        echo "#fillmargins0" >> "${source1%.*}".480.final.avs
-        echo "#fillmargins1" >> "${source1%.*}".480.final.avs
+        echo "#fillborders0" >> "${source1%.*}".480.final.avs
+        echo "#fillborders1" >> "${source1%.*}".480.final.avs
         echo "#balanceborders0" >> "${source1%.*}".480.final.avs
         echo "#balanceborders1" >> "${source1%.*}".480.final.avs
-        #echo "LoadPlugin(\"$pathcm\")" >> "${source1%.*}".480.final.avs
-        #echo "ColorMatrix(mode=\"Rec.709->Rec.601\", clamp=0)" >> "${source1%.*}".480.final.avs
-        echo "Spline36Resize($width480, $height480)" >> "${source1%.*}".480.final.avs
+        echo "LoadPlugin (\"$z_resize\")" >> "${source1%.*}".480.final.avs
+        if [[ ( -n $left_fb && -n $right_fb && -n $top_fb && -n $bottom_fb ) ]]; then
+            echo "$resize($width480, $height480, $left_fb, $top_fb, -$right_fb, -$bottom_fb, dither=\"error_diffusion\")" >> "${source1%.*}".480.final.avs
+        else
+            echo "$resize($width480, $height480)" >> "${source1%.*}".480.final.avs
+        fi
     }
 
     function avs576 {
@@ -1187,18 +1238,22 @@ case "$answer_00" in
         # keep cfg informed
         sed -i "/finalavs576/d" "${config%/*}/${source2%.*}.cfg"
         echo "finalavs576=${source1%.*}.576.final.avs" >> "${config%/*}/${source2%.*}.cfg"
-        echo "FFVideosource(\"$source1\")" > "${source1%.*}".576.final.avs
+        echo "LoadPlugin(\""$lsmashsource"\")" > "${source1%.*}".576.final.avs
+        echo "LWLibavVideoSource(\"$source1\")" >> "${source1%.*}".576.final.avs
         echo "#greyscale" >> "${source1%.*}".576.final.avs
         echo "#interlaced" >> "${source1%.*}".576.final.avs
         echo "#telecined" >> "${source1%.*}".576.final.avs
         echo "Crop($left_crop, $top_crop, -$right_crop, -$bottom_crop)" >> "${source1%.*}".576.final.avs
-        echo "#fillmargins0" >> "${source1%.*}".576.final.avs
-        echo "#fillmargins1" >> "${source1%.*}".576.final.avs
+        echo "#fillborders0" >> "${source1%.*}".576.final.avs
+        echo "#fillborders1" >> "${source1%.*}".576.final.avs
         echo "#balanceborders0" >> "${source1%.*}".576.final.avs
         echo "#balanceborders1" >> "${source1%.*}".576.final.avs
-        #echo "LoadPlugin(\"$pathcm\")" >> "${source1%.*}".576.final.avs
-        #echo "ColorMatrix(mode=\"Rec.709->Rec.601\", clamp=0)" >> "${source1%.*}".576.final.avs
-        echo "Spline36Resize($width576, $height576)" >> "${source1%.*}".576.final.avs
+        echo "LoadPlugin (\"$z_resize\")" >> "${source1%.*}".576.final.avs
+        if [[ ( -n $left_fb && -n $right_fb && -n $top_fb && -n $bottom_fb ) ]]; then
+            echo "$resize($width576, $height576, $left_fb, $top_fb, -$right_fb, -$bottom_fb, dither=\"error_diffusion\")" >> "${source1%.*}".576.final.avs
+        else
+            echo "$resize($width576, $height576)" >> "${source1%.*}".576.final.avs
+        fi
     }
 
     function avs720 {
@@ -1206,16 +1261,22 @@ case "$answer_00" in
         # keep cfg informed
         sed -i "/finalavs720/d" "${config%/*}/${source2%.*}.cfg"
         echo "finalavs720=${source1%.*}.720.final.avs" >> "${config%/*}/${source2%.*}.cfg"
-        echo "FFVideosource(\"$source1\")" > "${source1%.*}".720.final.avs
+        echo "LoadPlugin(\""$lsmashsource"\")" > "${source1%.*}".720.final.avs
+        echo "LWLibavVideoSource(\"$source1\")" >> "${source1%.*}".720.final.avs
         echo "#greyscale" >> "${source1%.*}".720.final.avs
         echo "#interlaced" >> "${source1%.*}".720.final.avs
         echo "#telecined" >> "${source1%.*}".720.final.avs
         echo "Crop($left_crop, $top_crop, -$right_crop, -$bottom_crop)" >> "${source1%.*}".720.final.avs
-        echo "#fillmargins0" >> "${source1%.*}".720.final.avs
-        echo "#fillmargins1" >> "${source1%.*}".720.final.avs
+        echo "#fillborders0" >> "${source1%.*}".720.final.avs
+        echo "#fillborders1" >> "${source1%.*}".720.final.avs
         echo "#balanceborders0" >> "${source1%.*}".720.final.avs
         echo "#balanceborders1" >> "${source1%.*}".720.final.avs
-        echo "Spline36Resize($width720, $height720)" >> "${source1%.*}".720.final.avs
+        echo "LoadPlugin (\"$z_resize\")" >> "${source1%.*}".720.final.avs
+        if [[ ( -n $left_fb && -n $right_fb && -n $top_fb && -n $bottom_fb ) ]]; then
+            echo "$resize($width720, $height720, $left_fb, $top_fb, -$right_fb, -$bottom_fb, dither=\"error_diffusion\")" >> "${source1%.*}".720.final.avs
+        else
+            echo "$resize($width720, $height720)" >> "${source1%.*}".720.final.avs
+        fi
     }
 
     function avs1080 {
@@ -1223,16 +1284,17 @@ case "$answer_00" in
         # keep cfg informed
         sed -i "/finalavs1080/d" "${config%/*}/${source2%.*}.cfg"
         echo "finalavs1080=${source1%.*}.1080.final.avs" >> "${config%/*}/${source2%.*}.cfg"
-        echo "FFVideosource(\"$source1\")" > "${source1%.*}".1080.final.avs
+        echo "LoadPlugin(\""$lsmashsource"\")" > "${source1%.*}".1080.final.avs
+        echo "LWLibavVideoSource(\"$source1\")" >> "${source1%.*}".1080.final.avs
         echo "#greyscale" >> "${source1%.*}".1080.final.avs
         echo "#interlaced" >> "${source1%.*}".1080.final.avs
         echo "#telecined" >> "${source1%.*}".1080.final.avs
         echo "Crop($left_crop, $top_crop, -$right_crop, -$bottom_crop)" >> "${source1%.*}".1080.final.avs
-        echo "#fillmargins0" >> "${source1%.*}".1080.final.avs
-        echo "#fillmargins1" >> "${source1%.*}".1080.final.avs
+        echo "#fillborders0" >> "${source1%.*}".1080.final.avs
+        echo "#fillborders1" >> "${source1%.*}".1080.final.avs
         echo "#balanceborders0" >> "${source1%.*}".1080.final.avs
         echo "#balanceborders1" >> "${source1%.*}".1080.final.avs
-        # no spline36resize necessary
+        # no resize necessary
     }
 
     function testavsSD {
@@ -1329,27 +1391,27 @@ case "$answer_00" in
     sed -i "/sarheight1/d" "${config%/*}/${source2%.*}.cfg"
     echo "sarheight1=$sarheight1" >> "${config%/*}/${source2%.*}.cfg"
 
-    # fillmargins in case of 1 line of black or dirty pixels
+    # fillborders in case of 1 line of black or dirty pixels
     # note: editing the avs files will happen at the very end of option 2
-    if [[ ( -n $left_fm && -n $right_fm && -n $top_fm && -n $bottom_fm ) ]]; then
-        echo -e "\nfillmargin values for "$source2":"
-        echo -e "left:\t $left_fm"
-        echo -e "top:\t $top_fm"
-        echo -e "right:\t $right_fm"
-        echo -e "bottom:\t $bottom_fm\n"
+    if [[ ( -n $left_fb && -n $right_fb && -n $top_fb && -n $bottom_fb ) ]]; then
+        echo -e "\nfillborders values for "$source2":"
+        echo -e "left:\t $left_fb"
+        echo -e "top:\t $top_fb"
+        echo -e "right:\t $right_fb"
+        echo -e "bottom:\t $bottom_fb\n"
         echo "do you want to (e)dit them?"
         echo "else, RETURN"
-        read -e -p "(RETURN|e) > " answer_fillmarginsedit
-            case $answer_fillmarginsedit in
+        read -e -p "(RETURN|e) > " answer_fillbordersedit
+            case $answer_fillbordersedit in
                 e|E|edit|EDIT|Edit)
-                    fillmargins
+                    fillborders
                 ;;
 
                 *) # do nothing here
                 ;;
             esac
     else
-        fillmargins
+        fillborders
     fi
 
     # balanceborders in case of 1-4 lines of dirty pixels
@@ -1423,8 +1485,11 @@ case "$answer_00" in
                 ;;
 
                 *)
-                    echo "FFVideosource(\"$source1\")" > "${source1%.*}".avs
-                    wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".avs
+                    echo "LoadPlugin(\""$lsmashsource"\")" > "${source1%.*}".avs
+                    echo "LWLibavVideoSource(\"$source1\")" >> "${source1%.*}".avs
+                    echo "Import(\""$lwlinfo"\")" >> "${source1%.*}".avs
+                    echo "LWLInfo()" >> "${source1%.*}".avs
+                    wine "$avspmod" "${source1%.*}".avs
                     unset width480
                     unset height480
                     unset width576
@@ -1450,7 +1515,7 @@ case "$answer_00" in
             echo "darwidth1=$darwidth1" >> "${config%/*}/${source2%.*}.cfg"
 
         elif [[ $par = @(40:33|8:9|10:11) ]]; then
-            darheight1=$(echo "$sarheight1 * $par_divider/$par_denominator"|bc)
+            darheight1=$(echo "$sarheight1 * $par_denominator/$par_divider"|bc)
             echo "resulting in a DAR of ~$sarwidth1×$darheight1"
             # keep cfg informed
             sed -i "/darheight1/d" "${config%/*}/${source2%.*}.cfg"
@@ -1499,8 +1564,11 @@ case "$answer_00" in
         case "$answer_check_interlaced_telecined" in
             c|C|check|Check)
                 # generate a simple avs just to check if movie is interlaced or telecined
-                echo "FFVideosource(\"$source1\")" > "${source1%.*}".avs
-                wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".avs
+                echo "LoadPlugin(\""$lsmashsource"\")" > "${source1%.*}".avs
+                echo "LWLibavVideoSource(\"$source1\")" >> "${source1%.*}".avs
+                echo "Import(\""$lwlinfo"\")" >> "${source1%.*}".avs
+                echo "LWLInfo()" >> "${source1%.*}".avs
+                wine "$avspmod" "${source1%.*}".avs
             ;;
 
             *)
@@ -1526,7 +1594,7 @@ case "$answer_00" in
                 sed -i "/telecined/d" ${config%/*}/${source2%.*}.cfg
                 echo "telecined=1" >> ${config%/*}/${source2%.*}.cfg
                 for i in "${source1%.*}"*.avs ; do
-                    sed -i "s/#telecined/TFM().TDecimate()/" "$i"
+                    sed -i "s/#telecined/TFM(pp=0).TDecimate()/" "$i"
                 done
             ;;
 
@@ -1537,7 +1605,7 @@ case "$answer_00" in
                 echo "telecined=1" >> "${config%/*}/${source2%.*}.cfg"
                 for i in "${source1%.*}"*.avs ; do
                     sed -i "s/#interlaced/QTGMC().SelectEven()/" "$i"
-                    sed -i "s/#telecined/TFM().TDecimate()/" "$i"
+                    sed -i "s/#telecined/TFM(pp=0).TDecimate()/" "$i"
                 done
             ;;
 
@@ -1549,11 +1617,11 @@ case "$answer_00" in
             ;;
         esac
 
-    # fillmargins editing the avs files
-    if [[ $left_fm -ne 0 || $top_fm -ne 0 || $right_fm -ne 0 || $bottom_fm -ne 0 ]]; then
+    # fillborders editing the avs files
+    if [[ $left_fb -ne 0 || $top_fb -ne 0 || $right_fb -ne 0 || $bottom_fb -ne 0 ]]; then
         for i in ${source1%.*}.*.avs ; do
-            sed -i "s|#fillmargins0|LoadPlugin(\"$pathfm\")|" "$i"
-            sed -i "s|#fillmargins1|FillMargins($left_fm,$top_fm,$right_fm,$bottom_fm)|" "$i"
+            sed -i "s|#fillborders0|LoadPlugin(\"$pathfb\")|" "$i"
+            sed -i "s|#fillborders1|FillBorders($left_fb,$top_fb,$right_fb,$bottom_fb)|" "$i"
         done
      fi
 
@@ -1604,6 +1672,8 @@ case "$answer_00" in
 
         # number of test encodings
         number_encodings=$(echo "((($crf1high-$crf1low)/$crf1increment)+1)"|bc)
+        # number of left encodings
+        encodings_left=$number_encodings
 
         echo -e "\nthese settings will result in $number_encodings encodings"
         sleep 1.5
@@ -1612,11 +1682,10 @@ case "$answer_00" in
         start0=$(date +%s)
 
         # create comparison screen avs
-        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
+        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", "$align_position").LWLInfo()#.trim(0,framecount)" > "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
 
         for (( crf1=$crf1low; $crf1<=$crf1high; crf1+=$crf1increment)); do
             # number of left encodings
-            encodings_left=$(echo "((($crf1high-$crf1)/$crf1increment)+1)"|bc)
             if [[ $crf1 = $crf1low ]]; then
                 echo -e "\nrange crf *$crf1low* → $crf1high, increment $crf1increment; $encodings_left of $number_encodings encodings left"
             elif [[ $crf1 = $crf1high ]]; then
@@ -1633,30 +1702,30 @@ case "$answer_00" in
             # start measuring encoding time
             start1=$(date +%s)
 
-            # write list of encodings into avs file
-            echo "=FFVideoSource(\"${source1%.*}.$2.$count.crf$crf1.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 crf$crf1\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
+            # comparison screen avs
+            echo "=LWLibavVideoSource(\"${source1%.*}.$2.$count.crf$crf1.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 crf$crf1\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
 
             # write information to log files, no newline at the end of line
             echo -n "crf $(echo "scale=1;$crf1/10"|bc) : " | tee -a "${source1%.*}".$2.crf1.log >/dev/null
 
-            wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
-            | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
-            --crf $(printf '%s.%s' "$(($crf1/10))" "$(($crf1%10))") \
-            --preset "$preset" \
-            --tune "$tune" \
-            --profile "$profile" \
-            --ref "${ref##*=}" \
-            --sar "$par" \
-            --rc-lookahead "${lookahead##*=}" \
-            --me "$me" \
-            --merange "$merange" \
-            --subme "$subme" \
-            --deblock "$deblock" \
-            --aq-strength "${aqs##*=}" \
-            --aq-mode "${aqmode##*=}" \
-            --no-psy \
-            --chroma-qp-offset "${cqpo##*=}" \
-            -o "${source1%.*}".$2.$count.crf$crf1.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv - 2>&1|tee -a "${source1%.*}".$2.log|tee "${source1%.*}".$2.crf1-raw.log;
+             wine "$avs2yuv" "${avs##*=}" - \
+             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
+             --crf $(printf '%s.%s' "$(($crf1/10))" "$(($crf1%10))") \
+             --preset "$preset" \
+             --tune "$tune" \
+             --profile "$profile" \
+             --ref "${ref##*=}" \
+             --sar "$par" \
+             --rc-lookahead "${lookahead##*=}" \
+             --me "$me" \
+             --merange "$merange" \
+             --subme "$subme" \
+             --deblock "$deblock" \
+             --aq-strength "${aqs##*=}" \
+             --aq-mode "${aqmode##*=}" \
+             --no-psy \
+             --chroma-qp-offset "${cqpo##*=}" \
+             -o "${source1%.*}".$2.$count.crf$crf1.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv - 2>&1|tee -a "${source1%.*}".$2.log|tee "${source1%.*}".$2.crf1-raw.log;
 
             # write the encodings bit rate into the crf1 specific log file
             egrep 'x264 \[info\]: kb\/s:' "${source1%.*}".$2.crf1-raw.log|cut -d':' -f3|tail -1 >> "${source1%.*}".$2.crf1.log
@@ -1666,6 +1735,9 @@ case "$answer_00" in
             stop=$(date +%s);
             time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
             echo -e "\nencoding "${source2%.*}".$2.$count.crf$crf1.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv lasted $time"
+
+            # number of left encodings
+            let encodings_left=$(( encodings_left - 1 ))
         done
 
         # stop measuring overall encoding time
@@ -1676,14 +1748,25 @@ case "$answer_00" in
         #comparison screen
         prefixes=({a..z} {a..e}{a..z})
         i=0
-        while IFS= read -r line; do
+        #line=$(tail -n +2  "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs)
+        while IFS= read -r line ; do
         printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}".$2.temp.crf1.$crf1low-$crf1high-$crf1increment.avs
         done < "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
         avslines="$(wc -l < "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs)"
         echo "interleave($(printf %s, a,{b..z} a,{a..e}{a..z})a)" | cut -d ',' --complement -f "$(( ("$avslines" *2) -1 ))"-310 >> "${source1%.*}".$2.temp.crf1.$crf1low-$crf1high-$crf1increment.avs
-        echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.temp.crf1.$crf1low-$crf1high-$crf1increment.avs
-        echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".$2.temp.crf1.$crf1low-$crf1high-$crf1increment.avs
         mv "${source1%.*}".$2.temp.crf1.$crf1low-$crf1high-$crf1increment.avs "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
+#        echo "Import(\""$lwlinfo"\")" >> "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
+#        echo "LWLInfo()" >> "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
+#        if [[ $par = @(32:27|64:45|16:11|16:15|12:11) ]]; then
+            echo "LoadPlugin(\"$z_resize\")" >> "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
+            echo "$resize(ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
+#         elif [[ $par = @(40:33|8:9|10:11) ]]; then
+#             echo "LoadPlugin(\"$z_resize\")" >> "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
+#             echo "$resize($sarwidth1,$darheight1)" >> "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
+#         fi
+        #now add a LoadPlugin for LSMASH as first line
+        sed -i "1i LoadPlugin(\""$lsmashsource"\")" "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
+        sed -i "1i Import(\""$lwlinfo"\")" "${source1%.*}".$2.crf1.$crf1low-$crf1high-$crf1increment.avs
 
         if [ -e /usr/bin/beep ]; then beep $beep; fi
 
@@ -1701,7 +1784,7 @@ case "$answer_00" in
         echo "find some more precise value."
         sleep 1.5
 
-        wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".$2.crf1.*.avs
+        wine "$avspmod" "${source1%.*}".$2.crf1.*.avs
 }
 
     while true; do
@@ -1760,12 +1843,12 @@ case "$answer_00" in
         echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.mbt.cqpo${cqpo##*=}.mkv\n"
 
         # create comparison screen avs
-        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".$2.mbt.avs
+        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", "$align_position").LWLInfo()#.trim(0,framecount)" > "${source1%.*}".$2.mbt.avs
 
         # write list of encodings into comparison screen avs file
-        echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 mbtree\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.mbt.avs
+        echo "=LWLibavVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 mbtree\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".$2.mbt.avs
 
-        wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
+        wine "$avs2yuv" "${avs##*=}" - \
             | x264 --stdin y4m \
             --bitrate "${br##*=}" \
             --pass 1 \
@@ -1787,7 +1870,7 @@ case "$answer_00" in
             --qcomp "${qcomp##*=}" \
             -o /dev/null - 2>&1|tee -a "${source1%.*}".$2.log;
 
-        wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
+        wine "$avs2yuv" "${avs##*=}" - \
             | x264 --stdin y4m \
             --bitrate "${br##*=}" \
             --pass 2 \
@@ -1819,9 +1902,9 @@ case "$answer_00" in
         echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.no-mbt.cqpo${cqpo##*=}.mkv\n"
 
         # write list of encodings into comparison screen avs file
-        echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.no-mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 no-mbtree\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.mbt.avs
+        echo "=LWLibavVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.no-mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 no-mbtree\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".$2.mbt.avs
 
-        wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
+        wine "$avs2yuv" "${avs##*=}" - \
             | x264 --stdin y4m --no-mbtree \
             --bitrate "${br##*=}" \
             --pass 1 \
@@ -1843,7 +1926,7 @@ case "$answer_00" in
             --qcomp "${qcomp##*=}" \
             -o /dev/null - 2>&1|tee -a "${source1%.*}".$2.log;
 
-        wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
+        wine "$avs2yuv" "${avs##*=}" - \
             | x264 --stdin y4m --no-mbtree \
             --bitrate "${br##*=}" \
             --pass 2 \
@@ -1881,9 +1964,20 @@ case "$answer_00" in
         done < "${source1%.*}".$2.mbt.avs
         avslines="$(wc -l < "${source1%.*}".$2.mbt.avs)"
         echo "interleave($(printf %s, a,{b..z} a,{a..e}{a..z})a)" | cut -d ',' --complement -f "$(( ("$avslines" *2) -1 ))"-310 >> "${source1%.*}".$2.temp.mbt.avs
-        echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.temp.mbt.avs
-        echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".$2.temp.mbt.avs
         mv "${source1%.*}".$2.temp.mbt.avs "${source1%.*}".$2.mbt.avs
+#        echo "Import(\""$lwlinfo"\")" >> "${source1%.*}".$2.mbt.avs
+#        echo "LWLInfo()" >> "${source1%.*}".$2.mbt.avs
+#         if [[ $par = @(32:27|64:45|16:11|16:15|12:11) ]]; then
+            echo "LoadPlugin(\"$z_resize\")" >> "${source1%.*}".$2.mbt.avs
+            echo "$resize(ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.mbt.avs
+#         elif [[ $par = @(40:33|8:9|10:11) ]]; then
+#             echo "#LoadPlugin(\"$z_resize\")" >> "${source1%.*}".$2.mbt.avs
+#             echo "$resize($sarwidth1,$darheight1)" >> "${source1%.*}".$2.mbt.avs
+#         fi
+
+        #now add a LoadPlugin for LSMASH as first line
+        sed -i "1i LoadPlugin(\""$lsmashsource"\")" "${source1%.*}".$2.mbt.avs
+        sed -i "1i Import(\""$lwlinfo"\")" "${source1%.*}".$2.mbt.avs
 
         if [ -e /usr/bin/beep ]; then beep $beep; fi
 
@@ -1897,7 +1991,7 @@ case "$answer_00" in
         fi
         sleep 1.5
 
-        wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".$2.mbt.avs
+        wine "$avspmod" "${source1%.*}".$2.mbt.avs
     }
 
     while true; do
@@ -1923,8 +2017,6 @@ case "$answer_00" in
                     br_change $1 $2
                 ;;
             esac
-        # read nombtree from cfg
-        #nombtree=$(cat "$config"|grep nombtree|grep $2)
     done
 
     until [[ $mbt =~ ^[0-1]$ ]] ; do
@@ -1974,6 +2066,8 @@ case "$answer_00" in
 
         # number of test encodings
         number_encodings=$(echo "((($qcomphigh-$qcomplow)/$qcompincrement)+1)"|bc)
+        # number of left encodings
+        encodings_left=$number_encodings
 
         echo -e "\nthese settings will result in $number_encodings encodings"
         sleep 1.5
@@ -1982,11 +2076,9 @@ case "$answer_00" in
         start0=$(date +%s)
 
         # create comparison screen avs
-        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
+        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
 
         for ((qcomp0=$qcomplow; $qcomp0<=$qcomphigh; qcomp0+=$qcompincrement)); do
-            # number of left encodings
-            encodings_left=$(echo "((($qcomphigh-$qcomp0)/$qcompincrement)+1)"|bc)
             if [[ $qcomp0 = $qcomplow ]]; then
                 echo -e "\nrange qcomp *$qcomplow* → $qcomphigh, increment $qcompincrement; $encodings_left of $number_encodings encodings left"
             elif [[ $qcomp0 = $qcomphigh ]]; then
@@ -2003,10 +2095,10 @@ case "$answer_00" in
             # start measuring encoding time
             start1=$(date +%s)
 
-            # create comparison screen avs
-            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc$qcomp0.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 br${br##*=} qc$qcomp0\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
+            # comparison screen avs
+            echo "=LWLibavVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc$qcomp0.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 br${br##*=} qc$qcomp0\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
 
-            wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
+            wine "$avs2yuv" "${avs##*=}" - \
             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
             --bitrate "${br##*=}" \
             --pass 1 \
@@ -2028,7 +2120,7 @@ case "$answer_00" in
             --qcomp $(echo "scale=2;$qcomp0/100"|bc) \
             -o /dev/null - 2>&1|tee -a "${source1%.*}".$2.log;
 
-            wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
+            wine "$avs2yuv" "${avs##*=}" - \
             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
             --bitrate "${br##*=}" \
             --pass 2 \
@@ -2060,6 +2152,9 @@ case "$answer_00" in
             if [[ -z ${nombtree##*=} ]]; then
                 rm ${source1%.*}.$2.$count.*.stats.mbtree
             fi
+
+            # number of left encodings
+            let encodings_left=$(( encodings_left - 1 ))
         done
 
         # stop measuring overall encoding time
@@ -2076,9 +2171,20 @@ case "$answer_00" in
         done < "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
         avslines="$(wc -l < "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs)"
         echo "interleave($(printf %s, a,{b..z} a,{a..e}{a..z})a)" | cut -d ',' --complement -f "$(( ("$avslines" *2) -1 ))"-310 >> "${source1%.*}".$2.temp.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
-        echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.temp.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
-        echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".$2.temp.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
         mv "${source1%.*}".$2.temp.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
+#        echo "Import(\""$lwlinfo"\")" >> "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
+#        echo "LWLInfo()" >> "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
+#         if [[ $par = @(32:27|64:45|16:11|16:15|12:11) ]]; then
+            echo "LoadPlugin(\"$z_resize\")" >> "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
+            echo "$resize(ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
+#         elif [[ $par = @(40:33|8:9|10:11) ]]; then
+#             echo "#LoadPlugin(\"$z_resize\")" >> "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
+#             echo "$resize($sarwidth1,$darheight1)" >> "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
+#         fi
+
+        #now add a LoadPlugin for LSMASH as first line
+        sed -i "1i LoadPlugin(\""$lsmashsource"\")" "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
+        sed -i "1i Import(\""$lwlinfo"\")" "${source1%.*}".$2.qcomp.$qcomplow-$qcomphigh-$qcompincrement.avs
 
         if [ -e /usr/bin/beep ]; then beep $beep; fi
 
@@ -2088,7 +2194,7 @@ case "$answer_00" in
         echo "then close AvsPmod."
         sleep 1.5
 
-        wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".$2.qcomp.*.avs
+        wine "$avspmod" "${source1%.*}".$2.qcomp.*.avs
     }
 
     while true; do
@@ -2150,6 +2256,8 @@ case "$answer_00" in
 
         # number of test encodings
         number_encodings=$(echo "(((($aqshigh-$aqslow)/$aqsincrement)+1)*${#answer_aqmode})"|bc)
+        # number of left encodings
+        encodings_left=$number_encodings
 
         echo -e "\nthese settings will result in $number_encodings encodings"
         sleep 1.5
@@ -2158,13 +2266,12 @@ case "$answer_00" in
         start0=$(date +%s)
 
         # create comparison screen avs
-        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".$2.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs
+        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", "$align_position").LWLInfo()#.trim(0,framecount)" > "${source1%.*}".$2.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs
 
-        for aqmode0 in ${answer_aqmode:0:1} ${answer_aqmode:1:1} ${answer_aqmode:2:3} ;do 
+        for aqmode0 in ${answer_aqmode:0:1} ${answer_aqmode:1:1} ${answer_aqmode:2:3} ;do
             for ((aqs0=$aqslow; $aqs0<=$aqshigh; aqs0+=$aqsincrement));do
-                # number of left encodings
-                encodings_left=$(echo "(((3-$aqmode0)*((($aqshigh-$aqslow)/$aqsincrement)+1))+((($aqshigh-$aqs0)/$aqsincrement)+1))"|bc)
-                if [[ $aqs0 = $aqslow ]]; then
+
+            if [[ $aqs0 = $aqslow ]]; then
                     echo -e "\nrange aq strength *$aqslow* → $aqshigh, increment $aqsincrement; aq-mode $aqmode0; $encodings_left of $number_encodings encodings left"
                 elif [[ $aqs0 = $aqshigh ]]; then
                     echo -e "\nrange aq strength $aqslow → *$aqshigh*, increment $aqsincrement; aq-mode $aqmode0; $encodings_left of $number_encodings encodings left"
@@ -2181,9 +2288,9 @@ case "$answer_00" in
                 start1=$(date +%s)
 
                 #comparison screen
-                echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 br${br##*=} aq$aqmode0.$aqs0 psy${psyrd##*=} pt${psytr##*=}\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs
+                echo "=LWLibavVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq$aqmode0.$aqs0.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 br${br##*=} aq$aqmode0.$aqs0 psy${psyrd##*=} pt${psytr##*=}\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".$2.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs
 
-                wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
+               wine "$avs2yuv" "${avs##*=}" - \
                 | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
                 --bitrate "${br##*=}" \
                 --pass 1 \
@@ -2205,7 +2312,7 @@ case "$answer_00" in
                 --psy-rd "${psyrd##*=}" \
                 -o /dev/null - 2>&1|tee -a "${source1%.*}".$2.log;
 
-                wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
+                wine "$avs2yuv" "${avs##*=}" - \
                 | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
                 --bitrate "${br##*=}" \
                 --pass 2 \
@@ -2237,6 +2344,9 @@ case "$answer_00" in
                 if [[ -z ${nombtree##*=} ]]; then
                     rm ${source1%.*}.$2.$count.*.stats.mbtree
                 fi
+
+                # number of left encodings
+                let encodings_left=$(( encodings_left - 1 ))
             done
         done
 
@@ -2254,9 +2364,20 @@ case "$answer_00" in
         done < "${source1%.*}".$2.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs
         avslines="$(wc -l < "${source1%.*}".$2.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs)"
         echo "interleave($(printf %s, a,{b..z} a,{a..e}{a..z})a)" | cut -d ',' --complement -f "$(( ("$avslines" *2) -1 ))"-310 >> "${source1%.*}".$2.temp.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs
-        echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.temp.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs
-        echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".$2.temp.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs
         mv "${source1%.*}".$2.temp.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs "${source1%.*}".$2.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs
+#        echo "Import(\""$lwlinfo"\")" >> "${source1%.*}".$2.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs
+#        echo "LWLInfo()" >> "${source1%.*}".$2.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs
+#         if [[ $par = @(32:27|64:45|16:11|16:15|12:11) ]]; then
+            echo "LoadPlugin(\"$z_resize\")" >> "${source1%.*}".$2.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs
+            echo "$resize(ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs
+#         elif [[ $par = @(40:33|8:9|10:11) ]]; then
+#             echo "#LoadPlugin(\"$z_resize\")" >> "${source1%.*}".$2.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs
+#             echo "$resize($sarwidth1,$darheight1)" >> "${source1%.*}".$2.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs
+#         fi
+
+        #now add a LoadPlugin for LSMASH as first line
+        sed -i "1i LoadPlugin(\""$lsmashsource"\")" "${source1%.*}".$2.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs
+        sed -i "1i Import(\""$lwlinfo"\")" "${source1%.*}".$2.aqmode$answer_aqmode-$aqslow-$aqshigh-$aqsincrement.avs
 
         if [ -e /usr/bin/beep ]; then beep $beep; fi
 
@@ -2266,9 +2387,9 @@ case "$answer_00" in
         echo -e "then close AvsPmod.\n"
         sleep 1.5
 
-        wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".$2.aqmode*.avs
+        wine "$avspmod" "${source1%.*}".$2.aqmode*.avs
     }
-    
+
     function set_aqmode {
         until [[ $aqmode =~ ^[1-3]$ ]] ; do
             echo "set aq mode for $2 of "${source2%.*}""
@@ -2302,7 +2423,7 @@ case "$answer_00" in
         echo -e "or RETURN to end testing\n"
         read -e -p "(1|2|3|13|23|123|RETURN) > " answer_aqmode
             case $answer_aqmode in
-                1|2|3|12|23|13|123) # only test for chosen aq-mode
+                1|2|3|12|13|21|23|31|32|123|132|213|231|312|321) # only test for chosen aq-mode
                     # keep cfg informed
                     #sed -i "/aqmode$2/d" "$config"
                     #echo "aqmode$2=$answer_aqmode" >> "$config"
@@ -2351,6 +2472,8 @@ case "$answer_00" in
 
         # number of test encodings
         number_encodings=$(echo "(($psyrdhigh-$psyrdlow)/$psyrdincrement)+1"|bc)
+        # number of left encodings
+        encodings_left=$number_encodings
 
         echo -e "\nthese settings will result in $number_encodings encodings"
         sleep 1.5
@@ -2359,11 +2482,9 @@ case "$answer_00" in
         start0=$(date +%s)
 
         # create comparison screen avs
-        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
+        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", "$align_position").LWLInfo()#.trim(0,framecount)" > "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
 
         for ((psyrd0=$psyrdlow; $psyrd0<=$psyrdhigh; psyrd0+=$psyrdincrement));do
-            # number of left encodings
-            encodings_left=$(echo "((($psyrdhigh-$psyrd0)/$psyrdincrement)+1)"|bc)
             if [[ $psyrd0 = $psyrdlow ]]; then
                 echo -e "\nrange psy-rdo *$psyrdlow* → $psyrdhigh, increment $psyrdincrement; $encodings_left of $number_encodings encodings left"
             elif [[ $psyrd0 = $psyrdhigh ]]; then
@@ -2380,9 +2501,9 @@ case "$answer_00" in
             # start measuring encoding time
             start1=$(date +%s)
             #comparison screen
-            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy$psyrd0.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 br${br##*=} aq${aqmode##*=}.${aqs##*=} psy$psyrd0 pt${psytr##*=}\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
+            echo "=LWLibavVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy$psyrd0.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 br${br##*=} aq${aqmode##*=}.${aqs##*=} psy$psyrd0 pt${psytr##*=}\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
 
-            wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
+            wine "$avs2yuv" "${avs##*=}" - \
             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
             --bitrate "${br##*=}" \
             --pass 1 \
@@ -2404,7 +2525,7 @@ case "$answer_00" in
             --psy-rd $(echo "scale=2;$psyrd0/100"|bc):unset \
             -o /dev/null - 2>&1|tee -a "${source1%.*}".$2.log;
 
-            wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
+            wine "$avs2yuv" "${avs##*=}" - \
             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
             --bitrate "${br##*=}" \
             --pass 2 \
@@ -2436,6 +2557,9 @@ case "$answer_00" in
             if [[ -z ${nombtree##*=} ]]; then
                 rm ${source1%.*}.$2.$count.*.stats.mbtree
             fi
+
+            # number of left encodings
+            let encodings_left=$(( encodings_left - 1 ))
         done
 
         # stop measuring overall encoding time
@@ -2452,9 +2576,19 @@ case "$answer_00" in
         done < "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
         avslines="$(wc -l < "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs)"
         echo "interleave($(printf %s, a,{b..z} a,{a..e}{a..z})a)" | cut -d ',' --complement -f "$(( ("$avslines" *2) -1 ))"-310 >> "${source1%.*}".$2.temp.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
-        echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.temp.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
-        echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".$2.temp.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
         mv "${source1%.*}".$2.temp.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
+#        echo "Import(\""$lwlinfo"\")" >> "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
+#        echo "LWLInfo()" >> "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
+#         if [[ $par = @(32:27|64:45|16:11|16:15|12:11) ]]; then
+            echo "LoadPlugin(\"$z_resize\")" >> "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
+            echo "$resize(ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
+#         elif [[ $par = @(40:33|8:9|10:11) ]]; then
+#             echo "#LoadPlugin(\"$z_resize\")" >> "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
+#             echo "$resize($sarwidth1,$darheight1)" >> "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
+#         fi
+        #now add a LoadPlugin for LSMASH as first line
+        sed -i "1i LoadPlugin(\""$lsmashsource"\")" "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
+        sed -i "1i Import(\""$lwlinfo"\")" "${source1%.*}".$2.psy.$psyrdlow-$psyrdhigh-$psyrdincrement.avs
 
         if [ -e /usr/bin/beep ]; then beep $beep; fi
 
@@ -2464,7 +2598,7 @@ case "$answer_00" in
         echo "then close AvsPmod."
         sleep 1.5
 
-        wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".$2.psy.*.avs
+        wine "$avspmod" "${source1%.*}".$2.psy.*.avs
     }
 
     while true; do
@@ -2524,130 +2658,144 @@ case "$answer_00" in
     8)  # 8 - variations in psy-trellis
 
     function psytrellis {
-                        #until psy2low 1-99 and psy2high 1-199 and psy2increment 1-99; do
-                        until [[  $psy2high -ge $psy2low && $psy2low =~ ^[0-9]$|^[1-9][0-9]$ && $psy2high =~ ^[0-9]$|^[1-9][0-9]$|^1[0-9][0-9]$ && $psy2increment =~ ^[1-9]$|^[1-9][0-9]$ ]]; do
-                            echo -e "\npsy-trellis: default is 0.0"
-                            echo "test for values ~0.0 through 0.15"
-                            echo -e "set lowest value for psy-trellis, e.g. 0\n"
-                            read -e -p "psy-trellis, lowest value > " psy2low
+        #until psy2low 1-99 and psy2high 1-199 and psy2increment 1-99; do
+        until [[  $psy2high -ge $psy2low && $psy2low =~ ^[0-9]$|^[1-9][0-9]$ && $psy2high =~ ^[0-9]$|^[1-9][0-9]$|^1[0-9][0-9]$ && $psy2increment =~ ^[1-9]$|^[1-9][0-9]$ ]]; do
+            echo -e "\npsy-trellis: default is 0.0"
+            echo "test for values ~0.0 through 0.15"
+            echo -e "set lowest value for psy-trellis, e.g. 0\n"
+            read -e -p "psy-trellis, lowest value > " psy2low
 
-                            echo -e "set maximum value for psy-trellis, e.g. 20 for 0.2\n"
-                            read -e -p "psy-trellis, maximum value > " psy2high
+            echo -e "set maximum value for psy-trellis, e.g. 20 for 0.2\n"
+            read -e -p "psy-trellis, maximum value > " psy2high
 
-                            echo -e "set increment steps, e.g. 2 for 0.02\n"
-                            read -e -p "increments > " psy2increment
-                        done
+            echo -e "set increment steps, e.g. 2 for 0.02\n"
+            read -e -p "increments > " psy2increment
+        done
 
-                        # number of test encodings
-                        number_encodings=$(echo "((($psy2high-$psy2low)/$psy2increment)+1)"|bc)
+        # number of test encodings
+        number_encodings=$(echo "((($psy2high-$psy2low)/$psy2increment)+1)"|bc)
+        # number of left encodings
+        encodings_left=$number_encodings
 
-                        echo -e "\nthese settings will result in $number_encodings encodings"
-                        sleep 1.5
+        echo -e "\nthese settings will result in $number_encodings encodings"
+        sleep 1.5
 
-                        start0=$(date +%s)
+        start0=$(date +%s)
 
-                        # create comparison screen avs
-                        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
+        # create comparison screen avs
+        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", "$align_position").LWLInfo()#.trim(0,framecount)" > "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
 
-                        for ((psy2=$psy2low; $psy2<=$psy2high; psy2+=$psy2increment));do
-                            # number of left encodings
-                            encodings_left=$(echo "((($psy2high-$psy2)/$psy2increment)+1)"|bc)
-                            if [[ $psy2 = $psy2low ]]; then
-                                echo -e "\nrange psy-trellis *$psy2low* → $psy2high, increment $psy2increment; $encodings_left of $number_encodings encodings left"
-                            elif [[ $psy2 = $psy2high ]]; then
-                                echo -e "\nrange psy-trellis $psy2low → *$psy2high*, increment $psy2increment; $encodings_left of $number_encodings encodings left"
-                            else
-                                echo -e "\nrange psy-trellis $psy2low → *$psy2* → $psy2high, increment $psy2increment; $encodings_left of $number_encodings encodings left"
-                            fi
+        for ((psy2=$psy2low; $psy2<=$psy2high; psy2+=$psy2increment));do
+            if [[ $psy2 = $psy2low ]]; then
+                echo -e "\nrange psy-trellis *$psy2low* → $psy2high, increment $psy2increment; $encodings_left of $number_encodings encodings left"
+            elif [[ $psy2 = $psy2high ]]; then
+                echo -e "\nrange psy-trellis $psy2low → *$psy2high*, increment $psy2increment; $encodings_left of $number_encodings encodings left"
+            else
+                echo -e "\nrange psy-trellis $psy2low → *$psy2* → $psy2high, increment $psy2increment; $encodings_left of $number_encodings encodings left"
+            fi
 
-                            # name the files in ascending order depending on the number of existing mkv in directory
-                            count=$( printf '%03d\n'  $(ls ${source1%/*}|grep "$2"| grep -c .mkv$))
+            # name the files in ascending order depending on the number of existing mkv in directory
+            count=$( printf '%03d\n'  $(ls ${source1%/*}|grep "$2"| grep -c .mkv$))
 
-                            echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt$psy2.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\n"
-                            start1=$(date +%s)
+            echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt$psy2.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\n"
+            start1=$(date +%s)
 
-                            #comparison screen
-                            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt$psy2.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 aq${aqmode##*=}.${aqs##*=} psy${psyrd##*=} pt$psy2\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
+            #comparison screen
+            echo "=LWLibavVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt$psy2.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 aq${aqmode##*=}.${aqs##*=} psy${psyrd##*=} pt$psy2\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
 
-                            wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
-                            | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
-                            --bitrate "${br##*=}" \
-                            --pass 1 \
-                            --stats "${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt$psy2.${nombtree##*=}mbt.cqpo${cqpo##*=}.stats" \
-                            --qcomp "${qcomp##*=}" \
-                            --aq-mode "${aqmode##*=}" \
-                            --aq-strength "${aqs##*=}" \
-                            --chroma-qp-offset "${cqpo##*=}" \
-                            --preset "$preset" \
-                            --tune "$tune" \
-                            --profile "$profile" \
-                            --ref "${ref##*=}" \
-                            --sar "$par" \
-                            --rc-lookahead "${lookahead##*=}" \
-                            --me "$me" \
-                            --merange "$merange" \
-                            --subme "$subme" \
-                            --deblock "$deblock" \
-                            --psy-rd "${psyrd##*=}":$(echo "scale=2;$psy2/100"|bc) \
-                            -o /dev/null - 2>&1|tee -a "${source1%.*}".$2.log
+            wine "$avs2yuv" "${avs##*=}" - \
+            | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
+            --bitrate "${br##*=}" \
+            --pass 1 \
+            --stats "${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt$psy2.${nombtree##*=}mbt.cqpo${cqpo##*=}.stats" \
+            --qcomp "${qcomp##*=}" \
+            --aq-mode "${aqmode##*=}" \
+            --aq-strength "${aqs##*=}" \
+            --chroma-qp-offset "${cqpo##*=}" \
+            --preset "$preset" \
+            --tune "$tune" \
+            --profile "$profile" \
+            --ref "${ref##*=}" \
+            --sar "$par" \
+            --rc-lookahead "${lookahead##*=}" \
+            --me "$me" \
+            --merange "$merange" \
+            --subme "$subme" \
+            --deblock "$deblock" \
+            --psy-rd "${psyrd##*=}":$(echo "scale=2;$psy2/100"|bc) \
+            -o /dev/null - 2>&1|tee -a "${source1%.*}".$2.log
 
-                            wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
-                            | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
-                            --bitrate "${br##*=}" \
-                            --pass 2 \
-                            --stats "${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt$psy2.${nombtree##*=}mbt.cqpo${cqpo##*=}.stats" \
-                            --qcomp "${qcomp##*=}" \
-                            --aq-mode "${aqmode##*=}" \
-                            --aq-strength "${aqs##*=}" \
-                            --chroma-qp-offset "${cqpo##*=}" \
-                            --preset "$preset" \
-                            --tune "$tune" \
-                            --profile "$profile" \
-                            --ref "${ref##*=}" \
-                            --sar "$par" \
-                            --rc-lookahead "${lookahead##*=}" \
-                            --me "$me" \
-                            --merange "$merange" \
-                            --subme "$subme" \
-                            --deblock "$deblock" \
-                            --psy-rd "${psyrd##*=}":$(echo "scale=2;$psy2/100"|bc) \
-                            -o "${source1%.*}".$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt$psy2.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv - 2>&1|tee -a "${source1%.*}".$2.log;
+            wine "$avs2yuv" "${avs##*=}" - \
+            | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
+            --bitrate "${br##*=}" \
+            --pass 2 \
+            --stats "${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt$psy2.${nombtree##*=}mbt.cqpo${cqpo##*=}.stats" \
+            --qcomp "${qcomp##*=}" \
+            --aq-mode "${aqmode##*=}" \
+            --aq-strength "${aqs##*=}" \
+            --chroma-qp-offset "${cqpo##*=}" \
+            --preset "$preset" \
+            --tune "$tune" \
+            --profile "$profile" \
+            --ref "${ref##*=}" \
+            --sar "$par" \
+            --rc-lookahead "${lookahead##*=}" \
+            --me "$me" \
+            --merange "$merange" \
+            --subme "$subme" \
+            --deblock "$deblock" \
+            --psy-rd "${psyrd##*=}":$(echo "scale=2;$psy2/100"|bc) \
+            -o "${source1%.*}".$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt$psy2.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv - 2>&1|tee -a "${source1%.*}".$2.log;
 
-                            # remove stats file
-                            rm ${source1%.*}.$2.$count.*.stats
-                            if [[ -z ${nombtree##*=} ]]; then
-                                rm ${source1%.*}.$2.$count.*.stats.mbtree
-                            fi
+            # remove stats file
+            rm ${source1%.*}.$2.$count.*.stats
+            if [[ -z ${nombtree##*=} ]]; then
+                rm ${source1%.*}.$2.$count.*.stats.mbtree
+            fi
 
-                            stop=$(date +%s);
-                            time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
-                            echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt$psy2.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv lasted $time"
-                        done
+            # number of left encodings
+            let encodings_left=$(( encodings_left - 1 ))
 
-                        stop=$(date +%s);
-                        days=$(( ($stop-$start0)/86400 ))
-                        time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
-                        echo -e "\n$1 $2: test encodings for psy-trellis lasted $days days and $time"
+            stop=$(date +%s);
+            time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
+            echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt$psy2.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv lasted $time"
+        done
 
-                        #comparison screen
-                        prefixes=({a..z} {a..e}{a..z})
-                        i=0
-                        while IFS= read -r line; do
-                        printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}".$2.temp.psytr.$psy2low-$psy2high-$psy2increment.avs
-                        done < "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
-                        avslines="$(wc -l < "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs)"
-                        echo "interleave($(printf %s, a,{b..z} a,{a..e}{a..z})a)" | cut -d ',' --complement -f "$(( ("$avslines" *2) -1 ))"-310 >> "${source1%.*}".$2.temp.psytr.$psy2low-$psy2high-$psy2increment.avs
-                        echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.temp.psytr.$psy2low-$psy2high-$psy2increment.avs
-                        echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".$2.temp.psytr.$psy2low-$psy2high-$psy2increment.avs
-                        mv "${source1%.*}".$2.temp.psytr.$psy2low-$psy2high-$psy2increment.avs "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
+        stop=$(date +%s);
+        days=$(( ($stop-$start0)/86400 ))
+        time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
+        echo -e "\n$1 $2: test encodings for psy-trellis lasted $days days and $time"
 
-                        if [ -e /usr/bin/beep ]; then beep $beep; fi
+        #comparison screen
+        prefixes=({a..z} {a..e}{a..z})
+        i=0
+        while IFS= read -r line; do
+        printf "%s %s\n" "${prefixes[i++]}" "$line" >> "${source1%.*}".$2.temp.psytr.$psy2low-$psy2high-$psy2increment.avs
+        done < "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
+        avslines="$(wc -l < "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs)"
+        echo "interleave($(printf %s, a,{b..z} a,{a..e}{a..z})a)" | cut -d ',' --complement -f "$(( ("$avslines" *2) -1 ))"-310 >> "${source1%.*}".$2.temp.psytr.$psy2low-$psy2high-$psy2increment.avs
+        mv "${source1%.*}".$2.temp.psytr.$psy2low-$psy2high-$psy2increment.avs "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
+#        echo "Import(\""$lwlinfo"\")" >> "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
+#        echo "LWLInfo()" >> "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
+#         if [[ $par = @(32:27|64:45|16:11|16:15|12:11) ]]; then
+            echo "LoadPlugin(\"$z_resize\")" >> "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
+            echo "$resize(ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
+#         elif [[ $par = @(40:33|8:9|10:11) ]]; then
+#             echo "#LoadPlugin(\"$z_resize\")" >> "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
+#             echo "$resize($sarwidth1,$darheight1)" >> "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
+#         fi
 
-                        echo -e "\nthoroughly look through this last test"
-                        echo "encodings and decide, which one is your best encode."
-                        echo "then close AvsPmod."
-                        sleep 1.5
-                        wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".$2.psytr.*.avs
+        #now add a LoadPlugin for LSMASH as first line
+        sed -i "1i LoadPlugin(\""$lsmashsource"\")" "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
+        sed -i "1i Import(\""$lwlinfo"\")" "${source1%.*}".$2.psytr.$psy2low-$psy2high-$psy2increment.avs
+
+        if [ -e /usr/bin/beep ]; then beep $beep; fi
+
+        echo -e "\nthoroughly look through this last test"
+        echo "encodings and decide, which one is your best encode."
+        echo "then close AvsPmod."
+        sleep 1.5
+        wine "$avspmod" "${source1%.*}".$2.psytr.*.avs
     }
 
     if [[ $(echo "scale=0;${psyrd##*=}/1"|bc) -lt 1 ]]; then
@@ -2731,6 +2879,8 @@ case "$answer_00" in
 
                         # number of test encodings
                         number_encodings=$(expr "$cqpohigh" - "$cqpolow" + 1)
+                        # number of left encodings
+                        encodings_left=$number_encodings
 
                         echo -e "\nthese settings will result in $number_encodings encodings"
                         sleep 1.5
@@ -2738,11 +2888,9 @@ case "$answer_00" in
                         start0=$(date +%s)
 
                         # create comparison screen avs
-                        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
+                        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", "$align_position").LWLInfo()#.trim(0,framecount)" > "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
 
                         for ((cqpo0=$cqpolow; $cqpo0<=$cqpohigh; cqpo0=$cqpo0+1));do
-                            # number of left encodings
-                            encodings_left=$(expr "$cqpohigh" - "$cqpo0" + 1)
                             if [[ $cqpo0 = $cqpolow ]]; then
                                 echo -e "\nrange chroma qp offset *$cqpolow* → $cqpohigh, increment $cqpoincrement; $encodings_left of $number_encodings encodings left"
                             elif [[ $cqpo0 = $cqpohigh ]]; then
@@ -2759,9 +2907,9 @@ case "$answer_00" in
                             start1=$(date +%s)
 
                             #comparison screen
-                            echo "=FFVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.mkv\").subtitle(\"${source2%.*} encode $2 cqpo$cqpo0\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
+                            echo "=LWLibavVideoSource(\"${source1%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.mkv\").subtitle(\"${source2%.*} encode $2 cqpo$cqpo0\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
 
-                            wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
+                            wine "$avs2yuv" "${avs##*=}" - \
                             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
                             --bitrate "${br##*=}" \
                             --pass 1 \
@@ -2783,7 +2931,7 @@ case "$answer_00" in
                             --psy-rd "${psyrd##*=}":"${psytr##*=}" \
                             -o /dev/null - 2>&1|tee -a "${source1%.*}".$2.log;
 
-                            wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
+                            wine "$avs2yuv" "${avs##*=}" - \
                             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
                             --bitrate "${br##*=}" \
                             --pass 2 \
@@ -2811,6 +2959,9 @@ case "$answer_00" in
                                 rm ${source1%.*}.$2.$count.*.stats.mbtree
                             fi
 
+                            # number of left encodings
+                            let encodings_left=$(( encodings_left - 1 ))
+
                             stop=$(date +%s);
                             time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
                             echo -e "\nencoding ${source2%.*}.$2.$count.br${br##*=}.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo$cqpo0.mkv lasted $time"
@@ -2829,9 +2980,19 @@ case "$answer_00" in
                         done < "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
                         avslines="$(wc -l < "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs)"
                         echo "interleave($(printf %s, a,{b..z} a,{a..e}{a..z})a)" | cut -d ',' --complement -f "$(( ("$avslines" *2) -1 ))"-310 >> "${source1%.*}".$2.temp.cqpo.$cqpolow-$cqpohigh.avs
-                        echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.temp.cqpo.$cqpolow-$cqpohigh.avs
-                        echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".$2.temp.cqpo.$cqpolow-$cqpohigh.avs
                         mv "${source1%.*}".$2.temp.cqpo.$cqpolow-$cqpohigh.avs "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
+#                        echo "Import(\""$lwlinfo"\")" >> "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
+#                        echo "LWLInfo()" >> "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
+#                         if [[ $par = @(32:27|64:45|16:11|16:15|12:11) ]]; then
+                            echo "LoadPlugin(\"$z_resize\")" >> "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
+                            echo "$resize(ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
+#                         elif [[ $par = @(40:33|8:9|10:11) ]]; then
+#                             echo "#LoadPlugin(\"$z_resize\")" >> "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
+#                             echo "$resize($sarwidth1,$darheight1)" >> "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
+#                         fi
+                        #now add a LoadPlugin for LSMASH as first line
+                        sed -i "1i LoadPlugin(\""$lsmashsource"\")" "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
+                        sed -i "1i Import(\""$lwlinfo"\")" "${source1%.*}".$2.cqpo.$cqpolow-$cqpohigh.avs
 
                         if [ -e /usr/bin/beep ]; then beep $beep; fi
 
@@ -2839,7 +3000,7 @@ case "$answer_00" in
                         echo "and decide, which one is your best encode."
                         echo "then close AvsPmod."
                         sleep 1.5
-                        wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".$2.cqpo.*.avs
+                        wine "$avspmod" "${source1%.*}".$2.cqpo.*.avs
                     }
 
                     while true; do
@@ -2904,6 +3065,8 @@ case "$answer_00" in
 
         # number of test encodings
         number_encodings=$(echo "((($crf2high-$crf2low)/$crf2increment)+1)"|bc)
+        # number of left encodings
+        encodings_left=$number_encodings
 
         echo -e "\nthese settings will result in $number_encodings encodings"
         sleep 1.5
@@ -2912,11 +3075,9 @@ case "$answer_00" in
         start0=$(date +%s)
 
         # create comparison screen avs
-        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
+        echo "=import(\"${avs##*=}\").subtitle(\"${source2%.*} source $2\", "$align_position").LWLInfo()#.trim(0,framecount)" > "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
 
         for ((crf2=$crf2low; $crf2<=$crf2high; crf2+=$crf2increment));do
-            # number of left encodings
-            encodings_left=$(echo "((($crf2high-$crf2)/$crf2increment)+1)"|bc)
             if [[ $crf2 = $crf2low ]]; then
                 echo -e "\nrange crf *$crf2low* → $crf2high, increment $crf2increment; $encodings_left of $number_encodings encodings left"
             elif [[ $crf2 = $crf2high ]]; then
@@ -2934,12 +3095,12 @@ case "$answer_00" in
             start1=$(date +%s)
 
             #comparison screen
-            echo "=FFVideoSource(\"${source1%.*}.$2.$count.crf$crf2.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 crf$crf2\", align=8)#.trim(0,framecount)" >> "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
+            echo "=LWLibavVideoSource(\"${source1%.*}.$2.$count.crf$crf2.qc${qcomp##*=}.aq${aqmode##*=}.${aqs##*=}.psy${psyrd##*=}.pt${psytr##*=}.${nombtree##*=}mbt.cqpo${cqpo##*=}.mkv\").subtitle(\"${source2%.*} encode $2 crf$crf2\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
 
             # write information to log files, no newline at the end of line
             echo -n "crf $(echo "scale=1;$crf2/10"|bc) : " | tee -a "${source1%.*}".$2.crf2.log >/dev/null
 
-            wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${avs##*=}" - \
+            wine "$avs2yuv" "${avs##*=}" - \
             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
             --qcomp "${qcomp##*=}" \
             --aq-strength "${aqs##*=}" \
@@ -2963,6 +3124,9 @@ case "$answer_00" in
             egrep 'x264 \[info\]: kb\/s:' "${source1%.*}".$2.crf2-raw.log|cut -d':' -f3|tail -1 >> "${source1%.*}".$2.crf2.log
             rm "${source1%.*}".$2.crf2-raw.log
 
+            # number of left encodings
+            let encodings_left=$(( encodings_left - 1 ))
+
             # stop measuring encoding time
             stop=$(date +%s);
             time=$(date -u -d "0 $stop seconds - $start1 seconds" +"%H:%M:%S")
@@ -2974,7 +3138,7 @@ case "$answer_00" in
         time=$(date -u -d "0 $stop seconds - $start0 seconds" +"%H:%M:%S")
         echo -e "\n$1 $2: test encodings for a second round of crf lasted $days days and $time"
 
-        #comparison screen
+        # comparison screen
         prefixes=({a..z} {a..e}{a..z})
         i=0
         while IFS= read -r line; do
@@ -2982,10 +3146,20 @@ case "$answer_00" in
         done < "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
         avslines="$(wc -l < "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs)"
         echo "interleave($(printf %s, a,{b..z} a,{a..e}{a..z})a)" | cut -d ',' --complement -f "$(( ("$avslines" *2) -1 ))"-310 >> "${source1%.*}".$2.temp.crf2.$crf2low-$crf2high-$crf2increment.avs
-        echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.temp.crf2.$crf2low-$crf2high-$crf2increment.avs
-        echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".$2.temp.crf2.$crf2low-$crf2high-$crf2increment.avs
         mv "${source1%.*}".$2.temp.crf2.$crf2low-$crf2high-$crf2increment.avs "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
+#       echo "Import(\""$lwlinfo"\")" >> "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
+#       echo "LWLInfo()" >> "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
+#         if [[ $par = @(32:27|64:45|16:11|16:15|12:11) ]]; then
+            echo "LoadPlugin(\"$z_resize\")" >> "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
+            echo "$resize(ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
+#         elif [[ $par = @(40:33|8:9|10:11) ]]; then
+#             echo "#LoadPlugin(\"$z_resize\")" >> "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
+#             echo "$resize($sarwidth1,$darheight1)" >> "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
+#         fi
 
+        # add a LoadPlugin for LSMASH as first line
+        sed -i "1i LoadPlugin(\""$lsmashsource"\")" "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
+        sed -i "1i Import(\""$lwlinfo"\")" "${source1%.*}".$2.crf2.$crf2low-$crf2high-$crf2increment.avs
         if [ -e /usr/bin/beep ]; then beep $beep; fi
 
         # show bitrate from logfile
@@ -2999,7 +3173,7 @@ case "$answer_00" in
         echo "get best results at considerable bitrate."
         echo "then close AvsPmod."
         sleep 1.5
-        wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".$2.crf2.*.avs
+        wine "$avspmod" "${source1%.*}".$2.crf2.*.avs
     }
 
     while true; do
@@ -3116,46 +3290,52 @@ case "$answer_00" in
 
     function SDcomparison {
         # create comparison screen avs
-        echo "a=import(\"${finalavs##*=}\").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".comparison.$2.avs
+        echo ""
+        echo "Import(\""$lwlinfo"\")" > "${source1%.*}".comparison.$2.avs
+        echo "a=import(\"${finalavs##*=}\").subtitle(\"${source2%.*} source $2\", "$align_position").LWLInfo().propSet("_FieldBased", 0)#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
         if [[ ${ratectrl##*=} == c ]]; then
-        echo "b=FFVideoSource(\"${source1%.*}.$2.crf"${crf##*=}".mkv\").subtitle(\"${source2%.*} encode $2\", align=8)#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
+        echo "b=LWLibavVideoSource(\"${source1%.*}.$2.crf"${crf##*=}".mkv\").subtitle(\"${source2%.*} encode $2\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
         elif [[ ${ratectrl##*=} == 2 ]]; then
-        echo "b=FFVideoSource(\"${source1%.*}.$2.br"${br##*=}".mkv\").subtitle(\"${source2%.*} encode $2\", align=8)#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
+        echo "b=LWLibavVideoSource(\"${source1%.*}.$2.br"${br##*=}".mkv\").subtitle(\"${source2%.*} encode $2\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
         fi
         echo "interleave(a,b)" >> "${source1%.*}".comparison.$2.avs
-        echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".comparison.$2.avs
-        echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.$2.avs
+        
+        echo "LoadPlugin(\"$z_resize\")" >> "${source1%.*}".comparison.$2.avs
+        if [[ -n ${darwidth1##*=} && -n ${sarheight1##*=} ]]; then
+            echo "$resize($darwidth1, $sarheight1)" >> "${source1%.*}".comparison.$2.avs
+        elif [[ -n ${darheight1##*=} && -n  ${sarwidth1##*=} ]]; then
+            echo "$resize($sarwidth1, $darheight1)" >> "${source1%.*}".comparison.$2.avs
+        fi
     }
 
     function HDcomparison {
         # create comparison screen avs
+        echo "Import(\""$lwlinfo"\")" > "${source1%.*}".comparison.$2.avs
         if [[ -n ${darwidth1##*=} && -n ${sarheight1##*=} ]]; then
-            echo "a=import(\"${finalavs##*=}\").Spline36Resize("${darwidth1##*=}","${sarheight1##*=}").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".comparison.$2.avs
+            echo "a=import(\"${finalavs##*=}\").Spline36Resize("${darwidth1##*=}","${sarheight1##*=}").subtitle(\"${source2%.*} source $2\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
         elif [[ -n ${darheight1##*=} && -n  ${sarwidth1##*=} ]]; then
-            echo "a=import(\"${finalavs##*=}\").Spline36Resize("${sarwidth1##*=}","${darheight1##*=}").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".comparison.$2.avs
+            echo "a=import(\"${finalavs##*=}\").Spline36Resize("${sarwidth1##*=}","${darheight1##*=}").subtitle(\"${source2%.*} source $2\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
         else
-            echo "a=import(\"${finalavs##*=}\").Spline36Resize("${width##*=}","${height##*=}").subtitle(\"${source2%.*} source $2\", align=8)#.trim(0,framecount)" > "${source1%.*}".comparison.$2.avs
+            echo "a=import(\"${finalavs##*=}\").Spline36Resize("${width##*=}","${height##*=}").subtitle(\"${source2%.*} source $2\", "$align_position").LWLInfo()#.trim(0,framecount)" > "${source1%.*}".comparison.$2.avs
         fi
         if [[ ${ratectrl##*=} == c ]]; then
-        echo "b=FFVideoSource(\"${source1%.*}.$2.crf"${crf##*=}".mkv\").subtitle(\"${source2%.*} encode $2\", align=8)#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
+        echo "b=LWLibavVideoSource(\"${source1%.*}.$2.crf"${crf##*=}".mkv\").subtitle(\"${source2%.*} encode $2\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
         elif [[ ${ratectrl##*=} == 2 ]]; then
-        echo "b=FFVideoSource(\"${source1%.*}.$2.br"${br##*=}".mkv\").subtitle(\"${source2%.*} encode $2\", align=8)#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
+        echo "b=LWLibavVideoSource(\"${source1%.*}.$2.br"${br##*=}".mkv\").subtitle(\"${source2%.*} encode $2\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
         fi
         echo "interleave(a,b)" >> "${source1%.*}".comparison.$2.avs
-        echo "spline36resize(converttorgb,ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".comparison.$2.avs
-        echo "ffinfo(framenum=true,frametype=true,cfrtime=false,vfrtime=false)" >> "${source1%.*}".comparison.$2.avs
     }
 
     function encode2pass {
         start=$(date +%s)
 
         # 1. pass
-        wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${finalavs##*=}" - \
+        wine "$avs2yuv" "${finalavs##*=}" - \
         | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
         --pass 1 \
         --bitrate "${br##*=}" \
         --sar "$par" \
-        --stats "${source1%.*}$2.stats" \
+        --stats "${source1%.*}.$2.stats" \
         --ref "${ref##*=}" \
         --qcomp "${qcomp##*=}" \
         --aq-strength "${aqs##*=}" \
@@ -3174,11 +3354,11 @@ case "$answer_00" in
         -o /dev/null - 2>&1|tee -a "${source1%.*}".$2.log|tee "${source1%.*}".$2.br"${br##*=}".final.log;
 
         # 2. pass
-        wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${finalavs##*=}" - \
+        wine "$avs2yuv" "${finalavs##*=}" - \
         | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
         --pass 3 \
         --bitrate "${br##*=}" \
-        --stats "${source1%.*}$2.stats" \
+        --stats "${source1%.*}.$2.stats" \
         --sar "$par" \
         --ref "${ref##*=}" \
         --qcomp "${qcomp##*=}" \
@@ -3200,12 +3380,18 @@ case "$answer_00" in
         stop=$(date +%s);
         days=$(( ($stop-$start)/86400 ))
         time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
+        
+        # remove stats file
+        rm ${source1%.*}.$2.stats
+        if [[ -z ${nombtree##*=} ]]; then
+            rm ${source1%.*}.$2.stats.mbtree
+        fi
     }
 
     function encodecrf {
         start=$(date +%s)
         if [[ -e ${config%/*}/$1.$2.zones.txt ]]; then
-            wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${finalavs##*=}" - \
+            wine "$avs2yuv" "${finalavs##*=}" - \
             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
             --zones "${zones}" \
             --crf "${crf##*=}" \
@@ -3227,7 +3413,7 @@ case "$answer_00" in
             --colormatrix "${colormatrix##*=}" --colorprim "${colorprim##*=}" \
             -o "${source1%.*}".$2.crf"${crf##*=}".mkv - 2>&1|tee -a "${source1%.*}".$2.log|tee "${source1%.*}".$2.crf"${crf##*=}".final.log;
         else
-            wine "$winedir"/drive_c/Program\ Files/avs2yuv/avs2yuv.exe "${finalavs##*=}" - \
+            wine "$avs2yuv" "${finalavs##*=}" - \
             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
             --crf "${crf##*=}" \
             --sar "$par" \
@@ -3281,7 +3467,7 @@ case "$answer_00" in
         echo "take some comparison screen shots"
         echo "then close AvsPmod"
         sleep 1
-        wine "$winedir"/drive_c/Program\ Files/AvsPmod/AvsPmod.exe "${source1%.*}".comparison.$2.avs
+        wine "$avspmod" "${source1%.*}".comparison.$2.avs
     }
 
     echo -e "\nfinally encode the movie"
@@ -3313,9 +3499,9 @@ case "$answer_00" in
     done
 
     encoding_pre $1 $2
-    if [[ $sarheight0 -le 576 ]] && [[ $sarwidth0 -le 720 ]]; then
+    if [[ $sarheight0 -le 576 ]] && [[ $sarwidth0 -le 720 ]] ; then
         SDcomparison $1 $2
-    elif [[ $sarheight0 -gt 576 ]] && [[ $sarwidth0 -gt 720 ]]; then
+    elif [[ $sarheight0 -gt 576 ]] && [[ $sarwidth0 -gt 720 ]] ; then
         HDcomparison $1 $2
     fi
     if [[ ${ratectrl##*=} == c ]]; then
