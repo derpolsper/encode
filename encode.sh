@@ -599,6 +599,15 @@ case "$answer_00" in
 
     2)  # 2 - create avs files
 
+    function basic_avs {
+        echo "LoadPlugin(\""$lsmashsource"\")" > "${source1%.*}".avs
+        echo "LWLibavVideoSource(\"$source1\")" >> "${source1%.*}".avs
+        echo "Import(\""$lwlinfo"\")" >> "${source1%.*}".avs
+        echo "LWLInfo()" >> "${source1%.*}".avs
+}
+
+    basic_avs
+
     function par {
         echo -e "\nthe movies' storage aspect ratio is $sarwidth0×$sarheight0"
         echo -e "the movies' display aspect ratio is $darwidth0×$darheight0\n"
@@ -701,10 +710,6 @@ case "$answer_00" in
                 ;;
 
                 *)
-                    echo "LoadPlugin(\""$lsmashsource"\")" > "${source1%.*}".avs
-                    echo "LWLibavVideoSource(\"$source1\")" >> "${source1%.*}".avs
-                    echo "Import(\""$lwlinfo"\")" >> "${source1%.*}".avs
-                    echo "LWLInfo()" >> "${source1%.*}".avs
                     wine "$avspmod" "${source1%.*}".avs
                 ;;
             esac
@@ -1195,7 +1200,7 @@ case "$answer_00" in
         sed -i "/finalavsSD/d" "${config%/*}/${source2%.*}.cfg"
         echo "finalavsSD=${source1%.*}.SD.final.avs" >> "${config%/*}/${source2%.*}.cfg"
         echo "LoadPlugin(\""$lsmashsource"\")" > "${source1%.*}".SD.final.avs
-        echo "LWLibavVideoSource(\"$source1\")" >> "${source1%.*}".SD.final.avs
+        echo "LWLibavVideoSource(\"$source1\").propDelete(\"_FieldBased\")" >> "${source1%.*}".SD.final.avs
         #echo "LoadPlugin(\""$d2vsource"\")" > "${source1%.*}".SD.final.avs
         #echo "D2VSource(\"$source1\")" >> "${source1%.*}".SD.final.avs
         #echo "Import(\""$lwlinfo"\")" >> "${source1%.*}".SD.final.avs
@@ -1485,10 +1490,6 @@ case "$answer_00" in
                 ;;
 
                 *)
-                    echo "LoadPlugin(\""$lsmashsource"\")" > "${source1%.*}".avs
-                    echo "LWLibavVideoSource(\"$source1\")" >> "${source1%.*}".avs
-                    echo "Import(\""$lwlinfo"\")" >> "${source1%.*}".avs
-                    echo "LWLInfo()" >> "${source1%.*}".avs
                     wine "$avspmod" "${source1%.*}".avs
                     unset width480
                     unset height480
@@ -1563,11 +1564,6 @@ case "$answer_00" in
     read -e -p "(RETURN|c) > " answer_check_interlaced_telecined
         case "$answer_check_interlaced_telecined" in
             c|C|check|Check)
-                # generate a simple avs just to check if movie is interlaced or telecined
-                echo "LoadPlugin(\""$lsmashsource"\")" > "${source1%.*}".avs
-                echo "LWLibavVideoSource(\"$source1\")" >> "${source1%.*}".avs
-                echo "Import(\""$lwlinfo"\")" >> "${source1%.*}".avs
-                echo "LWLInfo()" >> "${source1%.*}".avs
                 wine "$avspmod" "${source1%.*}".avs
             ;;
 
@@ -1633,6 +1629,39 @@ case "$answer_00" in
             sed -i "s|#balanceborders1|Balanceborders($top_bb,$bottom_bb,$left_bb,$right_bb,$bb_thresh,$bb_blur)|" "$i"
         done
      fi
+
+     # generate a qpfile for frameexact chapter marks
+    function makeqpfile {
+    echo -e "\nenter path to chapter file"
+    echo -e "if there is no chapter file, press (n)o\n"
+        read -e -p "(PATH|n) > " chapter_file_exist
+            case "$chapter_file_exist" in
+                n|N|no|No|NO)
+                    touch > "${config%/*}/${source2%.*}.qpfile.txt"
+                ;;
+
+                *)
+                    # read the framerate from the source file
+                    framerate=$(mediainfo ${source1}|grep FPS|cut -d ':' -f2|cut -d ' ' -f2)
+                    # empty a prevalent qpfile
+                    touch > "${config%/*}/${source2%.*}.qpfile.txt"
+                    # check on and correct the timings in your chapter file
+                    echo -e "\ncheck timings in your chapter file and correct them if neccessary\n"
+                    $EDITOR "$chapter_file_exist" & wine "$avspmod" "${source1%.*}".avs
+                    # read the timings and translate to framenumbers
+                    while IFS= read -r line ; do
+                        if [[ ! $line =~ NAME= ]] ; then
+                            timings=$(echo $line|cut -d '=' -f2| awk -F: '{print ($1*3600)+($2*60)+($3)}')
+                            framenumber=$(echo "scale=0;((($timings)*($framerate))+0.5)/1"|bc )
+                            printf "$framenumber I\n" >> "${config%/*}/${source2%.*}.qpfile.txt"
+                        fi
+                    done < $chapter_file_exist
+                ;;
+            esac
+}
+
+    makeqpfile
+
     # if sarheight0 and sarwidth0 indicate standard resolution, treat as SD
     # else adequate to chosen <resolution>
     echo -e "\nuse the corresponding config file"
@@ -3292,20 +3321,21 @@ case "$answer_00" in
         # create comparison screen avs
         echo ""
         echo "Import(\""$lwlinfo"\")" > "${source1%.*}".comparison.$2.avs
-        echo "a=import(\"${finalavs##*=}\").subtitle(\"${source2%.*} source $2\", "$align_position").LWLInfo().propSet("_FieldBased", 0)#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
+        echo "a=import(\"${finalavs##*=}\").subtitle(\"${source2%.*} source $2\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
         if [[ ${ratectrl##*=} == c ]]; then
         echo "b=LWLibavVideoSource(\"${source1%.*}.$2.crf"${crf##*=}".mkv\").subtitle(\"${source2%.*} encode $2\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
         elif [[ ${ratectrl##*=} == 2 ]]; then
         echo "b=LWLibavVideoSource(\"${source1%.*}.$2.br"${br##*=}".mkv\").subtitle(\"${source2%.*} encode $2\", "$align_position").LWLInfo()#.trim(0,framecount)" >> "${source1%.*}".comparison.$2.avs
         fi
         echo "interleave(a,b)" >> "${source1%.*}".comparison.$2.avs
-        
+
         echo "LoadPlugin(\"$z_resize\")" >> "${source1%.*}".comparison.$2.avs
-        if [[ -n ${darwidth1##*=} && -n ${sarheight1##*=} ]]; then
-            echo "$resize($darwidth1, $sarheight1)" >> "${source1%.*}".comparison.$2.avs
-        elif [[ -n ${darheight1##*=} && -n  ${sarwidth1##*=} ]]; then
-            echo "$resize($sarwidth1, $darheight1)" >> "${source1%.*}".comparison.$2.avs
-        fi
+        echo "$resize(ffsar>1?round(width*ffsar):width,ffsar<1?round(height/ffsar):height)" >> "${source1%.*}".comparison.$2.avs
+#        if [[ -n ${darwidth1##*=} && -n ${sarheight1##*=} ]]; then
+#            echo "$resize($darwidth1, $sarheight1)" >> "${source1%.*}".comparison.$2.avs
+#        elif [[ -n ${darheight1##*=} && -n  ${sarwidth1##*=} ]]; then
+#            echo "$resize($sarwidth1, $darheight1)" >> "${source1%.*}".comparison.$2.avs
+#        fi
     }
 
     function HDcomparison {
@@ -3332,6 +3362,7 @@ case "$answer_00" in
         # 1. pass
         wine "$avs2yuv" "${finalavs##*=}" - \
         | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
+        --qpfile "${config%/*}/${source2%.*}.qpfile.txt" \
         --pass 1 \
         --bitrate "${br##*=}" \
         --sar "$par" \
@@ -3356,6 +3387,7 @@ case "$answer_00" in
         # 2. pass
         wine "$avs2yuv" "${finalavs##*=}" - \
         | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
+        --qpfile "${config%/*}/${source2%.*}.qpfile.txt" \
         --pass 3 \
         --bitrate "${br##*=}" \
         --stats "${source1%.*}.$2.stats" \
@@ -3380,7 +3412,7 @@ case "$answer_00" in
         stop=$(date +%s);
         days=$(( ($stop-$start)/86400 ))
         time=$(date -u -d "0 $stop seconds - $start seconds" +"%H:%M:%S")
-        
+
         # remove stats file
         rm ${source1%.*}.$2.stats
         if [[ -z ${nombtree##*=} ]]; then
@@ -3394,6 +3426,7 @@ case "$answer_00" in
             wine "$avs2yuv" "${finalavs##*=}" - \
             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
             --zones "${zones}" \
+            --qpfile "${config%/*}/${source2%.*}.qpfile.txt" \
             --crf "${crf##*=}" \
             --sar "$par" \
             --ref "${ref##*=}" \
@@ -3415,6 +3448,7 @@ case "$answer_00" in
         else
             wine "$avs2yuv" "${finalavs##*=}" - \
             | x264 --stdin y4m ${nombtree:+"--no-mbtree"} \
+            --qpfile "${config%/*}/${source2%.*}.qpfile.txt" \
             --crf "${crf##*=}" \
             --sar "$par" \
             --ref "${ref##*=}" \
