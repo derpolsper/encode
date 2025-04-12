@@ -10,36 +10,20 @@ It works for standard and high definition sources, getting along with Matroska c
 
 If you encode a HD file in a SD resolution, the appropriate colormatrix is chosen.
 
-It offers several options, (mostly) one prerequesite to another, largely corresponding to the methods recommended in advanced encoding guides:
+It offers several options, (mostly) one prerequesite to another, largely corresponding to the methods recommended in advanced encoding guides.
 
-+ 00 - check, if all necessary programs are installed
-+ 0  - display and edit default settings and current encoding parameters
-+ 1  - demux de-/ unencrypted m2ts|remux -> mpeg2|h264|vc1|m2v -> mkv,
-+ 2  - create necessary avs files
-+ 3  - test for crf
-+ 4  - test for mbtree vs --no-mbtree
-+ 5  - test for qcomp
-+ 6  - test for aq strength in different aq modes
-+ 7  - test for psy-rd
-+ 8  - test for psy-trellis
-+ 9  - do some more things: chroma-qp-offset
-+ 10 - another round of crf
-+ 11 - encoding the whole movie
-
-The script consists of two parts:
-
-The bash script itself: encode.sh and a configuration file default.cfg in a directory named encode.
+To properly work, the bash script relies on a configuration file, default.cfg.
 You may place the script somewhere in your `$PATH`.
 
 The config file I suggest to place to
 `~/.config/encode/default.cfg`
-but any other place may be suitable. In the latter case, you have to edit the script:
+but any other place may be suitable. In the latter case, you have to edit the script, e.g.:
 `config="${HOME}/.config/encode/default.cfg"`
 
 Each movie gets its own config file derived from the default.cfg and stores all relevant parameters that occur during encoding.
 If you want to change them manually, use your editor of choice or choose the edit-option in option 0.
 
-Maybe you prefer not to mix your encoding environment with other installations of wine. If you do not have any wine-installation yet, you may leave the newly installed wine directory in place. If you do have a wine installation already, you may rename it or install your encoding environment someplace else. Edit the script:
+Maybe you prefer not to mix your encoding environment with other installations of wine. If you do not have any wine-installation yet, you may leave the newly installed wine directory in place. If you do have a wine installation already, you may rename it or install your encoding environment someplace else. Edit the script, e.g.:
 
 `wine="${HOME}/.wine.encode"`
 
@@ -90,7 +74,6 @@ This script does not need more programs to work. You can use all kind of avisynt
 
 I tested positive for
 + QTGMC()
-+ SelectEven()
 + TFM()
 + TDecimate()
 + ColorMatrix
@@ -107,12 +90,11 @@ When using the resize calculator in AvsPmod, do not click »apply«, do not let 
 The script does NOT do:
 
 + decrypt sources
-+ handle DVDs or VOB containers
 + handle demuxed audio files
 + handle demuxed subtitles
 + handle chapter files
 + mux anything together
 
-The maximum number of test encodings in one avs file is somewhat 154, which does not seem to set a concerning limit the number of combinations even in cross testing aq modes and aq strength.
+The maximum number of test encodings in one avs file is 26^2=676, which does not set a concerning limit on the number of combinations even in cross testing aq modes and aq strength.
 
 Though some parameters can be set permanent, encoding needs a lot of trial and error to find the best possible result. There's lots of interaction. But hey, **encoding is fun!**
